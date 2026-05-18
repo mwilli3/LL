@@ -36,6 +36,10 @@
     --breath-in: 4s;
     --breath-hold: 7s;
     --breath-out: 8s;
+
+    /* Cursor position (updated by JS in hero only) */
+    --cx: 50%;
+    --cy: 50%;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -164,6 +168,36 @@
     to   { transform: translate3d(2%, 2%, 0) scale(1.08); }
   }
   .hero > * { position: relative; z-index: 1; }
+
+  /* Cursor-following glow, hero only. Pure radial gradient on transparent layer;
+     no filter blur (cheap), no layout-triggering properties. */
+  .hero__cursor-glow {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    opacity: 0;
+    background: radial-gradient(
+      circle 220px at var(--cx) var(--cy),
+      rgba(198,167,125,0.22) 0%,
+      rgba(198,167,125,0.10) 30%,
+      transparent 70%
+    );
+    transition: opacity 600ms var(--ease-out-quart);
+  }
+  .hero[data-cursor="in"] .hero__cursor-glow { opacity: 1; }
+  @media (hover: none), (pointer: coarse) { .hero__cursor-glow { display: none; } }
+
+  /* Time-of-day pill inside hero eyebrow */
+  .hero-eyebrow__tod {
+    display: inline-block; padding-right: 0.7rem; margin-right: 0.1rem;
+    color: var(--dark-brown); opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 600ms var(--ease-out-quart) 300ms,
+                transform 600ms var(--ease-out-quart) 300ms;
+  }
+  .hero-eyebrow__tod.is-in { opacity: 1; transform: translateY(0); }
+  .hero-eyebrow__tod::after {
+    content: ''; display: inline-block; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--gold); margin-left: 0.7rem; vertical-align: 0.18em;
+  }
 
   .hero-eyebrow {
     font-family: var(--font-body); font-size: 0.75rem; font-weight: 500;
@@ -354,7 +388,23 @@
     display: flex; align-items: center; justify-content: center;
     transition: transform 480ms var(--ease-out-quart);
   }
-  .archetype-card:hover .archetype-icon { transform: scale(1.06) rotate(-1.5deg); }
+  /* Per-archetype motion: variation per delight ref's "vary responses" rule */
+  .archetype-card:nth-child(1):hover .archetype-icon {
+    /* Regulator: gentle pulse — regulating */
+    animation: iconPulse 1.6s var(--ease-in-out-quint) infinite;
+  }
+  .archetype-card:nth-child(2):hover .archetype-icon {
+    /* Rooted One: slow rise — rooting */
+    transform: translateY(-4px);
+  }
+  .archetype-card:nth-child(3):hover .archetype-icon {
+    /* Power Reclaimer: forward tilt — claiming */
+    transform: rotate(-6deg) scale(1.04);
+  }
+  @keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.07); }
+  }
   .archetype-icon img { width: 100%; height: 100%; object-fit: contain; }
   .archetype-name {
     font-family: var(--font-heading); font-size: 1.55rem; font-weight: 500;
@@ -558,6 +608,87 @@
   }
   .footer p { font-size: 0.72rem; font-weight: 300; letter-spacing: 0.05em; color: rgba(203,184,169,0.6); }
 
+  /* ── BREATH COMPANION ── focused 4-7-8 overlay when pacer clicked ── */
+  .breath-modal {
+    position: fixed; inset: 0; z-index: 300;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(247, 245, 242, 0);
+    backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
+    pointer-events: none; opacity: 0;
+    transition: opacity 320ms var(--ease-out-quart),
+                backdrop-filter 380ms var(--ease-out-quart),
+                background 380ms var(--ease-out-quart);
+  }
+  .breath-modal[data-open="true"] {
+    pointer-events: auto; opacity: 1;
+    background: rgba(247, 245, 242, 0.86);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  }
+  .breath-modal__close {
+    position: absolute; top: 1.5rem; right: 1.5rem;
+    width: 40px; height: 40px; border: 1px solid rgba(74,58,50,0.15);
+    background: transparent; cursor: pointer; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--dark-brown);
+    transition: transform 200ms var(--ease-out-quart),
+                background 200ms var(--ease-out-quart);
+  }
+  .breath-modal__close:hover { background: var(--warm-beige); }
+  .breath-modal__close:active { transform: scale(0.94); }
+  .breath-modal__close svg { width: 14px; height: 14px; }
+
+  .breath-modal__circle {
+    width: clamp(180px, 30vw, 320px);
+    height: clamp(180px, 30vw, 320px);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(198,167,125,0.18) 0%, rgba(198,167,125,0.05) 60%, transparent 100%);
+    border: 1px solid rgba(164,124,99,0.4);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 2.5rem;
+    transform: scale(0.85);
+    transition: transform 100ms linear;
+  }
+  .breath-modal[data-open="true"] .breath-modal__circle {
+    animation: breathScaleStrong calc(var(--breath-in) + var(--breath-hold) + var(--breath-out)) var(--ease-in-out-quint) infinite;
+  }
+  @keyframes breathScaleStrong {
+    0%   { transform: scale(0.7); }
+    36%  { transform: scale(1.0); } /* inhale done (4s of 19s ≈ 21%, but the easing makes the perceived peak land later — keep at 36% so it pairs with the held phase) */
+    64%  { transform: scale(1.0); } /* hold */
+    100% { transform: scale(0.7); } /* exhale */
+  }
+  .breath-modal__inner {
+    width: 60%; height: 60%; border-radius: 50%;
+    background: var(--warm-brown); opacity: 0.18;
+  }
+  .breath-modal__phase {
+    font-family: var(--font-heading); font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 400; font-style: italic; color: var(--near-black);
+    letter-spacing: -0.005em; min-height: 1.4em;
+    transition: opacity 200ms var(--ease-out-quart);
+  }
+  .breath-modal__count {
+    font-family: var(--font-body); font-size: 0.72rem; font-weight: 500;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--warm-brown);
+    margin-top: 1rem;
+  }
+  .breath-modal__hint {
+    position: absolute; bottom: 2rem; left: 0; right: 0; text-align: center;
+    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--taupe);
+  }
+
+  /* Footer breath dot — compounding discovery for users who linger */
+  .footer-brand-line .footer-breath-dot {
+    display: inline-block; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--gold); margin: 0 0.4rem 0.1em; vertical-align: middle;
+    animation: footerDotBreath calc(var(--breath-in) + var(--breath-hold) + var(--breath-out)) var(--ease-in-out-quint) infinite;
+  }
+  @keyframes footerDotBreath {
+    0%, 100% { transform: scale(1); opacity: 0.55; }
+    36%      { transform: scale(1.5); opacity: 1; }
+    64%      { transform: scale(1.5); opacity: 1; }
+  }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
     .archetypes-grid { grid-template-columns: 1fr; max-width: 460px; margin-left: auto; margin-right: auto; }
@@ -585,7 +716,11 @@
       transition-duration: 200ms !important;
     }
     .hero__aurora, .brand-statement__bg, .final-cta__bg, .breath-pacer__ring,
-    .scroll-line::after { animation: none !important; }
+    .scroll-line::after,
+    .breath-modal__circle,
+    .footer-brand-line .footer-breath-dot,
+    .archetype-card:nth-child(1):hover .archetype-icon { animation: none !important; }
+    .hero__cursor-glow { display: none; }
     .reveal, .reveal-stagger > *,
     .hero-title .word, .hero-sub, .hero-cta, .hero-scroll {
       transform: none !important; opacity: 1 !important;
@@ -623,9 +758,10 @@
 </nav>
 
 <!-- ════════════ HERO ════════════ -->
-<section class="hero">
+<section class="hero" data-hero>
   <div class="hero__aurora" aria-hidden="true"></div>
-  <p class="hero-eyebrow">Nervous System Wellness</p>
+  <div class="hero__cursor-glow" aria-hidden="true"></div>
+  <p class="hero-eyebrow"><span class="hero-eyebrow__tod" data-tod></span>Nervous System Wellness</p>
   <h1 class="hero-title" data-split>Wellness built for <em>your nervous system</em> &mdash; not someone else&rsquo;s.</h1>
   <p class="hero-sub">Take the 3-minute Archetype Quiz. Find out why nothing else has worked, and what will.</p>
   <a href="#QUIZ_URL" class="hero-cta">Find Your Archetype</a>
@@ -818,9 +954,20 @@
     <a href="https://www.tiktok.com/@lovelarice" target="_blank" rel="noopener">@lovelarice</a>
     <a href="https://www.instagram.com/lovelarice.official" target="_blank" rel="noopener">@lovelarice.official</a>
   </div>
-  <p class="footer-brand-line">Wellness built for your nervous system, not someone else&rsquo;s.</p>
+  <p class="footer-brand-line">Wellness built for your nervous system<span class="footer-breath-dot" aria-hidden="true"></span>not someone else&rsquo;s.</p>
   <p>&copy; 2026 Larice Media LLC. All rights reserved.</p>
 </footer>
+
+<!-- ════════════ BREATH COMPANION (focused 4-7-8 overlay) ════════════ -->
+<div class="breath-modal" data-breath-modal role="dialog" aria-modal="true" aria-labelledby="breath-modal-phase" hidden>
+  <button class="breath-modal__close" type="button" aria-label="Close breathing exercise" data-breath-close>
+    <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.4"/></svg>
+  </button>
+  <div class="breath-modal__circle" aria-hidden="true"><div class="breath-modal__inner"></div></div>
+  <p class="breath-modal__phase" id="breath-modal-phase" data-breath-phase>Breathe in</p>
+  <p class="breath-modal__count" data-breath-count>Cycle 1 of 3</p>
+  <p class="breath-modal__hint">Tap anywhere or press Esc to close</p>
+</div>
 
 <script>
 (function () {
@@ -894,31 +1041,131 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  // ── Breath pacer label rotation: inhale / hold / exhale ──
+  // ── Time-of-day eyebrow prefix ──
+  var todEl = document.querySelector('[data-tod]');
+  if (todEl) {
+    var h = new Date().getHours();
+    var greeting =
+      h < 5  ? 'Night protocols' :
+      h < 10 ? 'Soft morning' :
+      h < 14 ? 'Midday reset' :
+      h < 18 ? 'Afternoon regulation' :
+      h < 22 ? 'Evening landing' :
+               'Night protocols';
+    todEl.textContent = greeting;
+    requestAnimationFrame(function () { todEl.classList.add('is-in'); });
+  }
+
+  // ── Hero-only cursor glow ──
   if (!reduce) {
-    var pacer = document.querySelector('[data-breath-pacer]');
-    if (pacer) {
-      var label = pacer.querySelector('.breath-pacer__label');
-      var phases = ['Breathe in', 'Hold', 'Breathe out'];
-      var cycle = 4000 + 7000 + 8000; // matches CSS keyframes
-      var start = performance.now();
-      var defaultLabel = 'Breathe with us';
-      var tick = function (now) {
-        var t = (now - start) % cycle;
-        var phase;
-        if (t < 4000) phase = 0;
-        else if (t < 4000 + 7000) phase = 1;
-        else phase = 2;
-        if (pacer.matches(':hover, :focus-visible')) {
-          label.textContent = phases[phase];
-        } else {
-          label.textContent = defaultLabel;
-        }
-        requestAnimationFrame(tick);
+    var hero = document.querySelector('[data-hero]');
+    if (hero && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      var heroRect;
+      var pendingX, pendingY, raf;
+      var updateRect = function () { heroRect = hero.getBoundingClientRect(); };
+      updateRect();
+      window.addEventListener('resize', updateRect, { passive: true });
+      window.addEventListener('scroll', updateRect, { passive: true });
+      var applyCursor = function () {
+        raf = 0;
+        hero.style.setProperty('--cx', pendingX + 'px');
+        hero.style.setProperty('--cy', pendingY + 'px');
       };
-      requestAnimationFrame(tick);
+      hero.addEventListener('pointermove', function (e) {
+        pendingX = e.clientX - heroRect.left;
+        pendingY = e.clientY - heroRect.top;
+        if (!raf) raf = requestAnimationFrame(applyCursor);
+      });
+      hero.addEventListener('pointerenter', function () { hero.setAttribute('data-cursor', 'in'); });
+      hero.addEventListener('pointerleave', function () { hero.setAttribute('data-cursor', 'out'); });
     }
   }
+
+  // ── Breath pacer label rotation + click-to-open companion ──
+  var pacer = document.querySelector('[data-breath-pacer]');
+  var modal = document.querySelector('[data-breath-modal]');
+  var phaseEl = modal && modal.querySelector('[data-breath-phase]');
+  var countEl = modal && modal.querySelector('[data-breath-count]');
+  var phases = ['Breathe in', 'Hold', 'Breathe out'];
+  var cycle = 4000 + 7000 + 8000;
+  var modalOpen = false;
+  var modalStart = 0;
+  var modalCycleCount = 0;
+  var lastPhase = -1;
+
+  var openModal = function () {
+    if (!modal || modalOpen) return;
+    modalOpen = true;
+    modalStart = performance.now();
+    modalCycleCount = 0; lastPhase = -1;
+    modal.hidden = false;
+    requestAnimationFrame(function () { modal.setAttribute('data-open', 'true'); });
+    document.body.style.overflow = 'hidden';
+  };
+  var closeModal = function () {
+    if (!modal || !modalOpen) return;
+    modalOpen = false;
+    modal.removeAttribute('data-open');
+    document.body.style.overflow = '';
+    setTimeout(function () { if (!modalOpen) modal.hidden = true; }, 340);
+  };
+
+  if (pacer) {
+    pacer.addEventListener('click', openModal);
+  }
+  if (modal) {
+    modal.addEventListener('click', function (e) {
+      // Close on backdrop click; close button handles itself
+      if (e.target === modal) closeModal();
+    });
+    var closeBtn = modal.querySelector('[data-breath-close]');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modalOpen) closeModal();
+    });
+  }
+
+  if (!reduce) {
+    var pacerLabel = pacer && pacer.querySelector('.breath-pacer__label');
+    var defaultLabel = 'Breathe with us';
+    var pacerStart = performance.now();
+    var tick = function (now) {
+      // Pacer label
+      if (pacer && pacerLabel) {
+        var t = (now - pacerStart) % cycle;
+        var phase = t < 4000 ? 0 : t < 11000 ? 1 : 2;
+        pacerLabel.textContent = pacer.matches(':hover, :focus-visible') ? phases[phase] : defaultLabel;
+      }
+      // Breath modal phase + cycle counter
+      if (modalOpen && phaseEl) {
+        var mt = (now - modalStart) % cycle;
+        var mPhase = mt < 4000 ? 0 : mt < 11000 ? 1 : 2;
+        if (mPhase !== lastPhase) {
+          // Wrap detection: going 2 -> 0 = a completed cycle
+          if (lastPhase === 2 && mPhase === 0) modalCycleCount++;
+          lastPhase = mPhase;
+          phaseEl.textContent = phases[mPhase];
+        }
+        if (countEl) countEl.textContent = 'Cycle ' + Math.min(modalCycleCount + 1, 99);
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  } else if (modal && phaseEl) {
+    // Reduced motion: open modal as static instructional layout
+    phaseEl.textContent = 'Breathe in for 4. Hold for 7. Out for 8.';
+    if (countEl) countEl.textContent = 'Three cycles';
+  }
+
+  // ── Console message for the curious ──
+  try {
+    if (window.console && console.log) {
+      console.log(
+        '%cYour nervous system can’t be coded around. But hi.',
+        'font: italic 14px/1.4 Georgia, serif; color: #a47c63; padding: 4px 0;'
+      );
+    }
+  } catch (e) { /* no-op */ }
 })();
 </script>
 {% endraw %}
