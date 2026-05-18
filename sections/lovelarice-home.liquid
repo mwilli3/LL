@@ -13,6 +13,8 @@
 
 {% assign quiz_url = section.settings.quiz_url | default: '#' %}
 
+<script>document.documentElement.classList.add('has-js');</script>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400;1,500&family=Outfit:wght@300;400;500&display=swap');
 
@@ -270,10 +272,10 @@
     font-family: var(--font-body); font-size: var(--text-lede); font-weight: 300;
     color: var(--dark-brown); max-width: 52ch; margin-bottom: 3rem; line-height: 1.7;
     letter-spacing: 0.005em;
-    opacity: 0; transform: translateY(16px);
     transition: opacity 700ms var(--ease-out-quart) 720ms,
                 transform 700ms var(--ease-out-quart) 720ms;
   }
+  .has-js .hero-sub { opacity: 0; transform: translateY(16px); }
   .hero-title.is-in ~ .hero-sub { opacity: 1; transform: translateY(0); }
 
   /* Hero CTA — clip-path wipe on hover, scale on active */
@@ -283,11 +285,11 @@
     font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
     color: var(--cream); background: var(--warm-brown);
     padding: 1.15rem 3.4rem; text-decoration: none;
-    opacity: 0; transform: translateY(16px);
     transition: opacity 700ms var(--ease-out-quart) 900ms,
                 transform 240ms var(--ease-out-quart),
                 box-shadow 240ms var(--ease-out-quart);
   }
+  .has-js .hero-cta { opacity: 0; transform: translateY(16px); }
   .hero-title.is-in ~ .hero-cta { opacity: 1; transform: translateY(0); }
   .hero-cta::before {
     content: ''; position: absolute; inset: 0; background: var(--dark-brown);
@@ -302,10 +304,10 @@
   .hero-scroll {
     position: absolute; bottom: 2.5rem; left: 0; right: 0;
     display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-    opacity: 0; transform: translateY(8px);
     transition: opacity 700ms var(--ease-out-quart) 1300ms,
                 transform 700ms var(--ease-out-quart) 1300ms;
   }
+  .has-js .hero-scroll { opacity: 0; transform: translateY(8px); }
   .hero-title.is-in ~ .hero-scroll { opacity: 1; transform: translateY(0); }
   .hero-scroll span { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--taupe); }
   .scroll-line { width: 1px; height: 44px; background: var(--taupe); position: relative; overflow: hidden; }
@@ -361,17 +363,21 @@
   .section-cta:hover { box-shadow: 0 10px 32px rgba(74,58,50,0.18); }
   .section-cta:active { transform: scale(0.97); }
 
-  /* ── REVEAL UTILITY — IntersectionObserver-driven ── */
-  .reveal { opacity: 0; transform: translateY(24px); }
-  .reveal.is-in {
+  /* ── REVEAL UTILITY — IntersectionObserver-driven.
+     All hidden-by-default states are gated behind .has-js (set inline by
+     the snippet at the top of this file). Without JS, the gate doesn't
+     match and everything stays visible — survives iOS Quick Look, RSS
+     readers, screen-reader walkthroughs, and any other JS-disabled env. */
+  .has-js .reveal { opacity: 0; transform: translateY(24px); }
+  .has-js .reveal.is-in {
     opacity: 1; transform: translateY(0);
     transition: opacity 800ms var(--ease-out-quart),
                 transform 800ms var(--ease-out-quart);
   }
-  .reveal-stagger > * {
+  .has-js .reveal-stagger > * {
     opacity: 0; transform: translateY(20px);
   }
-  .reveal-stagger.is-in > * {
+  .has-js .reveal-stagger.is-in > * {
     opacity: 1; transform: translateY(0);
     transition: opacity 700ms var(--ease-out-quart),
                 transform 700ms var(--ease-out-quart);
