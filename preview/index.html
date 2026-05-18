@@ -189,14 +189,17 @@
     justify-content: center; align-items: center; text-align: center;
     padding: 5rem 2rem 2.5rem; position: relative; overflow: hidden; background: var(--cream);
   }
-  /* Aurora layer — two slow-drifting radial gradients on transform only */
+  /* Aurora layer — two slow-drifting radial gradients on transform only.
+     Scroll parallax + device-tilt parallax compose via `translate` (separate
+     from the `transform` carrying the drift animation). */
   .hero__aurora {
     position: absolute; inset: -20%; pointer-events: none; z-index: 0;
     background:
       radial-gradient(40% 35% at 70% 20%, rgba(198,167,125,0.18) 0%, transparent 70%),
       radial-gradient(45% 40% at 20% 80%, rgba(164,124,99,0.14) 0%, transparent 70%),
       radial-gradient(35% 30% at 50% 50%, rgba(234,227,220,0.5) 0%, transparent 70%);
-    will-change: transform;
+    will-change: transform, translate;
+    translate: var(--tilt-x, 0px) calc(var(--parallax-y, 0px) + var(--tilt-y, 0px));
     animation: auroraDrift 28s var(--ease-in-out-quint) infinite alternate;
   }
   @keyframes auroraDrift {
@@ -432,22 +435,47 @@
     display: flex; align-items: center; justify-content: center;
     transition: transform 480ms var(--ease-out-quart);
   }
-  /* Per-archetype motion: variation per delight ref's "vary responses" rule */
-  .archetype-card:nth-child(1):hover .archetype-icon {
+  /* Per-archetype motion: variation per delight ref's "vary responses" rule.
+     Each motion has two trigger paths so mobile gets the delight too:
+       :hover         (desktop, retriggers each time)
+       .motion-in     (one-shot when card enters viewport, set by IO)        */
+  .archetype-card:nth-child(1):hover .archetype-icon,
+  .archetype-card:nth-child(1).motion-in .archetype-icon {
     /* Regulator: gentle pulse — regulating */
+    animation: iconPulseOnce 1.6s var(--ease-in-out-quint) both;
+  }
+  .archetype-card:nth-child(1):hover .archetype-icon {
     animation: iconPulse 1.6s var(--ease-in-out-quint) infinite;
   }
   .archetype-card:nth-child(2):hover .archetype-icon {
-    /* Rooted One: slow rise — rooting */
+    /* Rooted One: slow rise — rooting (held while hovered) */
     transform: translateY(-4px);
   }
+  .archetype-card:nth-child(2).motion-in .archetype-icon {
+    animation: iconRiseOnce 1.4s var(--ease-out-quart) both;
+  }
   .archetype-card:nth-child(3):hover .archetype-icon {
-    /* Power Reclaimer: forward tilt — claiming */
+    /* Power Reclaimer: forward tilt — claiming (held while hovered) */
     transform: rotate(-6deg) scale(1.04);
+  }
+  .archetype-card:nth-child(3).motion-in .archetype-icon {
+    animation: iconTiltOnce 1.4s var(--ease-out-quart) both;
   }
   @keyframes iconPulse {
     0%, 100% { transform: scale(1); }
     50%      { transform: scale(1.07); }
+  }
+  @keyframes iconPulseOnce {
+    0%, 100% { transform: scale(1); }
+    30%, 70% { transform: scale(1.07); }
+  }
+  @keyframes iconRiseOnce {
+    0%, 100% { transform: translateY(0); }
+    55%      { transform: translateY(-6px); }
+  }
+  @keyframes iconTiltOnce {
+    0%, 100% { transform: rotate(0) scale(1); }
+    45%      { transform: rotate(-6deg) scale(1.04); }
   }
   .archetype-icon img { width: 100%; height: 100%; object-fit: contain; }
   .archetype-name {
@@ -771,7 +799,9 @@
     .scroll-line::after,
     .breath-modal__circle,
     .footer-brand-line .footer-breath-dot,
-    .archetype-card:nth-child(1):hover .archetype-icon { animation: none !important; }
+    .archetype-card:hover .archetype-icon,
+    .archetype-card.motion-in .archetype-icon { animation: none !important; }
+    .hero__aurora { translate: 0 0 !important; }
     .hero__cursor-glow { display: none; }
     .reveal, .reveal-stagger > *,
     .hero-title .word, .hero-sub, .hero-cta, .hero-scroll {
@@ -1071,22 +1101,43 @@
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     document.querySelectorAll('.reveal, .reveal-stagger').forEach(function (el) { io.observe(el); });
+
+    // Per-archetype one-shot motion when card enters viewport — closes
+    // the desktop/mobile delight gap from hover-only triggers.
+    if (!reduce) {
+      var archIo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('motion-in');
+            archIo.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+      document.querySelectorAll('.archetype-card').forEach(function (el) { archIo.observe(el); });
+    }
   } else {
     document.querySelectorAll('.reveal, .reveal-stagger').forEach(function (el) { el.classList.add('is-in'); });
   }
 
-  // ── Scroll progress + nav scrolled-state ──
+  // ── Scroll progress + nav scrolled-state + hero aurora parallax ──
   var bar = document.querySelector('.scroll-progress__bar');
   var nav = document.querySelector('[data-nav]');
+  var aurora = document.querySelector('.hero__aurora');
   var ticking = false;
   var onScroll = function () {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(function () {
       var max = document.documentElement.scrollHeight - window.innerHeight;
-      var ratio = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      var sy = window.scrollY;
+      var ratio = max > 0 ? Math.min(1, Math.max(0, sy / max)) : 0;
       if (bar) bar.style.setProperty('--scroll', ratio.toFixed(3));
-      if (nav) nav.setAttribute('data-scrolled', window.scrollY > 24 ? 'true' : 'false');
+      if (nav) nav.setAttribute('data-scrolled', sy > 24 ? 'true' : 'false');
+      // Aurora parallax: cap at viewport height; 0.18 feels gentle, not seasick.
+      if (aurora && !reduce && sy < window.innerHeight * 1.5) {
+        var py = Math.min(120, sy * 0.18);
+        aurora.style.setProperty('--parallax-y', py + 'px');
+      }
       ticking = false;
     });
   };
@@ -1171,8 +1222,57 @@
     }
   };
 
+  // ── Device orientation parallax on hero aurora ──
+  // Android fires deviceorientation without permission. iOS Safari requires
+  // an explicit prompt invoked from a user gesture — gate that behind the
+  // first breath-pacer interaction so the prompt only appears when the user
+  // is already engaging with a breath-related feature.
+  var orientationBound = false;
+  var bindOrientation = function () {
+    if (orientationBound || reduce || !aurora) return;
+    orientationBound = true;
+    window.addEventListener('deviceorientation', function (e) {
+      if (e.gamma === null || e.beta === null) return;
+      var tx = Math.max(-12, Math.min(12, e.gamma * 0.35));
+      var ty = Math.max(-8, Math.min(8, (e.beta - 45) * 0.12));
+      aurora.style.setProperty('--tilt-x', tx.toFixed(2) + 'px');
+      aurora.style.setProperty('--tilt-y', ty.toFixed(2) + 'px');
+    }, { passive: true });
+  };
+  var enableOrientation = function () {
+    if (typeof DeviceOrientationEvent === 'undefined') return;
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+: requires user gesture, returns "granted" / "denied"
+      DeviceOrientationEvent.requestPermission().then(function (state) {
+        if (state === 'granted') bindOrientation();
+      }).catch(function () { /* user denied; silently skip */ });
+    } else {
+      bindOrientation();
+    }
+  };
+
   if (pacer) {
-    pacer.addEventListener('click', openModal);
+    pacer.addEventListener('click', function () {
+      openModal();
+      // First pacer click is the right user gesture to request orientation.
+      enableOrientation();
+    });
+  }
+  // Android (no requestPermission method) — bind immediately, no prompt needed.
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission !== 'function') {
+    bindOrientation();
+  }
+
+  // ── Haptic confirmation on touch taps of primary interactive elements ──
+  // Android supports navigator.vibrate; iOS Safari does not. No-op on iOS.
+  if ('vibrate' in navigator) {
+    var hapticSelector = '.nav-cta, .hero-cta, .section-cta, .final-cta-btn, .archetype-card, .breath-pacer, .breath-modal__close';
+    document.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'touch') return;
+      if (!e.target.closest || !e.target.closest(hapticSelector)) return;
+      try { navigator.vibrate(12); } catch (err) { /* no-op */ }
+    }, { passive: true });
   }
   if (modal) {
     modal.addEventListener('click', function (e) {
