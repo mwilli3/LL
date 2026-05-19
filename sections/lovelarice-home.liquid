@@ -495,14 +495,6 @@
     letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 1.3rem;
   }
   .archetype-desc { font-size: 0.97rem; font-weight: 300; line-height: 1.75; color: var(--dark-brown); }
-  .archetype-card__arrow {
-    margin-top: 1.6rem; display: inline-flex; align-items: center; gap: 0.5rem;
-    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.18em;
-    text-transform: uppercase; color: var(--warm-brown);
-    transition: gap 280ms var(--ease-out-quart);
-  }
-  .archetype-card:hover .archetype-card__arrow { gap: 0.85rem; }
-  .archetype-card__arrow svg { width: 18px; height: 8px; }
 
   /* ── HOW IT WORKS ── horizontal timeline rhythm ── */
   .steps-grid {
@@ -890,9 +882,6 @@
         <h3 class="archetype-name">The Regulator</h3>
         <p class="archetype-tagline" style="color: #2C6E6A;">Regulated Living</p>
         <p class="archetype-desc">You manage stress at high capacity, until burnout, insomnia, or emotional collapse forces the issue. Breathing exercises and meditation apps were built for a nervous system that can already slow down. Yours can&rsquo;t, yet.</p>
-        <span class="archetype-card__arrow" aria-hidden="true">Learn the pattern
-          <svg viewBox="0 0 18 8" fill="none"><path d="M1 4h16m0 0L13 1m4 3L13 7" stroke="currentColor" stroke-width="1"/></svg>
-        </span>
       </a>
 
       <a class="archetype-card" href="{{ quiz_url }}" aria-label="The Rooted One. Take the quiz to learn your pattern.">
@@ -903,9 +892,6 @@
         <h3 class="archetype-name">The Rooted One</h3>
         <p class="archetype-tagline" style="color: #5A7F3C;">Rooted Wellness</p>
         <p class="archetype-desc">You&rsquo;ve tried the routines, the habits, the 30-day challenges, and they never stuck. It isn&rsquo;t discipline. Every program you&rsquo;ve tried was built for someone whose nervous system already supports consistency. Yours doesn&rsquo;t, yet.</p>
-        <span class="archetype-card__arrow" aria-hidden="true">Learn the pattern
-          <svg viewBox="0 0 18 8" fill="none"><path d="M1 4h16m0 0L13 1m4 3L13 7" stroke="currentColor" stroke-width="1"/></svg>
-        </span>
       </a>
 
       <a class="archetype-card" href="{{ quiz_url }}" aria-label="The Power Reclaimer. Take the quiz to learn your pattern.">
@@ -916,9 +902,6 @@
         <h3 class="archetype-name">The Power Reclaimer</h3>
         <p class="archetype-tagline" style="color: #8B3A4A;">Reclaimed Power</p>
         <p class="archetype-desc">You&rsquo;ve been told to set boundaries, but nobody explained why saying no feels physically dangerous. Your nervous system has been running a pattern no self-help book was designed to fix.</p>
-        <span class="archetype-card__arrow" aria-hidden="true">Learn the pattern
-          <svg viewBox="0 0 18 8" fill="none"><path d="M1 4h16m0 0L13 1m4 3L13 7" stroke="currentColor" stroke-width="1"/></svg>
-        </span>
       </a>
     </div>
     <a href="{{ quiz_url }}" class="section-cta">Which One Are You?</a>
