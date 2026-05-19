@@ -547,6 +547,107 @@
     margin: 0 auto 2.2rem; position: relative; z-index: 1;
   }
 
+  /* ── POLYVAGAL LADDER — educational anchor ── */
+  .polyvagal-figure {
+    margin: 3.5rem auto 0; max-width: 540px;
+    display: flex; flex-direction: column; gap: 2.4rem;
+  }
+  .polyvagal-state {
+    display: flex; flex-direction: column; gap: 0.55rem;
+  }
+  .polyvagal-state-name {
+    font-family: var(--font-heading); font-size: 1.35rem;
+    font-style: italic; font-weight: 400; color: var(--dark-brown);
+    letter-spacing: -0.005em;
+  }
+  .polyvagal-state-mode {
+    font-family: var(--font-body); font-size: 0.72rem;
+    font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--warm-brown);
+  }
+  .polyvagal-wave {
+    width: 100%; height: 56px; display: block; margin-top: 0.3rem;
+    overflow: visible;
+  }
+  .polyvagal-wave path {
+    fill: none; stroke-width: 1.25;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .polyvagal-state--ventral     .polyvagal-wave path { stroke: #2C6E6A; }
+  .polyvagal-state--sympathetic .polyvagal-wave path { stroke: var(--gold); }
+  .polyvagal-state--dorsal      .polyvagal-wave path { stroke: var(--dark-brown); opacity: 0.55; }
+
+  /* Stroke-dasharray draw-in. pathLength=100 normalizes all three paths
+     so a single dash length works regardless of their actual geometry. */
+  .has-js .polyvagal-wave path {
+    stroke-dasharray: 100; stroke-dashoffset: 100;
+  }
+  .section--polyvagal.is-in .polyvagal-state--ventral .polyvagal-wave path {
+    animation: drawWave 1.6s var(--ease-out-quart) 0.20s forwards;
+  }
+  .section--polyvagal.is-in .polyvagal-state--sympathetic .polyvagal-wave path {
+    animation: drawWave 1.8s var(--ease-out-quart) 0.55s forwards;
+  }
+  .section--polyvagal.is-in .polyvagal-state--dorsal .polyvagal-wave path {
+    animation: drawWave 1.4s var(--ease-out-quart) 1.00s forwards;
+  }
+  @keyframes drawWave { to { stroke-dashoffset: 0; } }
+
+  .polyvagal-caption {
+    font-family: var(--font-body); font-size: 0.74rem; font-weight: 300;
+    font-style: italic; color: var(--warm-brown); text-align: center;
+    margin-top: 0.8rem; letter-spacing: 0.04em;
+  }
+
+  /* ── VAGUS NERVE PATHWAY (Truth section) ── */
+  .vagus-figure-wrapper {
+    margin: 3rem auto 2.5rem; max-width: 240px;
+    display: flex; flex-direction: column; align-items: center; gap: 0.9rem;
+  }
+  .vagus-figure { width: 100%; height: auto; display: block; overflow: visible; }
+  .vagus-figure .vagus-trunk,
+  .vagus-figure .vagus-branch {
+    fill: none; stroke: var(--warm-brown); stroke-width: 1;
+    stroke-linecap: round;
+  }
+  .vagus-figure .vagus-node { fill: var(--dark-brown); }
+  .vagus-figure .vagus-node--brain,
+  .vagus-figure .vagus-node--gut { fill: var(--warm-brown); }
+  .vagus-figure .vagus-label {
+    font-family: var(--font-body); font-size: 9px; font-weight: 400;
+    letter-spacing: 0.16em; text-transform: uppercase; fill: var(--warm-brown);
+  }
+  .vagus-figure-caption {
+    font-family: var(--font-body); font-size: 0.72rem; font-weight: 400;
+    font-style: italic; color: var(--warm-brown); text-align: center;
+    letter-spacing: 0.04em;
+  }
+  /* Draw-in for the vagal trunk on scroll-into-view */
+  .has-js .vagus-figure .vagus-trunk { stroke-dasharray: 100; stroke-dashoffset: 100; }
+  .has-js .vagus-figure .vagus-branch { opacity: 0; transition: opacity 600ms var(--ease-out-quart); }
+  .has-js .vagus-figure .vagus-node { opacity: 0; transition: opacity 400ms var(--ease-out-quart); }
+  .truth.is-in .vagus-figure .vagus-trunk {
+    animation: drawWave 2.4s var(--ease-out-quart) 0.3s forwards;
+  }
+  .truth.is-in .vagus-figure .vagus-node:nth-of-type(1) { transition-delay: 0.6s;  opacity: 1; }
+  .truth.is-in .vagus-figure .vagus-node:nth-of-type(2) { transition-delay: 1.4s;  opacity: 1; }
+  .truth.is-in .vagus-figure .vagus-node:nth-of-type(3) { transition-delay: 2.0s;  opacity: 1; }
+  .truth.is-in .vagus-figure .vagus-node:nth-of-type(4) { transition-delay: 2.4s;  opacity: 1; }
+  .truth.is-in .vagus-figure .vagus-branch { transition-delay: 2.6s; opacity: 0.7; }
+
+  /* ── ORGANIC SECTION DIVIDERS — soft cream tides washing into dark sections.
+     Painted INSIDE the dark section (so they're clipped by overflow:hidden),
+     filled with the color of the adjacent light section so they read as the
+     light section bleeding inward — a shoreline, not a hard edge. */
+  .section-divider {
+    display: block; width: 100%; height: 48px;
+    position: absolute; left: 0; pointer-events: none; z-index: 1;
+  }
+  .section-divider--top    { top: -1px; }
+  .section-divider--bottom { bottom: -1px; transform: scaleY(-1); }
+  .brand-statement .section-divider path,
+  .final-cta       .section-divider path { fill: var(--cream); }
+
   /* ── BDYALIGN BRIDGE ── */
   .bridge-layout { max-width: 720px; margin: 0 auto; text-align: center; }
   .bridge-products {
@@ -860,6 +961,33 @@
     <p class="section-body">You&rsquo;ve tried the routines. The morning protocols. The 30-day challenges. They either didn&rsquo;t work, or they worked for two weeks and quietly disappeared.</p>
     <p class="section-body">That&rsquo;s not a discipline problem. It&rsquo;s a design problem.</p>
     <p class="section-body">Every wellness product you&rsquo;ve tried was built for a generic nervous system. Yours isn&rsquo;t generic. It has a specific stress pattern, a specific regulation style, and a specific reason nothing has stuck.</p>
+
+    <figure class="vagus-figure-wrapper">
+      <svg class="vagus-figure" viewBox="0 0 200 420" role="img" aria-labelledby="vagus-title">
+        <title id="vagus-title">A stylized illustration of the vagus nerve descending from brainstem through heart, diaphragm, and gut</title>
+        <path class="vagus-trunk" pathLength="100"
+              d="M 100 30
+                 C 98 60, 102 80, 100 110
+                 C 96 145, 104 158, 100 180
+                 C 95 215, 105 230, 100 260
+                 C 96 295, 104 310, 100 340
+                 C 98 365, 102 380, 100 400" />
+        <path class="vagus-branch" d="M 100 180 Q 78 182, 70 205" />
+        <path class="vagus-branch" d="M 100 180 Q 122 182, 130 205" />
+        <path class="vagus-branch" d="M 100 345 Q 80 358, 76 380" />
+        <path class="vagus-branch" d="M 100 345 Q 120 358, 124 380" />
+        <circle class="vagus-node vagus-node--brain" cx="100" cy="30"  r="6" />
+        <circle class="vagus-node"                   cx="100" cy="180" r="4" />
+        <circle class="vagus-node"                   cx="100" cy="260" r="3" />
+        <circle class="vagus-node vagus-node--gut"   cx="100" cy="345" r="5" />
+        <text class="vagus-label" x="116" y="34">brainstem</text>
+        <text class="vagus-label" x="116" y="184">heart</text>
+        <text class="vagus-label" x="116" y="264">diaphragm</text>
+        <text class="vagus-label" x="116" y="349">gut</text>
+      </svg>
+      <figcaption class="vagus-figure-caption">The vagus nerve &middot; your body&rsquo;s regulator</figcaption>
+    </figure>
+
     <p class="truth-final">We build for that.</p>
   </div>
 </section>
@@ -935,8 +1063,48 @@
   </div>
 </section>
 
+<!-- ════════════ POLYVAGAL LADDER ════════════ -->
+<section class="section section--polyvagal">
+  <div class="section-inner reveal" style="text-align:center; max-width: 640px;">
+    <p class="section-eyebrow">Polyvagal Theory · Stephen Porges</p>
+    <h2 class="section-title">Your body lives between <em>three states.</em></h2>
+    <p class="section-body" style="margin: 0 auto 1rem; max-width: 52ch;">Every nervous system cycles through three patterns. Knowing which one is running you &mdash; right now, this week, this season &mdash; is what makes any practice actually land.</p>
+
+    <figure class="polyvagal-figure">
+      <div class="polyvagal-state polyvagal-state--ventral">
+        <span class="polyvagal-state-name">Ventral vagal</span>
+        <span class="polyvagal-state-mode">Safety &middot; Connection &middot; Ease</span>
+        <svg class="polyvagal-wave" viewBox="0 0 320 56" preserveAspectRatio="none" aria-hidden="true">
+          <path pathLength="100" d="M 0 28 Q 40 4, 80 28 T 160 28 T 240 28 T 320 28" />
+        </svg>
+      </div>
+      <div class="polyvagal-state polyvagal-state--sympathetic">
+        <span class="polyvagal-state-name">Sympathetic</span>
+        <span class="polyvagal-state-mode">Mobilized &middot; Reactive &middot; Wired</span>
+        <svg class="polyvagal-wave" viewBox="0 0 320 56" preserveAspectRatio="none" aria-hidden="true">
+          <path pathLength="100" d="M 0 28 L 20 6 L 40 50 L 60 6 L 80 50 L 100 6 L 120 50 L 140 6 L 160 50 L 180 6 L 200 50 L 220 6 L 240 50 L 260 6 L 280 50 L 300 6 L 320 28" />
+        </svg>
+      </div>
+      <div class="polyvagal-state polyvagal-state--dorsal">
+        <span class="polyvagal-state-name">Dorsal vagal</span>
+        <span class="polyvagal-state-mode">Collapsed &middot; Numb &middot; Withdrawn</span>
+        <svg class="polyvagal-wave" viewBox="0 0 320 56" preserveAspectRatio="none" aria-hidden="true">
+          <path pathLength="100" d="M 0 28 L 130 28 Q 145 30, 160 30 Q 175 30, 190 28 L 320 28" />
+        </svg>
+      </div>
+      <figcaption class="polyvagal-caption">Every protocol we build meets your body in the state it&rsquo;s in.</figcaption>
+    </figure>
+  </div>
+</section>
+
 <!-- ════════════ BRAND STATEMENT ════════════ -->
 <section class="brand-statement reveal">
+  <svg class="section-divider section-divider--top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M 0 0 L 1440 0 L 1440 24 C 1200 48, 960 4, 720 24 C 480 48, 240 4, 0 24 Z" />
+  </svg>
+  <svg class="section-divider section-divider--bottom" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M 0 0 L 1440 0 L 1440 24 C 1200 48, 960 4, 720 24 C 480 48, 240 4, 0 24 Z" />
+  </svg>
   <div class="brand-statement__bg" aria-hidden="true"></div>
   <div class="brand-statement-rule" aria-hidden="true"></div>
   <p class="brand-statement-text">This is not another wellness brand selling calm to people who are already calm.<br><br>This is nervous system science, translated into tools, practices, and products built for the woman whose body doesn&rsquo;t respond to generic advice.<br><br><strong>Your archetype. Your pattern. Your protocol.</strong></p>
@@ -1006,6 +1174,9 @@
 
 <!-- ════════════ FINAL CTA ════════════ -->
 <section class="final-cta reveal">
+  <svg class="section-divider section-divider--top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M 0 0 L 1440 0 L 1440 24 C 1200 48, 960 4, 720 24 C 480 48, 240 4, 0 24 Z" />
+  </svg>
   <div class="final-cta__bg" aria-hidden="true"></div>
   <p class="section-eyebrow">Ready to Begin?</p>
   <h2 class="section-title">Find out why <em>nothing else has worked.</em></h2>
