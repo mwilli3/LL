@@ -439,13 +439,6 @@ export default function App() {
             }}>
             Begin the assessment
           </button>
-
-          <p style={{
-            marginTop: 16, fontSize: 11.5, color: T.ink40, lineHeight: 1.6,
-            textAlign: "center",
-          }}>
-            No spam. Unsubscribe in one click.
-          </p>
         </form>
 
         <div style={{
@@ -843,7 +836,6 @@ export default function App() {
               display: "flex", flexDirection: "column", gap: 6,
             }}>
               {[
-                "30-day satisfaction guarantee. Full refund on request.",
                 "Instant access. Delivered to your inbox the moment you check out.",
                 "Secure checkout via Shopify."
               ].map((t, i) => (
