@@ -42,12 +42,12 @@ const Logo = ({ w = 460 }) => (
   <div
     role="img"
     aria-label="LoveLarice"
-    style={{ width: w, maxWidth: "100%", margin: "0 auto", overflow: "hidden" }}
+    style={{ width: w, maxWidth: "100%", margin: "0 auto" }}
     dangerouslySetInnerHTML={{
       __html: LOGO
         .replace(/width="1100"/, 'width="100%"')
         .replace(/height="500"/, "")
-        .replace(/viewBox="0 0 824.88 374.999991"/, 'viewBox="0 148 824.88 82"')
+        .replace(/viewBox="0 0 824.88 374.999991"/, 'viewBox="0 132 824.88 110"')
     }} />
 );
 
@@ -646,7 +646,7 @@ export default function App() {
             textAlign: "center", marginBottom: 56,
             animation: `up 700ms ${EASE_OUT_QUART} both`,
           }}>
-            <Logo w={150} />
+            <Logo w={280} />
 
             <div style={{ marginTop: 36 }}>
               <Eyebrow accent={a.c}>Your archetype</Eyebrow>
