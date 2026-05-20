@@ -148,27 +148,6 @@ function score(ans) {
   return Object.entries(c).sort((a, b) => b[1] - a[1])[0][0];
 }
 
-function Countdown({ seconds: init, onExpire, color }) {
-  const [s, setS] = useState(init);
-  useEffect(() => {
-    if (s <= 0) { if (onExpire) onExpire(); return; }
-    const t = setTimeout(() => setS(s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [s]);
-  const m = Math.floor(s / 60);
-  const sec = s % 60;
-  if (s <= 0) return null;
-  return (
-    <span style={{
-      fontFamily: F, fontVariantNumeric: "tabular-nums",
-      fontSize: 13, fontWeight: 500, letterSpacing: "0.22em",
-      color: color || T.gold, textTransform: "uppercase",
-    }}>
-      {String(m).padStart(2, "0")}:{String(sec).padStart(2, "0")} remaining
-    </span>
-  );
-}
-
 export default function App() {
   const [v, setV] = useState("welcome");
   const [email, setEmail] = useState("");
@@ -177,7 +156,7 @@ export default function App() {
   const [ans, setAns] = useState(Array(8).fill(null));
   const [res, setRes] = useState(null);
   const [ld, setLd] = useState(false);
-  const [expired, setExpired] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const ref = useRef(null);
   const offerRef = useRef(null);
   const trackedOffer = useRef(false);
@@ -215,17 +194,6 @@ export default function App() {
       /* Narrow-viewport adjustments (phones ≤ 480px) */
       @media (max-width: 480px) {
         .ll-bleed { margin-left: 0 !important; margin-right: 0 !important; }
-        .ll-offer-pricerow {
-          flex-wrap: wrap;
-          gap: 10px !important;
-        }
-        .ll-offer-pricerow .ll-spacer { display: none; }
-        .ll-offer-pricerow .ll-countdown {
-          flex-basis: 100%;
-          padding-top: 4px;
-          border-top: 1px solid rgba(198,167,125,0.25);
-          margin-top: 6px;
-        }
         .ll-opt { padding: 16px 18px !important; font-size: 15px !important; }
         .ll-opt-mark { top: 14px !important; right: 16px !important; }
       }
@@ -261,35 +229,44 @@ export default function App() {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !trackedOffer.current) {
         trackedOffer.current = true;
-        if (window.posthog) window.posthog.capture("offer_block_viewed", { archetype: res, price_shown: expired ? 57 : 47 });
+        if (window.posthog) window.posthog.capture("offer_block_viewed", { archetype: res, price_shown: 47 });
       }
     }, { threshold: 0.5 });
     observer.observe(offerRef.current);
     return () => observer.disconnect();
-  }, [v, res, expired]);
+  }, [v, res]);
 
-  const go = () => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setErr("Please enter a valid email address."); return; }
-    setErr(""); setV("quiz");
-  };
+  const begin = () => { setErr(""); setV("quiz"); };
 
   const pick = k => {
     const n = [...ans]; n[qi] = k; setAns(n);
-    if (qi < 7) { setTimeout(() => setQi(qi + 1), 280); return; }
+    if (qi < 7) { setTimeout(() => setQi(qi + 1), 450); return; }
     setLd(true);
     setTimeout(() => {
       const archetype = score(n);
-      setRes(archetype); setLd(false); setV("result");
-      if (window.posthog) window.posthog.capture("quiz_completed", { archetype, email: email.trim() });
-      fetch("https://a.klaviyo.com/api/track", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token: "YOUR_KLAVIYO_PUBLIC_KEY", event: "Archetype Revealed",
-          customer_properties: { "$email": email.trim() },
-          properties: { archetype, archetype_name: ARCH[archetype].name, pillar: ARCH[archetype].pillar }
-        })
-      }).catch(() => {});
-    }, 2200);
+      setRes(archetype); setLd(false); setV("email");
+      if (window.posthog) window.posthog.capture("quiz_completed", { archetype });
+    }, 1500);
+  };
+
+  // Email captured at peak intent, right before the reveal.
+  const reveal = () => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setErr("Please enter a valid email address."); return; }
+    setErr("");
+    const e = email.trim();
+    if (window.posthog) {
+      window.posthog.identify(e, { email: e });
+      window.posthog.capture("email_captured", { archetype: res, email: e });
+    }
+    fetch("https://a.klaviyo.com/api/track", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token: "YOUR_KLAVIYO_PUBLIC_KEY", event: "Archetype Revealed",
+        customer_properties: { "$email": e },
+        properties: { archetype: res, archetype_name: ARCH[res].name, pillar: ARCH[res].pillar }
+      })
+    }).catch(() => {});
+    setV("result");
   };
 
   /* ── Shared styles ───────────────────────────────── */
@@ -299,7 +276,7 @@ export default function App() {
     fontFeatureSettings: '"kern","liga","calt"',
     textRendering: "optimizeLegibility",
   };
-  const wrap = { maxWidth: 560, margin: "0 auto", padding: "0 24px" };
+  const wrap = { maxWidth: 560, margin: "0 auto", paddingLeft: 24, paddingRight: 24 };
 
   /* ─────────────────────────────────────────────────
      LOADING
@@ -380,56 +357,16 @@ export default function App() {
           </p>
         </div>
 
-        <form
-          noValidate
-          onSubmit={e => { e.preventDefault(); go(); }}
-          style={{
-            marginTop: 44, padding: "36px 32px",
-            background: T.white, border: `1px solid ${T.taupe}55`,
-            animation: "up .7s " + EASE_OUT_QUART + " .15s both",
-          }}>
-          <label htmlFor="ll-email" style={{
-            display: "block", fontFamily: F, fontSize: 10.5, fontWeight: 500,
-            letterSpacing: "0.28em", textTransform: "uppercase",
-            color: T.warmBrown, marginBottom: 10,
-          }}>Email address</label>
-
-          <input
-            id="ll-email"
-            type="email"
-            name="email"
-            autoComplete="email"
-            inputMode="email"
-            spellCheck="false"
-            aria-invalid={!!err}
-            aria-describedby={err ? "ll-email-err" : "ll-email-help"}
-            required
-            value={email}
-            onChange={e => { setEmail(e.target.value); setErr(""); }}
-            placeholder="you@email.com"
-            style={{
-              width: "100%", padding: "12px 0",
-              fontSize: 16, fontFamily: F, fontWeight: 300,
-              border: "none", borderBottom: `1px solid ${err ? T.rec : T.ink40}`,
-              background: "transparent", color: T.ink, outline: "none",
-              boxSizing: "border-box",
-              transition: `border-color 220ms ${EASE_OUT_QUART}`,
-            }}
-            onFocus={e => { if (!err) e.target.style.borderBottomColor = T.warmBrown; }}
-            onBlur={e => { if (!err) e.target.style.borderBottomColor = T.ink40; }}
-          />
-
-          {err && <p id="ll-email-err" role="alert" style={{ fontSize: 12, color: T.rec, marginTop: 10, fontWeight: 500 }}>{err}</p>}
-
-          <p id="ll-email-help" style={{ fontSize: 12, color: T.ink40, marginTop: 12, lineHeight: 1.65 }}>
-            Your archetype profile and matched guide will be delivered here.
-          </p>
-
+        <div style={{
+          marginTop: 40, textAlign: "center",
+          animation: "up .7s " + EASE_OUT_QUART + " .15s both",
+        }}>
           <button
-            type="submit"
+            type="button"
             className="ll-cta"
+            onClick={begin}
             style={{
-              display: "block", width: "100%", marginTop: 28,
+              display: "block", width: "100%", maxWidth: 300, margin: "0 auto",
               padding: "16px 0",
               fontFamily: F, fontSize: 12, fontWeight: 500,
               letterSpacing: "0.22em", textTransform: "uppercase",
@@ -437,12 +374,12 @@ export default function App() {
               border: "none", cursor: "pointer",
               transition: `transform 220ms ${EASE_OUT_QUART}, box-shadow 220ms ${EASE_OUT_QUART}`,
             }}>
-            Begin the assessment
+            Begin
           </button>
-        </form>
+        </div>
 
         <div style={{
-          marginTop: 44, textAlign: "center",
+          marginTop: 40, textAlign: "center",
           animation: "up .7s " + EASE_OUT_QUART + " .3s both",
         }}>
           <div style={{ display: "flex", justifyContent: "center", gap: 36 }}>
@@ -594,6 +531,122 @@ export default function App() {
               ← Previous question
             </button>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  /* ─────────────────────────────────────────────────
+     EMAIL TO REVEAL (captured at peak intent)
+     ───────────────────────────────────────────────── */
+  if (v === "email" && res) {
+    const a = ARCH[res];
+    return (
+      <div style={page}>
+        <style>{`
+          @keyframes up { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+          input::placeholder { color: ${T.ink40} }
+          .ll-cta { position: relative; overflow: hidden; isolation: isolate; }
+          .ll-cta::before {
+            content: ""; position: absolute; inset: 0; background: ${T.darkBrown};
+            clip-path: inset(0 0 100% 0);
+            transition: clip-path 380ms ${EASE_OUT_QUART}; z-index: -1;
+          }
+          .ll-cta:hover::before { clip-path: inset(0 0 0 0); }
+          .ll-cta:hover { box-shadow: 0 10px 32px rgba(74,58,50,0.18); }
+          .ll-cta:active { transform: scale(0.97); }
+        `}</style>
+
+        <div ref={ref} style={{ ...wrap, minHeight: "100dvh", display: "flex", flexDirection: "column", justifyContent: "center", paddingTop: 56, paddingBottom: 72 }}>
+          <div style={{ textAlign: "center", animation: "up .7s " + EASE_OUT_QUART + " both" }}>
+            <Logo w={160} />
+
+            <p style={{
+              marginTop: 32, fontFamily: F, fontSize: 11, fontWeight: 500,
+              letterSpacing: "0.32em", textTransform: "uppercase", color: a.c,
+              display: "inline-flex", alignItems: "center", gap: 12,
+            }}>
+              <span style={{ width: 22, height: 1, background: a.c, opacity: 0.6 }} />
+              Your pattern is ready
+            </p>
+
+            <h1 style={{
+              marginTop: 16, fontFamily: H, fontSize: "clamp(1.9rem, 5.6vw, 2.5rem)",
+              fontWeight: 300, lineHeight: 1.12, color: T.nearBlack, letterSpacing: "-0.018em",
+              textWrap: "balance",
+            }}>
+              Where should we send your <em style={{ fontStyle: "italic", fontWeight: 500, color: a.c }}>full profile</em>?
+            </h1>
+
+            <p style={{
+              marginTop: 16, fontSize: 15, lineHeight: 1.75, fontWeight: 300,
+              color: T.ink60, maxWidth: 400, margin: "16px auto 0",
+            }}>
+              Enter your email to reveal your archetype and receive your matched guide.
+            </p>
+          </div>
+
+          <form
+            noValidate
+            onSubmit={e => { e.preventDefault(); reveal(); }}
+            style={{
+              marginTop: 36, padding: "32px 30px",
+              background: T.white, border: `1px solid ${T.taupe}55`,
+              animation: "up .7s " + EASE_OUT_QUART + " .12s both",
+            }}>
+            <label htmlFor="ll-email" style={{
+              display: "block", fontFamily: F, fontSize: 10.5, fontWeight: 500,
+              letterSpacing: "0.28em", textTransform: "uppercase",
+              color: T.warmBrown, marginBottom: 10,
+            }}>Email address</label>
+
+            <input
+              id="ll-email"
+              type="email"
+              name="email"
+              autoComplete="email"
+              inputMode="email"
+              spellCheck="false"
+              autoFocus
+              aria-invalid={!!err}
+              aria-describedby={err ? "ll-email-err" : "ll-email-help"}
+              required
+              value={email}
+              onChange={e => { setEmail(e.target.value); setErr(""); }}
+              placeholder="you@email.com"
+              style={{
+                width: "100%", padding: "12px 0",
+                fontSize: 16, fontFamily: F, fontWeight: 300,
+                border: "none", borderBottom: `1px solid ${err ? T.rec : T.ink40}`,
+                background: "transparent", color: T.ink, outline: "none",
+                boxSizing: "border-box",
+                transition: `border-color 220ms ${EASE_OUT_QUART}`,
+              }}
+              onFocus={e => { if (!err) e.target.style.borderBottomColor = T.warmBrown; }}
+              onBlur={e => { if (!err) e.target.style.borderBottomColor = T.ink40; }}
+            />
+
+            {err && <p id="ll-email-err" role="alert" style={{ fontSize: 12, color: T.rec, marginTop: 10, fontWeight: 500 }}>{err}</p>}
+
+            <p id="ll-email-help" style={{ fontSize: 12, color: T.ink40, marginTop: 12, lineHeight: 1.65 }}>
+              Your archetype profile and matched guide will be delivered here.
+            </p>
+
+            <button
+              type="submit"
+              className="ll-cta"
+              style={{
+                display: "block", width: "100%", marginTop: 26,
+                padding: "16px 0",
+                fontFamily: F, fontSize: 12, fontWeight: 500,
+                letterSpacing: "0.22em", textTransform: "uppercase",
+                color: T.cream, background: a.c,
+                border: "none", cursor: "pointer",
+                transition: `transform 220ms ${EASE_OUT_QUART}, box-shadow 220ms ${EASE_OUT_QUART}`,
+              }}>
+              Reveal my archetype
+            </button>
+          </form>
         </div>
       </div>
     );
@@ -772,40 +825,21 @@ export default function App() {
               display: "flex", alignItems: "baseline", gap: 14,
               paddingTop: 22, borderTop: "1px solid rgba(198,167,125,0.25)",
             }}>
-              {!expired ? (
-                <>
-                  <span style={{
-                    fontFamily: H, fontSize: 38, fontWeight: 500,
-                    color: T.cream, letterSpacing: "-0.02em",
-                  }}>$47</span>
-                  <span style={{
-                    fontFamily: H, fontStyle: "italic", fontSize: 20,
-                    color: T.taupe, textDecoration: "line-through",
-                    textDecorationThickness: "1px",
-                  }}>$57</span>
-                  <span className="ll-spacer" style={{ flex: 1 }} />
-                  <span className="ll-countdown">
-                    <Countdown seconds={900} onExpire={() => setExpired(true)} color={T.gold} />
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span style={{
-                    fontFamily: H, fontSize: 38, fontWeight: 500,
-                    color: T.cream, letterSpacing: "-0.02em",
-                  }}>$57</span>
-                  <span style={{
-                    fontFamily: H, fontStyle: "italic", fontSize: 15,
-                    color: T.taupe,
-                  }}>Standard rate.</span>
-                </>
-              )}
+              <span style={{
+                fontFamily: H, fontSize: 38, fontWeight: 500,
+                color: T.cream, letterSpacing: "-0.02em",
+              }}>$47</span>
+              <span style={{
+                fontFamily: H, fontStyle: "italic", fontSize: 20,
+                color: T.taupe, textDecoration: "line-through",
+                textDecorationThickness: "1px",
+              }}>$57</span>
             </div>
 
             <p style={{
               marginTop: 8, fontSize: 11.5, color: "rgba(247,245,242,0.55)",
               letterSpacing: "0.06em", fontWeight: 300,
-            }}>{!expired ? "First-time archetype discovery price." : " "}</p>
+            }}>Your first-visit discovery price.</p>
 
             <button
               type="button"
@@ -813,9 +847,9 @@ export default function App() {
               aria-label={`Claim your ${a.offer.name}`}
               onClick={() => {
                 if (window.posthog) window.posthog.capture("checkout_opened", {
-                  archetype: res, price: expired ? 57 : 47, discounted: !expired, email: email.trim(),
+                  archetype: res, price: 47, discounted: true, email: email.trim(),
                 });
-                const url = expired ? (a.shopifyUrl || "#") : ((a.shopifyUrl || "#") + "?discount=ARCHETYPE10");
+                const url = (a.shopifyUrl || "#") + "?discount=ARCHETYPE10";
                 window.open(url, "_blank");
               }}
               style={{
@@ -855,8 +889,31 @@ export default function App() {
             </ul>
           </div>
 
+          {/* Progressive disclosure: the full profile is collapsed by default */}
+          {!expanded && (
+            <button
+              type="button"
+              aria-expanded={false}
+              onClick={() => { setExpanded(true); if (window.posthog) window.posthog.capture("full_profile_expanded", { archetype: res }); }}
+              style={{
+                display: "block", width: "100%", marginBottom: 8, padding: "16px 0",
+                fontFamily: F, fontSize: 11.5, fontWeight: 500,
+                letterSpacing: "0.22em", textTransform: "uppercase",
+                color: a.c, background: "transparent",
+                border: `1px solid ${a.c}40`, cursor: "pointer",
+                transition: `background 220ms ${EASE_OUT_QUART}, border-color 220ms ${EASE_OUT_QUART}`,
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = a.c + "0d"; e.currentTarget.style.borderColor = a.c + "80"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = a.c + "40"; }}>
+              Read your full profile
+            </button>
+          )}
+
+          {expanded && (
+          <div style={{ animation: `up 600ms ${EASE_OUT_QUART} both` }}>
+
           {/* ── ZONE 5 — Beliefs (paired, varied) */}
-          <div style={{ animation: `up 700ms ${EASE_OUT_QUART} 260ms both`, marginBottom: 44 }}>
+          <div style={{ animation: `up 700ms ${EASE_OUT_QUART} 60ms both`, marginBottom: 44 }}>
             <section style={{ marginBottom: 22 }}>
               <Eyebrow>The voice you are leaving behind</Eyebrow>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -996,6 +1053,9 @@ export default function App() {
               ))}
             </ul>
           </section>
+
+          </div>
+          )}
 
           {/* ── Footer */}
           <div style={{
