@@ -105,6 +105,18 @@
     transition: transform 80ms linear;
   }
 
+  /* ── FILM-GRAIN NOISE OVERLAY — analog warmth, set-and-forget.
+     Inline SVG turbulence filter tiled across the viewport. Low opacity
+     so it reads as paper texture, not visible static. stitchTiles makes
+     adjacent tiles seamless. Fixed positioning so it doesn't repaint
+     during scroll. Below modal z-index, above content. */
+  .noise-overlay {
+    position: fixed; inset: 0; pointer-events: none;
+    z-index: 1; opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+
   /* ── BREATH PACER ── on-brand microinteraction ── */
   .breath-pacer {
     position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 90;
@@ -547,59 +559,8 @@
     margin: 0 auto 2.2rem; position: relative; z-index: 1;
   }
 
-  /* ── POLYVAGAL LADDER — educational anchor ── */
-  .polyvagal-figure {
-    margin: 3.5rem auto 0; max-width: 540px;
-    display: flex; flex-direction: column; gap: 2.4rem;
-  }
-  .polyvagal-state {
-    display: flex; flex-direction: column; gap: 0.55rem;
-  }
-  .polyvagal-state-name {
-    font-family: var(--font-heading); font-size: 1.35rem;
-    font-style: italic; font-weight: 400; color: var(--dark-brown);
-    letter-spacing: -0.005em;
-  }
-  .polyvagal-state-mode {
-    font-family: var(--font-body); font-size: 0.72rem;
-    font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--warm-brown);
-  }
-  .polyvagal-wave {
-    width: 100%; height: 56px; display: block; margin-top: 0.3rem;
-    overflow: visible;
-  }
-  .polyvagal-wave path {
-    fill: none; stroke-width: 1.25;
-    stroke-linecap: round; stroke-linejoin: round;
-  }
-  .polyvagal-state--ventral     .polyvagal-wave path { stroke: #2C6E6A; }
-  .polyvagal-state--sympathetic .polyvagal-wave path { stroke: var(--gold); }
-  .polyvagal-state--dorsal      .polyvagal-wave path { stroke: var(--dark-brown); opacity: 0.55; }
-
-  /* Stroke-dasharray draw-in. pathLength=100 normalizes all three paths
-     so a single dash length works regardless of their actual geometry. */
-  .has-js .polyvagal-wave path {
-    stroke-dasharray: 100; stroke-dashoffset: 100;
-  }
-  .section--polyvagal.is-in .polyvagal-state--ventral .polyvagal-wave path {
-    animation: drawWave 1.6s var(--ease-out-quart) 0.20s forwards;
-  }
-  .section--polyvagal.is-in .polyvagal-state--sympathetic .polyvagal-wave path {
-    animation: drawWave 1.8s var(--ease-out-quart) 0.55s forwards;
-  }
-  .section--polyvagal.is-in .polyvagal-state--dorsal .polyvagal-wave path {
-    animation: drawWave 1.4s var(--ease-out-quart) 1.00s forwards;
-  }
-  @keyframes drawWave { to { stroke-dashoffset: 0; } }
-
-  .polyvagal-caption {
-    font-family: var(--font-body); font-size: 0.74rem; font-weight: 300;
-    font-style: italic; color: var(--warm-brown); text-align: center;
-    margin-top: 0.8rem; letter-spacing: 0.04em;
-  }
-
   /* ── VAGUS NERVE PATHWAY (Truth section) ── */
+  @keyframes drawWave { to { stroke-dashoffset: 0; } }
   .vagus-figure-wrapper {
     margin: 3rem auto 2.5rem; max-width: 240px;
     display: flex; flex-direction: column; align-items: center; gap: 0.9rem;
@@ -645,8 +606,7 @@
   }
   .section-divider--top    { top: -1px; }
   .section-divider--bottom { bottom: -1px; transform: scaleY(-1); }
-  .brand-statement .section-divider path,
-  .final-cta       .section-divider path { fill: var(--cream); }
+  .brand-statement .section-divider path { fill: var(--cream); }
 
   /* ── BDYALIGN BRIDGE ── */
   .bridge-layout { max-width: 720px; margin: 0 auto; text-align: center; }
@@ -926,6 +886,9 @@
 <!-- ════════════ SCROLL PROGRESS ════════════ -->
 <div class="scroll-progress" aria-hidden="true"><div class="scroll-progress__bar"></div></div>
 
+<!-- ════════════ FILM-GRAIN OVERLAY ════════════ -->
+<div class="noise-overlay" aria-hidden="true"></div>
+
 <!-- ════════════ BREATH PACER ════════════ -->
 <button class="breath-pacer" aria-label="Open breathing exercise" type="button" data-breath-pacer>
   <span class="breath-pacer__ring" aria-hidden="true"></span>
@@ -1063,40 +1026,6 @@
   </div>
 </section>
 
-<!-- ════════════ POLYVAGAL LADDER ════════════ -->
-<section class="section section--polyvagal">
-  <div class="section-inner reveal" style="text-align:center; max-width: 640px;">
-    <p class="section-eyebrow">Polyvagal Theory · Stephen Porges</p>
-    <h2 class="section-title">Your body lives between <em>three states.</em></h2>
-    <p class="section-body" style="margin: 0 auto 1rem; max-width: 52ch;">Every nervous system cycles through three patterns. Knowing which one is running you &mdash; right now, this week, this season &mdash; is what makes any practice actually land.</p>
-
-    <figure class="polyvagal-figure">
-      <div class="polyvagal-state polyvagal-state--ventral">
-        <span class="polyvagal-state-name">Ventral vagal</span>
-        <span class="polyvagal-state-mode">Safety &middot; Connection &middot; Ease</span>
-        <svg class="polyvagal-wave" viewBox="0 0 320 56" preserveAspectRatio="none" aria-hidden="true">
-          <path pathLength="100" d="M 0 28 Q 40 4, 80 28 T 160 28 T 240 28 T 320 28" />
-        </svg>
-      </div>
-      <div class="polyvagal-state polyvagal-state--sympathetic">
-        <span class="polyvagal-state-name">Sympathetic</span>
-        <span class="polyvagal-state-mode">Mobilized &middot; Reactive &middot; Wired</span>
-        <svg class="polyvagal-wave" viewBox="0 0 320 56" preserveAspectRatio="none" aria-hidden="true">
-          <path pathLength="100" d="M 0 28 L 20 6 L 40 50 L 60 6 L 80 50 L 100 6 L 120 50 L 140 6 L 160 50 L 180 6 L 200 50 L 220 6 L 240 50 L 260 6 L 280 50 L 300 6 L 320 28" />
-        </svg>
-      </div>
-      <div class="polyvagal-state polyvagal-state--dorsal">
-        <span class="polyvagal-state-name">Dorsal vagal</span>
-        <span class="polyvagal-state-mode">Collapsed &middot; Numb &middot; Withdrawn</span>
-        <svg class="polyvagal-wave" viewBox="0 0 320 56" preserveAspectRatio="none" aria-hidden="true">
-          <path pathLength="100" d="M 0 28 L 130 28 Q 145 30, 160 30 Q 175 30, 190 28 L 320 28" />
-        </svg>
-      </div>
-      <figcaption class="polyvagal-caption">Every protocol we build meets your body in the state it&rsquo;s in.</figcaption>
-    </figure>
-  </div>
-</section>
-
 <!-- ════════════ BRAND STATEMENT ════════════ -->
 <section class="brand-statement reveal">
   <svg class="section-divider section-divider--top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
@@ -1174,9 +1103,6 @@
 
 <!-- ════════════ FINAL CTA ════════════ -->
 <section class="final-cta reveal">
-  <svg class="section-divider section-divider--top" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M 0 0 L 1440 0 L 1440 24 C 1200 48, 960 4, 720 24 C 480 48, 240 4, 0 24 Z" />
-  </svg>
   <div class="final-cta__bg" aria-hidden="true"></div>
   <p class="section-eyebrow">Ready to Begin?</p>
   <h2 class="section-title">Find out why <em>nothing else has worked.</em></h2>
