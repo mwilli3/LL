@@ -216,7 +216,7 @@
         <h2 class="section-h2 center">Five tools built for the body first.</h2>
         <p class="section-intro" style="max-width:480px;">No account. No paywall. Just the framework — applied to your child's specific pattern.</p>
 
-        <div class="tools-list">
+        <div class="tools-list stagger">
           <a href="https://apps.regulatedchild.com/body" class="app-card">
             <div class="app-icon" style="background:rgba(168,74,48,0.05);"><div class="app-dot" style="border-color:#A84A30;"><div class="app-dot-inner" style="background:#A84A30;"></div></div></div>
             <div class="app-body"><div class="app-header"><h3>Body Behind the Behavior</h3><span class="app-badge" style="background:rgba(168,74,48,0.07);color:#A84A30;">Start here</span></div><p>Understand what your child's body is communicating before you respond to the behavior.</p></div>
@@ -276,7 +276,7 @@
         <h2 class="section-h2 center">The system behind the tools.</h2>
         <p class="section-intro" style="max-width:500px;">Each pillar builds on the one before it. Together, they create a complete framework for understanding your child's nervous system.</p>
 
-        <div class="pillars-grid">
+        <div class="pillars-grid stagger">
           <div class="pillar-card">
             <div class="icon-48"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="16" stroke="#A84A30" stroke-width="2" fill="none"/><path d="M24 8 C20 16,28 16,24 24 C20 32,28 32,24 40" stroke="#A84A30" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="24" cy="24" r="3" fill="#A84A30" opacity="0.3"/></svg></div>
             <p class="pillar-num" style="color:#A84A30;">Pillar 1</p>
@@ -335,7 +335,7 @@
         <h2 class="section-h2 center">When observation turns into protocol.</h2>
         <p class="section-intro" style="max-width:520px;">The free tools help you see the pattern. These help you track it, understand it, and build a protocol around it.</p>
 
-        <div class="deeper-grid">
+        <div class="deeper-grid stagger">
           <div class="paid-card">
             <div class="paid-header" style="background:var(--slate);"><h3>Behavior Decoder Workbook</h3><span class="paid-price">$47</span><span class="paid-once">one-time</span></div>
             <div class="paid-body">
@@ -413,23 +413,26 @@
       document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
     }, { passive: true });
 
-    // Smooth scroll
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Smooth scroll (honors reduced-motion via the 'behavior' value)
     document.querySelectorAll('.nav-links a').forEach(function(a) {
       a.addEventListener('click', function(e) {
         e.preventDefault();
         var t = document.querySelector(this.getAttribute('href'));
-        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (t) t.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
       });
     });
 
-    // Fade in
+    // Scroll-reveal — entrance motion is CSS-gated, so under reduced-motion
+    // (or no IntersectionObserver) we just mark everything visible up front.
     var fades = document.querySelectorAll('.fade');
-    if ('IntersectionObserver' in window) {
+    if (!reduceMotion && 'IntersectionObserver' in window) {
       var obs = new IntersectionObserver(function(entries) {
         entries.forEach(function(e) {
           if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
         });
-      }, { threshold: 0.1 });
+      }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
       fades.forEach(function(el) { obs.observe(el); });
     } else {
       fades.forEach(function(el) { el.classList.add('visible'); });
