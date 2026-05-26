@@ -88,6 +88,7 @@ export default function App() {
   const dayNum = getDayNum(data);
   const week = getWeek(dayNum);
   const todayEntry = data.entries?.[td()] || {no:"",protect:"",claim:""};
+  const answeredCount = EVENING_QS.filter(q=>todayEntry[q.key]&&todayEntry[q.key].trim()).length;
   const todayEnergy = data.energy?.[td()] || {gave:0,received:0};
 
   const updateEntry = (key,val) => {const d={...data};if(!d.startDate)d.startDate=td();d.entries={...d.entries,[td()]:{...todayEntry,[key]:val}};setData(d);};
@@ -205,10 +206,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
 
-        {!checked && <div style={{background:B.pri,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14}}><div style={{width:8,height:8,borderRadius:"50%",background:B.wh,animation:"pulse 2s ease-in-out infinite",minWidth:8}} /><p style={{fontSize:14,color:B.wh,fontWeight:500}}>You haven't checked in today</p></div>}
-        {checked && <div style={{background:B.accentL,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,border:`1px solid ${B.accent}20`}}><div style={{width:8,height:8,borderRadius:"50%",background:B.accent,minWidth:8}} /><p style={{fontSize:14,color:B.accent,fontWeight:500}}>Boundaries checked tonight</p></div>}
-
-        <div style={{textAlign:"center",marginBottom:40}}>
+        <div style={{textAlign:"center",marginBottom:28}}>
           {dayNum>0 && (
             <div style={{marginBottom:14}}>
               <div style={{display:"flex",justifyContent:"center",alignItems:"baseline",gap:8}}>
@@ -224,6 +222,12 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
           <p style={{fontSize:15,color:B.txm,lineHeight:1.7,maxWidth:400,margin:"0 auto"}}>30 days of boundary building. From noticing to naming to holding. With scripts, tracking, and the science of why saying no rewires your nervous system.</p>
         </div>
 
+        {/* Streak reward */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14,marginBottom:28,padding:"16px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+          <span style={{fontFamily:H,fontSize:46,fontWeight:600,color:B.accent,lineHeight:.85}}>{streak}</span>
+          <span style={{fontSize:12,letterSpacing:2,textTransform:"uppercase",fontWeight:600,color:B.txl,maxWidth:120,lineHeight:1.5}}>consecutive nights held</span>
+        </div>
+
         <div style={{display:"flex",gap:6,marginBottom:28}}>
           {[{k:"journal",l:"Journal"},{k:"program",l:"Program"},{k:"tools",l:"Tools"}].map(t=>(
             <button key={t.k} onClick={()=>setTab(t.k)} style={{flex:1,padding:"10px 0",fontSize:12,fontWeight:600,fontFamily:F,letterSpacing:1,textTransform:"uppercase",color:tab===t.k?B.wh:B.accent,background:tab===t.k?B.accent:"transparent",border:`1.5px solid ${B.accent}`,borderRadius:6,cursor:"pointer",transition:"all .2s"}}>{t.l}</button>
@@ -231,7 +235,13 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
         </div>
 
         {tab==="journal" && <>
-          <Lbl>Tonight's boundary check</Lbl>
+          <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,marginBottom:18}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:12}}>
+              <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
+              <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent,letterSpacing:.2}}>Tonight's boundary check</span>
+            </div>
+            <span style={{fontFamily:F,fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:answeredCount>0?B.accent:B.txl}}>{answeredCount>0?(answeredCount===3?"Complete ✓":`${answeredCount} of 3`):"Optional"}</span>
+          </div>
           {EVENING_QS.map((q,i)=>(
             <div key={i} style={{marginBottom:20}}>
               <div style={{display:"flex",alignItems:"baseline",gap:12,marginBottom:10}}>
@@ -386,13 +396,6 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
           </div>
         </>}
 
-        <div style={{display:"flex",alignItems:"center",gap:20,margin:"8px 0 28px",padding:"28px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
-          <p style={{fontFamily:H,fontSize:"clamp(72px,24vw,108px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
-          <div>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>nights held</p>
-          </div>
-        </div>
         <div style={{textAlign:"center",paddingTop:20}}>
           <p style={{fontSize:11,color:B.txl,letterSpacing:3,textTransform:"uppercase",fontWeight:600}}>I choose myself without apology.</p>
           <p style={{fontSize:11,color:B.txl,marginTop:8,letterSpacing:2}}>@lovelarice</p>

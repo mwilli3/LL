@@ -138,6 +138,7 @@ export default function App() {
   const checked = hasCheckedToday(data);
   const dayNum = getDayNum(data);
   const todayData = data.days?.[td()] || {};
+  const doneCount = PERIODS.filter(p=>todayData[p.key]).length;
   const todayWot = data.wot?.[td()] || 0;
 
   const togglePeriod = (key) => {
@@ -292,20 +293,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
 
-        {!checked && (
-          <div style={{background:B.pri,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,animation:"up .4s cubic-bezier(.22,1,.36,1) .1s both"}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:B.wh,animation:"pulse 2s ease-in-out infinite",minWidth:8}} />
-            <p style={{fontSize:14,color:B.wh,fontWeight:500}}>You haven't checked in today</p>
-          </div>
-        )}
-        {checked && (
-          <div style={{background:B.accentL,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,border:`1px solid ${B.accent}20`}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:B.accent,minWidth:8}} />
-            <p style={{fontSize:14,color:B.accent,fontWeight:500}}>Checked in today</p>
-          </div>
-        )}
-
-        <div style={{textAlign:"center",marginBottom:40,animation:"up .5s cubic-bezier(.22,1,.36,1) .15s both"}}>
+        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) .15s both"}}>
           {dayNum > 0 && (
             <div style={{display:"flex",justifyContent:"center",alignItems:"baseline",gap:8,marginBottom:14}}>
               <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:1}}>Day {dayNum}</span>
@@ -318,6 +306,12 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
           <p style={{fontSize:15,color:B.txm,lineHeight:1.7,maxWidth:400,margin:"0 auto"}}>30 days of nervous system regulation. Track, practice, and build the evidence that calm is a skill you own.</p>
         </div>
 
+        {/* Streak reward */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14,marginBottom:28,padding:"16px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+          <span style={{fontFamily:H,fontSize:46,fontWeight:600,color:B.accent,lineHeight:.85}}>{streak}</span>
+          <span style={{fontSize:12,letterSpacing:2,textTransform:"uppercase",fontWeight:600,color:B.txl,maxWidth:120,lineHeight:1.5}}>consecutive days regulated</span>
+        </div>
+
         {/* Tab nav */}
         <div style={{display:"flex",gap:6,marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) .2s both"}}>
           {[{k:"track",l:"Track"},{k:"practice",l:"Practices"},{k:"insights",l:"Insights"}].map(t=>(
@@ -328,7 +322,13 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
         {/* TRACK TAB */}
         {tab==="track" && <>
           <div style={{marginBottom:28}}>
-            <Lbl>Today's regulation check-in</Lbl>
+            <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,marginBottom:12}}>
+              <div style={{display:"flex",alignItems:"baseline",gap:12}}>
+                <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
+                <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent,letterSpacing:.2}}>Today's regulation check-in</span>
+              </div>
+              <span style={{fontFamily:F,fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:doneCount===3?B.accent:B.txl}}>{doneCount===3?"Complete ✓":`${doneCount} of 3`}</span>
+            </div>
             <div style={{background:B.wh,borderRadius:12,padding:"20px",border:`1px solid ${B.accent}15`}}>
               {PERIODS.map((p,i)=>{
                 const isDone = todayData[p.key];
@@ -501,15 +501,6 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
             ))}
           </div>
         </>}
-
-        {/* Streak */}
-        <div style={{display:"flex",alignItems:"center",gap:20,margin:"8px 0 28px",padding:"28px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
-          <p style={{fontFamily:H,fontSize:"clamp(72px,24vw,108px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
-          <div>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>days regulated</p>
-          </div>
-        </div>
 
         <div style={{textAlign:"center",paddingTop:20}}>
           <p style={{fontSize:11,color:B.txl,letterSpacing:3,textTransform:"uppercase",fontWeight:600}}>Calm is a practice, not a personality.</p>

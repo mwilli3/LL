@@ -73,6 +73,19 @@ const RECS = {
   foundation_building: { product:"Resveratrol", desc:"Your data shows you’re building real consistency. Resveratrol matches this approach — it’s not a quick-fix supplement. Its effects are measured in biomarkers over months. The long-game supplement for the woman who’s decided to stop starting over.", price:"$29.99", url:"https://bdyalign.com/products/resveratrol" },
 };
 
+function Accordion({ title, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{borderTop:`1px solid ${B.tx}12`,marginBottom:8}}>
+      <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",width:"100%",justifyContent:"space-between",alignItems:"center",gap:12,padding:"18px 0",background:"none",border:"none",cursor:"pointer",fontFamily:F,textAlign:"left"}}>
+        <span style={{fontFamily:H,fontSize:18,fontWeight:600,fontStyle:"italic",color:B.accent}}>{title}</span>
+        <span style={{color:B.accent,fontSize:22,fontWeight:400,lineHeight:1,minWidth:20,textAlign:"center"}}>{open?"−":"+"}</span>
+      </button>
+      {open && <div style={{paddingBottom:20,animation:"up .3s cubic-bezier(.22,1,.36,1) both"}}>{children}</div>}
+    </div>
+  );
+}
+
 export default function App() {
   const [data, setData] = useState(load);
   useEffect(() => {
@@ -103,6 +116,7 @@ export default function App() {
   const checked = hasCheckedToday(data);
   const dayNum = getDayNum(data);
   const todayData = data.days?.[td()] || {};
+  const doneCount = FOUNDS.filter(f=>todayData[f.key]).length;
   const totals30 = get30(data);
 
   const toggle = (key) => { const d={...data}; if(!d.startDate)d.startDate=td(); d.days={...d.days,[td()]:{...todayData,[key]:!todayData[key]}}; setData(d); };
@@ -223,10 +237,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
 
-        {!checked && <div style={{background:B.pri,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14}}><div style={{width:8,height:8,borderRadius:"50%",background:B.wh,animation:"pulse 2s ease-in-out infinite",minWidth:8}} /><p style={{fontSize:14,color:B.wh,fontWeight:500}}>You haven't checked in today</p></div>}
-        {checked && <div style={{background:B.accentL,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,border:`1px solid ${B.accent}20`}}><div style={{width:8,height:8,borderRadius:"50%",background:B.accent,minWidth:8}} /><p style={{fontSize:14,color:B.accent,fontWeight:500}}>Checked in today</p></div>}
-
-        <div style={{textAlign:"center",marginBottom:40}}>
+        <div style={{textAlign:"center",marginBottom:28}}>
           {dayNum>0 && (
             <div style={{display:"flex",justifyContent:"center",alignItems:"baseline",gap:8,marginBottom:14}}>
               <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:1}}>Day {dayNum}</span>
@@ -239,6 +250,12 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
           <p style={{fontSize:15,color:B.txm,lineHeight:1.7,maxWidth:400,margin:"0 auto"}}>The system that makes your foundations permanent. Track, audit, recover, and build the identity of someone who follows through.</p>
         </div>
 
+        {/* Streak reward */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14,marginBottom:28,padding:"16px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+          <span style={{fontFamily:H,fontSize:46,fontWeight:600,color:B.accent,lineHeight:.85}}>{streak}</span>
+          <span style={{fontSize:12,letterSpacing:2,textTransform:"uppercase",fontWeight:600,color:B.txl,maxWidth:120,lineHeight:1.5}}>consecutive days rooted</span>
+        </div>
+
         <div style={{display:"flex",gap:6,marginBottom:28}}>
           {[{k:"track",l:"Track"},{k:"system",l:"System"},{k:"research",l:"Research"}].map(t=>(
             <button key={t.k} onClick={()=>setTab(t.k)} style={{flex:1,padding:"10px 0",fontSize:12,fontWeight:600,fontFamily:F,letterSpacing:1,textTransform:"uppercase",color:tab===t.k?B.wh:B.accent,background:tab===t.k?B.accent:"transparent",border:`1.5px solid ${B.accent}`,borderRadius:6,cursor:"pointer",transition:"all .2s"}}>{t.l}</button>
@@ -246,14 +263,13 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
         </div>
 
         {tab==="track" && <>
-          <div style={{display:"flex",gap:10,marginBottom:24}}>
-            <div style={{flex:1}}><label style={{fontSize:11,fontWeight:600,color:B.txm,letterSpacing:1,textTransform:"uppercase",display:"block",marginBottom:6}}>Hydration target</label>
-            <input value={data.hydrationTarget||""} onChange={e=>setData({...data,hydrationTarget:e.target.value})} placeholder="e.g. 80 oz" style={{width:"100%",padding:"10px 0 8px",fontSize:14,fontFamily:F,border:"none",borderBottom:`2px solid ${B.txl}50`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}} onFocus={e=>e.target.style.borderBottomColor=B.accent} onBlur={e=>e.target.style.borderBottomColor=B.txl+"50"} /></div>
-            <div style={{flex:1}}><label style={{fontSize:11,fontWeight:600,color:B.txm,letterSpacing:1,textTransform:"uppercase",display:"block",marginBottom:6}}>Sleep window</label>
-            <input value={data.sleepWindow||""} onChange={e=>setData({...data,sleepWindow:e.target.value})} placeholder="e.g. 10pm-6am" style={{width:"100%",padding:"10px 0 8px",fontSize:14,fontFamily:F,border:"none",borderBottom:`2px solid ${B.txl}50`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}} onFocus={e=>e.target.style.borderBottomColor=B.accent} onBlur={e=>e.target.style.borderBottomColor=B.txl+"50"} /></div>
+          <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,marginBottom:12}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:12}}>
+              <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
+              <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent,letterSpacing:.2}}>Today's foundations</span>
+            </div>
+            <span style={{fontFamily:F,fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:doneCount===4?B.accent:B.txl}}>{doneCount===4?"Complete ✓":`${doneCount} of 4`}</span>
           </div>
-
-          <Lbl>Today's foundations</Lbl>
           <div style={{background:B.wh,borderRadius:12,padding:"20px",border:`1px solid ${B.accent}15`,marginBottom:24}}>
             {FOUNDS.map((f,i)=>{const isDone=todayData[f.key];return(
               <div key={i} style={{display:"flex",alignItems:"center",gap:14,marginBottom:i<3?16:0,paddingBottom:i<3?16:0,borderBottom:i<3?`1px solid ${B.tx}08`:"none"}}>
@@ -269,6 +285,15 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
           <textarea value={todayData.notice||""} onChange={e=>{const d={...data};if(!d.startDate)d.startDate=td();d.days={...d.days,[td()]:{...todayData,notice:e.target.value}};setData(d);}} placeholder="Energy, mood, patterns..."
             style={{width:"100%",minHeight:80,padding:14,fontSize:14,fontFamily:F,border:`1px solid ${B.accent}15`,borderRadius:10,background:B.wh,color:B.tx,outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.7,marginBottom:24}}
             onFocus={e=>e.target.style.borderColor=B.accent} onBlur={e=>e.target.style.borderColor=B.accent+"15"} />
+
+          <Accordion title="Your targets">
+            <div style={{display:"flex",gap:10}}>
+              <div style={{flex:1}}><label style={{fontSize:11,fontWeight:600,color:B.txm,letterSpacing:1,textTransform:"uppercase",display:"block",marginBottom:6}}>Hydration target</label>
+              <input value={data.hydrationTarget||""} onChange={e=>setData({...data,hydrationTarget:e.target.value})} placeholder="e.g. 80 oz" style={{width:"100%",padding:"10px 0 8px",fontSize:14,fontFamily:F,border:"none",borderBottom:`2px solid ${B.txl}50`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}} onFocus={e=>e.target.style.borderBottomColor=B.accent} onBlur={e=>e.target.style.borderBottomColor=B.txl+"50"} /></div>
+              <div style={{flex:1}}><label style={{fontSize:11,fontWeight:600,color:B.txm,letterSpacing:1,textTransform:"uppercase",display:"block",marginBottom:6}}>Sleep window</label>
+              <input value={data.sleepWindow||""} onChange={e=>setData({...data,sleepWindow:e.target.value})} placeholder="e.g. 10pm-6am" style={{width:"100%",padding:"10px 0 8px",fontSize:14,fontFamily:F,border:"none",borderBottom:`2px solid ${B.txl}50`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}} onFocus={e=>e.target.style.borderBottomColor=B.accent} onBlur={e=>e.target.style.borderBottomColor=B.txl+"50"} /></div>
+            </div>
+          </Accordion>
 
           <Lbl>Weekly habit audits</Lbl>
           {[1,2,3,4].map(wk=>{const isActive=dayNum>=((wk-1)*7+1);const totals=getWeekTotals(data,wk);const dw=wk===4?9:7;const tc=totals.hydration+totals.sleep+totals.movement+totals.nourish;return(
@@ -360,13 +385,6 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
           ))}
         </>}
 
-        <div style={{display:"flex",alignItems:"center",gap:20,margin:"8px 0 28px",padding:"28px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
-          <p style={{fontFamily:H,fontSize:"clamp(72px,24vw,108px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
-          <div>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>days rooted</p>
-          </div>
-        </div>
         <div style={{textAlign:"center",paddingTop:20}}>
           <p style={{fontSize:11,color:B.txl,letterSpacing:3,textTransform:"uppercase",fontWeight:600}}>Consistency beats intensity, always.</p>
           <p style={{fontSize:11,color:B.txl,marginTop:8,letterSpacing:2}}>@lovelarice</p>
