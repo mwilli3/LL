@@ -6,9 +6,9 @@
 |---|---|---|---|
 | Regulator | Teal `#2C6E6A` | Nervous System Reset Guide | Regulation Mastery Kit |
 | Rooted | Green `#5A7F3C` | 7-Day Foundation Tracker | Rooted Reset Challenge Kit |
-| Reclaimer | Rose `#8B3A4A` | Boundary Journal | Reclaimer paid app *(name TBD)* |
+| Reclaimer | Rose `#8B3A4A` | Boundary Journal | Boundary Mastery Kit |
 
-Every app — free or paid — is built from the same tokens, type, logo, motion, and recurring components below. Only the archetype accent swaps.
+Every app — free or paid — is built from the same tokens, type, logo, motion, and recurring components below. Only the archetype accent swaps. Free apps run a 7-day protocol; paid apps run a 30-day protocol with tabs, a live AI analysis, and a purchase gate (see §5 paid-tier components).
 
 ---
 
@@ -83,7 +83,7 @@ Flat and paper-like. Hierarchy comes from hairlines and negative space, not shad
 `Nerve_Branch_Woman_Logo-11.svg`, injected via `dangerouslySetInnerHTML`. Container `width:500 / maxWidth:100% / margin:0 auto / overflow:hidden`; SVG `width` forced to `100%`, `height` removed, `viewBox="0 110 824.88 110"` (crops to the wordmark band). Centered at the top of every app.
 
 ### Masthead
-Centered. Serif headline with the second line in accent italic; one supporting line in Muted Brown (`maxWidth:400, margin:0 auto`). **No decorative divider.** The **day index is the masthead kicker** — a centered serif-italic line "Day {n} — of seven" sitting above the headline. This is the single canonical location for the day index in every app.
+Centered. Serif headline with the second line in accent italic; one supporting line in Muted Brown (`maxWidth:400, margin:0 auto`). **No decorative divider.** The **day index is the masthead kicker** — a centered serif-italic line "Day {n} of seven" (free) or "Day {n} of thirty" (paid) sitting above the headline. This is the single canonical location for the day index in every app. Paid apps split the product name across two headline lines (line 2 in accent italic), e.g. "Regulation / *Mastery Kit*"; an optional small uppercase sub-line under the kicker carries phase context (e.g. "Week 1 · Notice").
 
 ### Section label (`Lbl`)
 Serif italic 20px accent text preceded by a 26px / 1px accent hairline, baseline-aligned. Replaces uppercase micro-eyebrows for section headers.
@@ -115,6 +115,15 @@ Stacked-zone SVG, all colors via tokens (see §2 zone tokens): **Hyperarousal** 
 
 ### Footer
 Centered uppercase tracked tagline + `@lovelarice` handle.
+
+### Paid-tier components
+Paid apps (Regulation Mastery / Rooted Reset Challenge / Boundary Mastery Kit) reuse everything above and add:
+- **Purchase gate** — full-screen email-entry view shown until verified. Serif display product name (name split, accent-italic line 2), single underline email input (border brightens to `accent` on focus; `pri` on error), one uppercase `accent` "Verify purchase" button. Verification persists to `localStorage`. **Never restyle in a way that breaks the verify/gate logic.**
+- **Tab bar** — 3 equal pill-outline tabs (e.g. Track / System / Research). Active tab: `accent` fill + white text; inactive: `accent` outline + `accent` text. Uppercase Outfit, tracking 1.
+- **AI analysis block** — one full-width `accent` button ("Audit my foundations" / "Analyze my regulation") that calls the live `/.netlify/functions/analyze` endpoint. Result renders in an `accentL` callout panel (flowing paragraphs, `whiteSpace:pre-wrap`). **Backend contract is fixed — restyle only.** This is the paid payoff that the free apps' Day-3 teaser points toward; paid apps do **not** carry a Day-3 teaser.
+- **BdyAlign product-recommendation card** — appears under the AI result. Intentionally uses the **Clay (`pri`/`fill`) accent, not the archetype accent**, to signal it's a cross-brand commerce module. Serif product name, Muted-Brown description, clay "Learn more" link to `bdyalign.com`, clay price. Driven by a pattern tag the AI returns.
+- **30-day structures** — weekly habit/regulation audits (ruled rows or progress bars), identity/reflection prompts (accentL callout panels with a textarea), and a flat hairline 30-day summary row of serif numerals (same pattern as the journal stat row).
+- **Breath-practice library** — multiple guided practices (extended exhale, box, 4-7-8, physiological sigh) sharing one animated `BreathTimer` (accent ring that scales with the breath; count numeral; phase label).
 
 ## 6. Do's and Don'ts
 

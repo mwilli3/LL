@@ -218,10 +218,9 @@ export default function App() {
           <div style={{padding:"28px 24px",background:B.accent,borderRadius:12,marginBottom:32,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}>
             <p style={{fontSize:10,fontWeight:600,letterSpacing:3,textTransform:"uppercase",color:"rgba(255,255,255,.55)",marginBottom:12}}>Day 3 · Your first pattern</p>
             <p style={{fontSize:15,fontWeight:500,lineHeight:1.6,color:B.wh,marginBottom:18}}>{getDay3Insight(patterns)}</p>
-            {/* TODO: Reclaimer paid product name TBD */}
-            <p style={{fontSize:13,lineHeight:1.7,color:"rgba(255,255,255,.75)",marginBottom:20}}>The <strong style={{fontWeight:600,color:B.wh}}>full Reclaimer practice</strong> extends this into daily boundary scripts, pattern analysis, and the complete reclamation sequence.</p>
+            <p style={{fontSize:13,lineHeight:1.7,color:"rgba(255,255,255,.75)",marginBottom:20}}>The <strong style={{fontWeight:600,color:B.wh}}>Boundary Mastery Kit</strong> extends this into a 30-day practice — daily boundary scripts, pattern analysis, and the complete reclamation sequence.</p>
             <button style={{padding:"14px 36px",fontSize:13,fontWeight:600,fontFamily:F,color:B.accent,background:B.wh,border:"none",borderRadius:8,cursor:"pointer",letterSpacing:1,textTransform:"uppercase",transition:"transform .2s"}}
-              onMouseEnter={e=>{e.target.style.transform="translateY(-1px)"}} onMouseLeave={e=>{e.target.style.transform="translateY(0)"}}>Unlock the full practice</button>
+              onMouseEnter={e=>{e.target.style.transform="translateY(-1px)"}} onMouseLeave={e=>{e.target.style.transform="translateY(0)"}}>Get the Mastery Kit</button>
           </div>
         )}
 

@@ -41,6 +41,20 @@ const apps = [
     id: "reset", file: "ns-reset-guide.jsx", key: "larice_ns_reset",
     seed: { startDate: iso(2), days: days3({ morning: true, midday: true, evening: true }) },
   },
+  // Paid apps (email-gated). gateKey bypasses the purchase gate for preview.
+  {
+    id: "rooted-kit", file: "rooted-challenge.jsx", key: "larice_rooted_kit", gateKey: "larice_rooted_kit_email",
+    seed: { startDate: iso(2), hydrationTarget: "80 oz", sleepWindow: "10pm-6am",
+            days: days3({ hydration: true, sleep: true, movement: true, nourish: true }) },
+  },
+  {
+    id: "reg-mastery", file: "regulation-mastery.jsx", key: "larice_reg_mastery", gateKey: "larice_reg_mastery_email",
+    seed: { startDate: iso(2), wot: days3(6), days: days3({ morning: true, midday: true, evening: true }) },
+  },
+  {
+    id: "boundary-mastery", file: "boundary-mastery.jsx", key: "larice_boundary_mastery", gateKey: "larice_boundary_mastery_email",
+    seed: { startDate: iso(2), entries: days3({ no: "Said no to a late ask.", protect: "Protected my morning.", claim: "Claimed rest." }) },
+  },
 ];
 
 const filter = process.argv.slice(2);
@@ -79,9 +93,9 @@ for (const app of selected) {
   writeFileSync(pagePath, html(js));
 
   for (const [state, seed] of [["empty", null], ["seeded", app.seed]]) {
-    await page.addInitScript(({ key, value }) => {
-      try { localStorage.clear(); if (value) localStorage.setItem(key, JSON.stringify(value)); } catch {}
-    }, { key: app.key, value: seed });
+    await page.addInitScript(({ key, value, gateKey }) => {
+      try { localStorage.clear(); if (value) localStorage.setItem(key, JSON.stringify(value)); if (gateKey && value) localStorage.setItem(gateKey, "preview@lovelarice.test"); } catch {}
+    }, { key: app.key, value: seed, gateKey: app.gateKey });
     await page.goto("file://" + pagePath, { waitUntil: "networkidle" });
     await page.waitForTimeout(1200);
     const out = resolve(OUT, `${app.id}-${state}.png`);
