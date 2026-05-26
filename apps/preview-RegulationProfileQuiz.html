@@ -7248,12 +7248,50 @@
     }
   });
 
+  // node_modules/react/cjs/react-jsx-runtime.production.min.js
+  var require_react_jsx_runtime_production_min = __commonJS({
+    "node_modules/react/cjs/react-jsx-runtime.production.min.js"(exports) {
+      "use strict";
+      var f = require_react();
+      var k = /* @__PURE__ */ Symbol.for("react.element");
+      var l = /* @__PURE__ */ Symbol.for("react.fragment");
+      var m = Object.prototype.hasOwnProperty;
+      var n = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner;
+      var p = { key: true, ref: true, __self: true, __source: true };
+      function q(c, a, g) {
+        var b, d = {}, e = null, h = null;
+        void 0 !== g && (e = "" + g);
+        void 0 !== a.key && (e = "" + a.key);
+        void 0 !== a.ref && (h = a.ref);
+        for (b in a) m.call(a, b) && !p.hasOwnProperty(b) && (d[b] = a[b]);
+        if (c && c.defaultProps) for (b in a = c.defaultProps, a) void 0 === d[b] && (d[b] = a[b]);
+        return { $$typeof: k, type: c, key: e, ref: h, props: d, _owner: n.current };
+      }
+      exports.Fragment = l;
+      exports.jsx = q;
+      exports.jsxs = q;
+    }
+  });
+
+  // node_modules/react/jsx-runtime.js
+  var require_jsx_runtime = __commonJS({
+    "node_modules/react/jsx-runtime.js"(exports, module) {
+      "use strict";
+      if (true) {
+        module.exports = require_react_jsx_runtime_production_min();
+      } else {
+        module.exports = null;
+      }
+    }
+  });
+
   // entry.jsx
   var import_react2 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
   // Quiz.jsx
   var import_react = __toESM(require_react());
+  var import_jsx_runtime = __toESM(require_jsx_runtime());
   var C = {
     text: "oklch(0.26 0.03 45)",
     muted: "oklch(0.50 0.02 55)",
@@ -7273,52 +7311,81 @@
   var DISPLAY = "'Young Serif', serif";
   var UI = "'Outfit', sans-serif";
   var EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
-  var FontLink = () => /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("link", { rel: "preconnect", href: "https://fonts.googleapis.com" }), /* @__PURE__ */ React.createElement("link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" }), /* @__PURE__ */ React.createElement(
-    "link",
-    {
-      href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Young+Serif&display=swap",
-      rel: "stylesheet"
-    }
-  ), /* @__PURE__ */ React.createElement("style", null, `
+  var FontLink = () => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("link", { rel: "preconnect", href: "https://fonts.googleapis.com" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+      "link",
+      {
+        href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Young+Serif&display=swap",
+        rel: "stylesheet"
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("style", { children: `
       @keyframes rcFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
       @keyframes rcArcDraw { from { stroke-dashoffset: var(--rc-arc-len); } to { stroke-dashoffset: var(--rc-arc-off); } }
       .rc-rise { opacity: 0; animation: rcFadeUp .7s ${EASE} forwards; }
       * { -webkit-tap-highlight-color: transparent; }
-    `));
-  var ArcLogo = ({ size = 40 }) => /* @__PURE__ */ React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 200 200", width: size, height: size, "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("path", { d: "M100 22 A78 78 0 0 1 178 100", stroke: "oklch(0.53 0.12 40)", strokeWidth: "14", fill: "none", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("path", { d: "M178 100 A78 78 0 0 1 100 178", stroke: "oklch(0.68 0.09 44)", strokeWidth: "14", fill: "none", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("path", { d: "M100 178 A78 78 0 0 1 22 100", stroke: "oklch(0.45 0.07 300)", strokeWidth: "14", fill: "none", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("path", { d: "M22 100 A78 78 0 0 1 100 22", stroke: "oklch(0.53 0.12 40)", strokeWidth: "8", fill: "none", strokeLinecap: "round", opacity: "0.32" }), /* @__PURE__ */ React.createElement("circle", { cx: "100", cy: "100", r: "16", fill: "oklch(0.53 0.12 40)" }));
+    ` })
+  ] });
+  var ArcLogo = ({ size = 40 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 200 200", width: size, height: size, "aria-hidden": "true", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M100 22 A78 78 0 0 1 178 100", stroke: "oklch(0.53 0.12 40)", strokeWidth: "14", fill: "none", strokeLinecap: "round" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M178 100 A78 78 0 0 1 100 178", stroke: "oklch(0.68 0.09 44)", strokeWidth: "14", fill: "none", strokeLinecap: "round" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M100 178 A78 78 0 0 1 22 100", stroke: "oklch(0.45 0.07 300)", strokeWidth: "14", fill: "none", strokeLinecap: "round" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M22 100 A78 78 0 0 1 100 22", stroke: "oklch(0.53 0.12 40)", strokeWidth: "8", fill: "none", strokeLinecap: "round", opacity: "0.32" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "100", cy: "100", r: "16", fill: "oklch(0.53 0.12 40)" })
+  ] });
   var ArcRing = ({ value, total, color, size = 46 }) => {
     const r = 20, cx = 24, cy = 24;
     const circ = 2 * Math.PI * r;
     const frac = Math.min(value / total, 1);
-    return /* @__PURE__ */ React.createElement("div", { style: { position: "relative", width: size, height: size } }, /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 48 48", width: size, height: size }, /* @__PURE__ */ React.createElement("circle", { cx, cy, r, fill: "none", stroke: C.line, strokeWidth: "4" }), /* @__PURE__ */ React.createElement(
-      "circle",
-      {
-        cx,
-        cy,
-        r,
-        fill: "none",
-        stroke: color,
-        strokeWidth: "4",
-        strokeLinecap: "round",
-        strokeDasharray: circ,
-        strokeDashoffset: circ * (1 - frac),
-        transform: `rotate(-90 ${cx} ${cy})`,
-        style: { transition: `stroke-dashoffset .55s ${EASE}` }
-      }
-    )), /* @__PURE__ */ React.createElement("div", { style: {
-      position: "absolute",
-      inset: 0,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontFamily: UI,
-      fontSize: 12,
-      fontWeight: 600,
-      color: C.text
-    } }, value, /* @__PURE__ */ React.createElement("span", { style: { color: C.muted, fontWeight: 500 } }, "/", total)));
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative", width: size, height: size }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { viewBox: "0 0 48 48", width: size, height: size, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx, cy, r, fill: "none", stroke: C.line, strokeWidth: "4" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+          "circle",
+          {
+            cx,
+            cy,
+            r,
+            fill: "none",
+            stroke: color,
+            strokeWidth: "4",
+            strokeLinecap: "round",
+            strokeDasharray: circ,
+            strokeDashoffset: circ * (1 - frac),
+            transform: `rotate(-90 ${cx} ${cy})`,
+            style: { transition: `stroke-dashoffset .55s ${EASE}` }
+          }
+        )
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: {
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: UI,
+        fontSize: 12,
+        fontWeight: 600,
+        color: C.text
+      }, children: [
+        value,
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { style: { color: C.muted, fontWeight: 500 }, children: [
+          "/",
+          total
+        ] })
+      ] })
+    ] });
   };
-  var ArcSeal = ({ color, size = 92 }) => /* @__PURE__ */ React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 200 200", width: size, height: size, "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("path", { d: "M100 16 A84 84 0 0 1 184 100", stroke: color, strokeWidth: "13", fill: "none", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("path", { d: "M184 100 A84 84 0 0 1 100 184", stroke: color, strokeWidth: "13", fill: "none", strokeLinecap: "round", opacity: "0.55" }), /* @__PURE__ */ React.createElement("path", { d: "M100 184 A84 84 0 0 1 16 100", stroke: color, strokeWidth: "13", fill: "none", strokeLinecap: "round", opacity: "0.28" }), /* @__PURE__ */ React.createElement("path", { d: "M100 50 A50 50 0 0 1 150 100", stroke: color, strokeWidth: "9", fill: "none", strokeLinecap: "round", opacity: "0.85" }), /* @__PURE__ */ React.createElement("circle", { cx: "100", cy: "100", r: "15", fill: color }));
-  var ArcField = ({ color, style }) => /* @__PURE__ */ React.createElement(
+  var ArcSeal = ({ color, size = 92 }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 200 200", width: size, height: size, "aria-hidden": "true", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M100 16 A84 84 0 0 1 184 100", stroke: color, strokeWidth: "13", fill: "none", strokeLinecap: "round" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M184 100 A84 84 0 0 1 100 184", stroke: color, strokeWidth: "13", fill: "none", strokeLinecap: "round", opacity: "0.55" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M100 184 A84 84 0 0 1 16 100", stroke: color, strokeWidth: "13", fill: "none", strokeLinecap: "round", opacity: "0.28" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M100 50 A50 50 0 0 1 150 100", stroke: color, strokeWidth: "9", fill: "none", strokeLinecap: "round", opacity: "0.85" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("circle", { cx: "100", cy: "100", r: "15", fill: color })
+  ] });
+  var ArcField = ({ color, style }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
     "svg",
     {
       viewBox: "0 0 400 400",
@@ -7326,11 +7393,13 @@
       height: "100%",
       preserveAspectRatio: "xMidYMid slice",
       style: { position: "absolute", inset: 0, ...style },
-      "aria-hidden": "true"
-    },
-    /* @__PURE__ */ React.createElement("path", { d: "M40 360 A320 320 0 0 1 360 40", stroke: color, strokeWidth: "2", fill: "none", opacity: "0.5" }),
-    /* @__PURE__ */ React.createElement("path", { d: "M90 360 A270 270 0 0 1 360 90", stroke: color, strokeWidth: "2", fill: "none", opacity: "0.32" }),
-    /* @__PURE__ */ React.createElement("path", { d: "M150 360 A210 210 0 0 1 360 150", stroke: color, strokeWidth: "2", fill: "none", opacity: "0.18" })
+      "aria-hidden": "true",
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M40 360 A320 320 0 0 1 360 40", stroke: color, strokeWidth: "2", fill: "none", opacity: "0.5" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M90 360 A270 270 0 0 1 360 90", stroke: color, strokeWidth: "2", fill: "none", opacity: "0.32" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M150 360 A210 210 0 0 1 360 150", stroke: color, strokeWidth: "2", fill: "none", opacity: "0.18" })
+      ]
+    }
   );
   var questions = [
     {
@@ -7500,43 +7569,66 @@
       boxSizing: "border-box",
       transition: `border-color .3s ${EASE}`
     };
-    return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.bg, fontFamily: UI, color: C.text, position: "relative", overflow: "hidden" } }, /* @__PURE__ */ React.createElement(FontLink, null), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: "-22%", right: "-32%", width: "92vw", maxWidth: 560, height: "92vw", maxHeight: 560, pointerEvents: "none" } }, /* @__PURE__ */ React.createElement(ArcField, { color: C.brand })), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", maxWidth: 520, margin: "0 auto", padding: "clamp(28px, 9vw, 64px) 24px 48px" } }, /* @__PURE__ */ React.createElement("div", { className: "rc-rise", style: { display: "flex", alignItems: "center", gap: 10, marginBottom: "clamp(40px, 12vw, 72px)" } }, /* @__PURE__ */ React.createElement(ArcLogo, { size: 34 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: C.brand } }, "The Regulated Child")), /* @__PURE__ */ React.createElement("p", { className: "rc-rise", style: { animationDelay: ".06s", fontSize: 12, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: C.terracotta, margin: "0 0 14px" } }, "The Regulation Profile Quiz"), /* @__PURE__ */ React.createElement("h1", { className: "rc-rise", style: { animationDelay: ".12s", fontFamily: DISPLAY, fontWeight: 400, fontSize: "clamp(38px, 11vw, 60px)", lineHeight: 1.04, letterSpacing: "-0.01em", margin: "0 0 20px", maxWidth: "12ch" } }, "What\u2019s your child\u2019s regulation profile?"), /* @__PURE__ */ React.createElement("p", { className: "rc-rise", style: { animationDelay: ".18s", fontSize: 17, color: C.muted, lineHeight: 1.6, margin: "0 0 clamp(32px, 9vw, 48px)", maxWidth: "34ch" } }, "Find out how your child\u2019s nervous system responds to stress, and what it needs most. Eight questions, under three minutes."), /* @__PURE__ */ React.createElement("div", { className: "rc-rise", style: { animationDelay: ".24s" } }, /* @__PURE__ */ React.createElement("label", { style: { fontSize: 12, fontWeight: 600, letterSpacing: ".02em", color: C.muted, display: "block", marginBottom: 4 } }, "First name"), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "text",
-        value: name,
-        onChange: (e) => setName(e.target.value),
-        placeholder: "Your first name",
-        onFocus: (e) => e.target.style.borderColor = C.brand,
-        onBlur: (e) => e.target.style.borderColor = C.line,
-        style: { ...inputStyle, marginBottom: 24 }
-      }
-    ), /* @__PURE__ */ React.createElement("label", { style: { fontSize: 12, fontWeight: 600, letterSpacing: ".02em", color: C.muted, display: "block", marginBottom: 4 } }, "Email address"), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        type: "email",
-        value: email,
-        onChange: (e) => setEmail(e.target.value),
-        placeholder: "you@email.com",
-        onKeyDown: (e) => e.key === "Enter" && submit(),
-        onFocus: (e) => e.target.style.borderColor = C.brand,
-        onBlur: (e) => e.target.style.borderColor = C.line,
-        style: { ...inputStyle, marginBottom: 30 }
-      }
-    ), /* @__PURE__ */ React.createElement("button", { onClick: submit, disabled: !ok, style: {
-      width: "100%",
-      padding: "17px",
-      borderRadius: 14,
-      border: "none",
-      fontSize: 16,
-      fontWeight: 600,
-      fontFamily: UI,
-      cursor: ok ? "pointer" : "default",
-      background: ok ? C.brand : C.line,
-      color: ok ? "white" : C.muted,
-      letterSpacing: ".01em",
-      transition: `all .3s ${EASE}`
-    } }, "Start the quiz")), /* @__PURE__ */ React.createElement("div", { className: "rc-rise", style: { animationDelay: ".3s", display: "flex", flexWrap: "wrap", gap: "10px 22px", marginTop: 34, paddingTop: 26, borderTop: `1px solid ${C.line}` } }, [["Sensory Seeker", "ss"], ["Sensitive Regulator", "sr"], ["Slow-to-Recover", "sto"]].map(([label, key]) => /* @__PURE__ */ React.createElement("div", { key, style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { width: 9, height: 9, borderRadius: 5, background: PROFILE_COLOR[key].solid } }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, color: C.muted, fontWeight: 500 } }, label))))));
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { minHeight: "100vh", background: C.bg, fontFamily: UI, color: C.text, position: "relative", overflow: "hidden" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FontLink, {}),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { position: "absolute", top: "-22%", right: "-32%", width: "92vw", maxWidth: 560, height: "92vw", maxHeight: 560, pointerEvents: "none" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArcField, { color: C.brand }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative", maxWidth: 520, margin: "0 auto", padding: "clamp(28px, 9vw, 64px) 24px 48px" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "rc-rise", style: { display: "flex", alignItems: "center", gap: 10, marginBottom: "clamp(40px, 12vw, 72px)" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArcLogo, { size: 34 }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: 11, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: C.brand }, children: "The Regulated Child" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "rc-rise", style: { animationDelay: ".06s", fontSize: 12, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: C.terracotta, margin: "0 0 14px" }, children: "The Regulation Profile Quiz" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { className: "rc-rise", style: { animationDelay: ".12s", fontFamily: DISPLAY, fontWeight: 400, fontSize: "clamp(38px, 11vw, 60px)", lineHeight: 1.04, letterSpacing: "-0.01em", margin: "0 0 20px", maxWidth: "12ch" }, children: "What\u2019s your child\u2019s regulation profile?" }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "rc-rise", style: { animationDelay: ".18s", fontSize: 17, color: C.muted, lineHeight: 1.6, margin: "0 0 clamp(32px, 9vw, 48px)", maxWidth: "34ch" }, children: "Find out how your child\u2019s nervous system responds to stress, and what it needs most. Eight questions, under three minutes." }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "rc-rise", style: { animationDelay: ".24s" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { style: { fontSize: 12, fontWeight: 600, letterSpacing: ".02em", color: C.muted, display: "block", marginBottom: 4 }, children: "First name" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "input",
+            {
+              type: "text",
+              value: name,
+              onChange: (e) => setName(e.target.value),
+              placeholder: "Your first name",
+              onFocus: (e) => e.target.style.borderColor = C.brand,
+              onBlur: (e) => e.target.style.borderColor = C.line,
+              style: { ...inputStyle, marginBottom: 24 }
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", { style: { fontSize: 12, fontWeight: 600, letterSpacing: ".02em", color: C.muted, display: "block", marginBottom: 4 }, children: "Email address" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "input",
+            {
+              type: "email",
+              value: email,
+              onChange: (e) => setEmail(e.target.value),
+              placeholder: "you@email.com",
+              onKeyDown: (e) => e.key === "Enter" && submit(),
+              onFocus: (e) => e.target.style.borderColor = C.brand,
+              onBlur: (e) => e.target.style.borderColor = C.line,
+              style: { ...inputStyle, marginBottom: 30 }
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: submit, disabled: !ok, style: {
+            width: "100%",
+            padding: "17px",
+            borderRadius: 14,
+            border: "none",
+            fontSize: 16,
+            fontWeight: 600,
+            fontFamily: UI,
+            cursor: ok ? "pointer" : "default",
+            background: ok ? C.brand : C.line,
+            color: ok ? "white" : C.muted,
+            letterSpacing: ".01em",
+            transition: `all .3s ${EASE}`
+          }, children: "Start the quiz" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "rc-rise", style: { animationDelay: ".3s", display: "flex", flexWrap: "wrap", gap: "10px 22px", marginTop: 34, paddingTop: 26, borderTop: `1px solid ${C.line}` }, children: [["Sensory Seeker", "ss"], ["Sensitive Regulator", "sr"], ["Slow-to-Recover", "sto"]].map(([label, key]) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { width: 9, height: 9, borderRadius: 5, background: PROFILE_COLOR[key].solid } }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: 13, color: C.muted, fontWeight: 500 }, children: label })
+        ] }, key)) })
+      ] })
+    ] });
   }
   function QuizScreen({ qIndex, onAnswer }) {
     const [selected, setSelected] = (0, import_react.useState)(null);
@@ -7550,73 +7642,153 @@
         setSelected(null);
       }
     };
-    return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.bg, fontFamily: UI, color: C.text, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(FontLink, null), /* @__PURE__ */ React.createElement("header", { style: { padding: "16px 20px", background: C.surface, borderBottom: `1px solid ${C.line}`, position: "sticky", top: 0, zIndex: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 560, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 9 } }, /* @__PURE__ */ React.createElement(ArcLogo, { size: 26 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: C.brand } }, "Regulation Profile Quiz")), /* @__PURE__ */ React.createElement(ArcRing, { value: qIndex + 1, total, color: C.brand }))), /* @__PURE__ */ React.createElement("main", { key: qIndex, style: { flex: 1, maxWidth: 560, width: "100%", margin: "0 auto", padding: "clamp(28px, 8vw, 56px) 20px 150px", boxSizing: "border-box" } }, /* @__PURE__ */ React.createElement("p", { className: "rc-rise", style: { fontSize: 12, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: C.terracotta, margin: "0 0 14px" } }, "Question ", qIndex + 1), /* @__PURE__ */ React.createElement("h2", { className: "rc-rise", style: { animationDelay: ".05s", fontFamily: DISPLAY, fontWeight: 400, fontSize: "clamp(24px, 6.5vw, 32px)", lineHeight: 1.22, letterSpacing: "-0.01em", margin: "0 0 30px" } }, q.q), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 12 } }, q.options.map((opt, i) => {
-      const on = selected === i;
-      return /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          key: i,
-          onClick: () => setSelected(i),
-          className: "rc-rise",
-          style: {
-            animationDelay: `${0.12 + i * 0.06}s`,
-            display: "flex",
-            gap: 16,
-            alignItems: "flex-start",
-            width: "100%",
-            padding: "18px 18px",
-            borderRadius: 16,
-            textAlign: "left",
-            cursor: "pointer",
-            fontFamily: UI,
-            fontSize: 15.5,
-            lineHeight: 1.5,
-            color: C.text,
-            background: on ? PROFILE_COLOR[q.options[i].profile].tint : C.surface,
-            border: `1.5px solid ${on ? PROFILE_COLOR[q.options[i].profile].solid : C.line}`,
-            transition: `background .25s ${EASE}, border-color .25s ${EASE}, transform .25s ${EASE}`,
-            transform: on ? "translateY(-1px)" : "none"
-          }
-        },
-        /* @__PURE__ */ React.createElement("span", { style: {
-          flexShrink: 0,
-          width: 28,
-          height: 28,
-          borderRadius: 8,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: DISPLAY,
-          fontSize: 15,
-          lineHeight: 1,
-          marginTop: 1,
-          background: on ? PROFILE_COLOR[q.options[i].profile].solid : "transparent",
-          color: on ? "white" : C.muted,
-          border: on ? "none" : `1.5px solid ${C.line}`,
-          transition: `all .25s ${EASE}`
-        } }, letters[i]),
-        /* @__PURE__ */ React.createElement("span", null, opt.text)
-      );
-    }))), /* @__PURE__ */ React.createElement("footer", { style: { position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px calc(16px + env(safe-area-inset-bottom))", background: C.surface, borderTop: `1px solid ${C.line}` } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 560, margin: "0 auto" } }, /* @__PURE__ */ React.createElement("button", { onClick: handleNext, disabled: selected === null, style: {
-      width: "100%",
-      padding: "17px",
-      borderRadius: 14,
-      border: "none",
-      fontSize: 16,
-      fontWeight: 600,
-      fontFamily: UI,
-      cursor: selected !== null ? "pointer" : "default",
-      background: selected !== null ? C.brand : C.line,
-      color: selected !== null ? "white" : C.muted,
-      transition: `all .3s ${EASE}`
-    } }, last ? "See my child\u2019s profile" : "Next question"))));
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { minHeight: "100vh", background: C.bg, fontFamily: UI, color: C.text, display: "flex", flexDirection: "column" }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FontLink, {}),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("header", { style: { padding: "16px 20px", background: C.surface, borderBottom: `1px solid ${C.line}`, position: "sticky", top: 0, zIndex: 10 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { maxWidth: 560, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: 9 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArcLogo, { size: 26 }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: 10, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: C.brand }, children: "Regulation Profile Quiz" })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArcRing, { value: qIndex + 1, total, color: C.brand })
+      ] }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("main", { style: { flex: 1, maxWidth: 560, width: "100%", margin: "0 auto", padding: "clamp(28px, 8vw, 56px) 20px 150px", boxSizing: "border-box" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", { className: "rc-rise", style: { fontSize: 12, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: C.terracotta, margin: "0 0 14px" }, children: [
+          "Question ",
+          qIndex + 1
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { className: "rc-rise", style: { animationDelay: ".05s", fontFamily: DISPLAY, fontWeight: 400, fontSize: "clamp(24px, 6.5vw, 32px)", lineHeight: 1.22, letterSpacing: "-0.01em", margin: "0 0 30px" }, children: q.q }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", flexDirection: "column", gap: 12 }, children: q.options.map((opt, i) => {
+          const on = selected === i;
+          return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+            "button",
+            {
+              onClick: () => setSelected(i),
+              className: "rc-rise",
+              style: {
+                animationDelay: `${0.12 + i * 0.06}s`,
+                display: "flex",
+                gap: 16,
+                alignItems: "flex-start",
+                width: "100%",
+                padding: "18px 18px",
+                borderRadius: 16,
+                textAlign: "left",
+                cursor: "pointer",
+                fontFamily: UI,
+                fontSize: 15.5,
+                lineHeight: 1.5,
+                color: C.text,
+                background: on ? PROFILE_COLOR[q.options[i].profile].tint : C.surface,
+                border: `1.5px solid ${on ? PROFILE_COLOR[q.options[i].profile].solid : C.line}`,
+                transition: `background .25s ${EASE}, border-color .25s ${EASE}, transform .25s ${EASE}`,
+                transform: on ? "translateY(-1px)" : "none"
+              },
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: {
+                  flexShrink: 0,
+                  width: 28,
+                  height: 28,
+                  borderRadius: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: DISPLAY,
+                  fontSize: 15,
+                  lineHeight: 1,
+                  marginTop: 1,
+                  background: on ? PROFILE_COLOR[q.options[i].profile].solid : "transparent",
+                  color: on ? "white" : C.muted,
+                  border: on ? "none" : `1.5px solid ${C.line}`,
+                  transition: `all .25s ${EASE}`
+                }, children: letters[i] }),
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: opt.text })
+              ]
+            },
+            i
+          );
+        }) })
+      ] }, qIndex),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("footer", { style: { position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px calc(16px + env(safe-area-inset-bottom))", background: C.surface, borderTop: `1px solid ${C.line}` }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { maxWidth: 560, margin: "0 auto" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: handleNext, disabled: selected === null, style: {
+        width: "100%",
+        padding: "17px",
+        borderRadius: 14,
+        border: "none",
+        fontSize: 16,
+        fontWeight: 600,
+        fontFamily: UI,
+        cursor: selected !== null ? "pointer" : "default",
+        background: selected !== null ? C.brand : C.line,
+        color: selected !== null ? "white" : C.muted,
+        transition: `all .3s ${EASE}`
+      }, children: last ? "See my child\u2019s profile" : "Next question" }) }) })
+    ] });
   }
   function ResultScreen({ profileKey }) {
     const p = profiles[profileKey];
     const pc = PROFILE_COLOR[profileKey].solid;
     const tint = PROFILE_COLOR[profileKey].tint;
-    const Kicker = ({ children, style }) => /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: pc, margin: "0 0 14px", ...style } }, children);
-    return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.bg, fontFamily: UI, color: C.text } }, /* @__PURE__ */ React.createElement(FontLink, null), /* @__PURE__ */ React.createElement("header", { style: { background: tint, position: "relative", overflow: "hidden", borderBottom: `1px solid ${C.line}` } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", bottom: "-46%", left: "-24%", width: "70vw", maxWidth: 380, height: "70vw", maxHeight: 380, opacity: 0.7, pointerEvents: "none" } }, /* @__PURE__ */ React.createElement(ArcField, { color: pc })), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", maxWidth: 560, margin: "0 auto", padding: "20px 20px 44px" } }, /* @__PURE__ */ React.createElement("div", { className: "rc-rise", style: { display: "flex", alignItems: "center", gap: 9, marginBottom: "clamp(28px, 9vw, 48px)" } }, /* @__PURE__ */ React.createElement(ArcLogo, { size: 24 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 10, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: pc } }, "Your child\u2019s profile")), /* @__PURE__ */ React.createElement("div", { className: "rc-rise", style: { animationDelay: ".08s", marginBottom: 18 } }, /* @__PURE__ */ React.createElement(ArcSeal, { color: pc, size: 88 })), /* @__PURE__ */ React.createElement("h1", { className: "rc-rise", style: { animationDelay: ".14s", fontFamily: DISPLAY, fontWeight: 400, fontSize: "clamp(34px, 9.5vw, 50px)", lineHeight: 1.05, letterSpacing: "-0.01em", margin: "0 0 12px" } }, p.name), /* @__PURE__ */ React.createElement("p", { className: "rc-rise", style: { animationDelay: ".2s", fontSize: 17, color: C.text, opacity: 0.78, lineHeight: 1.5, margin: 0, maxWidth: "32ch" } }, p.subtitle))), /* @__PURE__ */ React.createElement("main", { style: { maxWidth: 560, margin: "0 auto", padding: "clamp(36px, 10vw, 56px) 20px 64px" } }, /* @__PURE__ */ React.createElement("section", { style: { marginBottom: "clamp(40px, 11vw, 60px)" } }, /* @__PURE__ */ React.createElement(Kicker, null, "What it looks like"), /* @__PURE__ */ React.createElement("ul", { style: { listStyle: "none", margin: 0, padding: 0 } }, p.looks.map((item, i) => /* @__PURE__ */ React.createElement("li", { key: i, style: { display: "flex", gap: 14, alignItems: "baseline", padding: "13px 0", borderTop: i ? `1px solid ${C.line}` : "none", fontSize: 15.5, lineHeight: 1.55 } }, /* @__PURE__ */ React.createElement("span", { style: { flexShrink: 0, fontFamily: DISPLAY, fontSize: 13, color: pc, width: "2ch", textAlign: "right" } }, String(i + 1).padStart(2, "0")), /* @__PURE__ */ React.createElement("span", null, item))))), /* @__PURE__ */ React.createElement("section", { style: { marginBottom: "clamp(36px, 9vw, 52px)" } }, /* @__PURE__ */ React.createElement(Kicker, null, "What this profile means"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 17, lineHeight: 1.62, margin: 0, color: C.text, maxWidth: "62ch" } }, p.meaning)), /* @__PURE__ */ React.createElement("section", { style: { position: "relative", background: tint, borderRadius: 18, padding: "30px 26px 28px", marginBottom: "clamp(40px, 11vw, 60px)", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("span", { "aria-hidden": "true", style: { position: "absolute", top: -14, left: 14, fontFamily: DISPLAY, fontSize: 110, lineHeight: 1, color: pc, opacity: 0.18 } }, "\u201C"), /* @__PURE__ */ React.createElement("div", { style: { position: "relative" } }, /* @__PURE__ */ React.createElement(Kicker, { style: { marginBottom: 12 } }, "A note on this profile"), /* @__PURE__ */ React.createElement("p", { style: { fontFamily: DISPLAY, fontWeight: 400, fontSize: "clamp(18px, 4.8vw, 21px)", lineHeight: 1.45, margin: 0, color: C.text } }, p.note))), /* @__PURE__ */ React.createElement("section", { style: { marginBottom: "clamp(40px, 11vw, 60px)" } }, /* @__PURE__ */ React.createElement(Kicker, null, "Five strategies for this profile"), /* @__PURE__ */ React.createElement("div", null, p.strategies.map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", gap: 18, padding: "20px 0", borderTop: `1px solid ${C.line}` } }, /* @__PURE__ */ React.createElement("span", { style: { flexShrink: 0, fontFamily: DISPLAY, fontSize: 28, lineHeight: 1, color: pc, opacity: 0.85, width: "1.4ch" } }, i + 1), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h3", { style: { fontFamily: UI, fontSize: 16.5, fontWeight: 600, color: C.text, margin: "2px 0 6px", lineHeight: 1.3 } }, s.title), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14.5, color: C.muted, lineHeight: 1.6, margin: 0, maxWidth: "60ch" } }, s.text)))))), /* @__PURE__ */ React.createElement("section", { style: { marginBottom: 48 } }, /* @__PURE__ */ React.createElement(Kicker, null, "What comes next"), /* @__PURE__ */ React.createElement("div", { style: { border: `1px solid ${C.line}`, borderRadius: 18, overflow: "hidden", background: C.surface } }, p.ctas.map((cta, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", gap: 14, alignItems: "baseline", padding: "18px 20px", borderTop: i ? `1px solid ${C.line}` : "none" } }, /* @__PURE__ */ React.createElement("span", { style: { flexShrink: 0, fontSize: 11, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: pc, minWidth: "5.5ch" } }, cta.label), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, color: C.muted, lineHeight: 1.55, margin: 0 } }, cta.text))))), /* @__PURE__ */ React.createElement("footer", { style: { textAlign: "center", paddingTop: 8 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 14 } }, /* @__PURE__ */ React.createElement(ArcLogo, { size: 20 }), /* @__PURE__ */ React.createElement("a", { href: "https://www.tiktok.com/@regulatedchild", target: "_blank", rel: "noopener", style: { fontSize: 13, color: C.brand, textDecoration: "none", fontWeight: 600 } }, "@regulatedchild")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 12, color: C.cite, fontStyle: "italic", lineHeight: 1.55, maxWidth: "44ch", margin: "0 auto 8px" } }, "These profiles are parent education tools, not clinical assessments. For your child\u2019s specific situation, please consult a licensed professional."), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: C.cite, lineHeight: 1.6, margin: "0 0 8px" } }, "Ayres (1972) \xB7 Kranowitz (1998) \xB7 Porges (2011) \xB7 Schore (2003) \xB7 Siegel (1999) \xB7 van der Kolk (2014)"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: C.cite } }, "\xA9 The Regulated Child \xB7 Larice \xB7 regulatedchild.com"))));
+    const Kicker = ({ children, style }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 11, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: pc, margin: "0 0 14px", ...style }, children });
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { minHeight: "100vh", background: C.bg, fontFamily: UI, color: C.text }, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FontLink, {}),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", { style: { background: tint, position: "relative", overflow: "hidden", borderBottom: `1px solid ${C.line}` }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { position: "absolute", bottom: "-46%", left: "-24%", width: "70vw", maxWidth: 380, height: "70vw", maxHeight: 380, opacity: 0.7, pointerEvents: "none" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArcField, { color: pc }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative", maxWidth: 560, margin: "0 auto", padding: "20px 20px 44px" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "rc-rise", style: { display: "flex", alignItems: "center", gap: 9, marginBottom: "clamp(28px, 9vw, 48px)" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArcLogo, { size: 24 }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: 10, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: pc }, children: "Your child\u2019s profile" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "rc-rise", style: { animationDelay: ".08s", marginBottom: 18 }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArcSeal, { color: pc, size: 88 }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { className: "rc-rise", style: { animationDelay: ".14s", fontFamily: DISPLAY, fontWeight: 400, fontSize: "clamp(34px, 9.5vw, 50px)", lineHeight: 1.05, letterSpacing: "-0.01em", margin: "0 0 12px" }, children: p.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { className: "rc-rise", style: { animationDelay: ".2s", fontSize: 17, color: C.text, opacity: 0.78, lineHeight: 1.5, margin: 0, maxWidth: "32ch" }, children: p.subtitle })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("main", { style: { maxWidth: 560, margin: "0 auto", padding: "clamp(36px, 10vw, 56px) 20px 64px" }, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { style: { marginBottom: "clamp(40px, 11vw, 60px)" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kicker, { children: "What it looks like" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", { style: { listStyle: "none", margin: 0, padding: 0 }, children: p.looks.map((item, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { style: { display: "flex", gap: 14, alignItems: "baseline", padding: "13px 0", borderTop: i ? `1px solid ${C.line}` : "none", fontSize: 15.5, lineHeight: 1.55 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { flexShrink: 0, fontFamily: DISPLAY, fontSize: 13, color: pc, width: "2ch", textAlign: "right" }, children: String(i + 1).padStart(2, "0") }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item })
+          ] }, i)) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { style: { marginBottom: "clamp(36px, 9vw, 52px)" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kicker, { children: "What this profile means" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 17, lineHeight: 1.62, margin: 0, color: C.text, maxWidth: "62ch" }, children: p.meaning })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { style: { position: "relative", background: tint, borderRadius: 18, padding: "30px 26px 28px", marginBottom: "clamp(40px, 11vw, 60px)", overflow: "hidden" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { "aria-hidden": "true", style: { position: "absolute", top: -14, left: 14, fontFamily: DISPLAY, fontSize: 110, lineHeight: 1, color: pc, opacity: 0.18 }, children: "\u201C" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { position: "relative" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kicker, { style: { marginBottom: 12 }, children: "A note on this profile" }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontFamily: DISPLAY, fontWeight: 400, fontSize: "clamp(18px, 4.8vw, 21px)", lineHeight: 1.45, margin: 0, color: C.text }, children: p.note })
+          ] })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { style: { marginBottom: "clamp(40px, 11vw, 60px)" }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kicker, { children: "Five strategies for this profile" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: p.strategies.map((s, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 18, padding: "20px 0", borderTop: `1px solid ${C.line}` }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { flexShrink: 0, fontFamily: DISPLAY, fontSize: 28, lineHeight: 1, color: pc, opacity: 0.85, width: "1.4ch" }, children: i + 1 }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { fontFamily: UI, fontSize: 16.5, fontWeight: 600, color: C.text, margin: "2px 0 6px", lineHeight: 1.3 }, children: s.title }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 14.5, color: C.muted, lineHeight: 1.6, margin: 0, maxWidth: "60ch" }, children: s.text })
+            ] })
+          ] }, i)) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { style: { marginBottom: 48 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Kicker, { children: "What comes next" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { border: `1px solid ${C.line}`, borderRadius: 18, overflow: "hidden", background: C.surface }, children: p.ctas.map((cta, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", gap: 14, alignItems: "baseline", padding: "18px 20px", borderTop: i ? `1px solid ${C.line}` : "none" }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { flexShrink: 0, fontSize: 11, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: pc, minWidth: "5.5ch" }, children: cta.label }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 14, color: C.muted, lineHeight: 1.55, margin: 0 }, children: cta.text })
+          ] }, i)) })
+        ] }),
+        /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("footer", { style: { textAlign: "center", paddingTop: 8 }, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 14 }, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArcLogo, { size: 20 }),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", { href: "https://www.tiktok.com/@regulatedchild", target: "_blank", rel: "noopener", style: { fontSize: 13, color: C.brand, textDecoration: "none", fontWeight: 600 }, children: "@regulatedchild" })
+          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 12, color: C.cite, fontStyle: "italic", lineHeight: 1.55, maxWidth: "44ch", margin: "0 auto 8px" }, children: "These profiles are parent education tools, not clinical assessments. For your child\u2019s specific situation, please consult a licensed professional." }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 11, color: C.cite, lineHeight: 1.6, margin: "0 0 8px" }, children: "Ayres (1972) \xB7 Kranowitz (1998) \xB7 Porges (2011) \xB7 Schore (2003) \xB7 Siegel (1999) \xB7 van der Kolk (2014)" }),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 11, color: C.cite }, children: "\xA9 The Regulated Child \xB7 Larice \xB7 regulatedchild.com" })
+        ] })
+      ] })
+    ] });
   }
   function RegulationProfileQuiz() {
     const [screen, setScreen] = (0, import_react.useState)("gate");
@@ -7634,9 +7806,9 @@
         setScreen("result-" + winner);
       }
     };
-    if (screen === "gate") return /* @__PURE__ */ React.createElement(Gate, { onSubmit: () => setScreen("quiz") });
-    if (screen === "quiz") return /* @__PURE__ */ React.createElement(QuizScreen, { qIndex, onAnswer: handleAnswer });
-    if (screen.startsWith("result-")) return /* @__PURE__ */ React.createElement(ResultScreen, { profileKey: screen.replace("result-", "") });
+    if (screen === "gate") return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Gate, { onSubmit: () => setScreen("quiz") });
+    if (screen === "quiz") return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(QuizScreen, { qIndex, onAnswer: handleAnswer });
+    if (screen.startsWith("result-")) return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ResultScreen, { profileKey: screen.replace("result-", "") });
     return null;
   }
 
@@ -7671,6 +7843,17 @@ react-dom/cjs/react-dom.production.min.js:
   (**
    * @license React
    * react-dom.production.min.js
+   *
+   * Copyright (c) Facebook, Inc. and its affiliates.
+   *
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
+   *)
+
+react/cjs/react-jsx-runtime.production.min.js:
+  (**
+   * @license React
+   * react-jsx-runtime.production.min.js
    *
    * Copyright (c) Facebook, Inc. and its affiliates.
    *
