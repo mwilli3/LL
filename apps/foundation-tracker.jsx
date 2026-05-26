@@ -63,6 +63,19 @@ function getDay3Insight(data) {
   return `${top} is your steadiest foundation so far, and ${low} is where the rhythm slips — that's your highest-leverage focus this week.`;
 }
 
+function Accordion({ title, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{borderTop:`1px solid ${B.tx}12`}}>
+      <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",width:"100%",justifyContent:"space-between",alignItems:"center",gap:12,padding:"20px 0",background:"none",border:"none",cursor:"pointer",fontFamily:F,textAlign:"left"}}>
+        <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent}}>{title}</span>
+        <span style={{color:B.accent,fontSize:22,fontWeight:400,lineHeight:1,minWidth:20,textAlign:"center"}}>{open?"−":"+"}</span>
+      </button>
+      {open && <div style={{paddingBottom:24,animation:"up .3s cubic-bezier(.22,1,.36,1) both"}}>{children}</div>}
+    </div>
+  );
+}
+
 export default function App() {
   const [data, setData] = useState(load);
   useEffect(() => {
@@ -84,6 +97,7 @@ export default function App() {
   const checked = hasCheckedToday(data);
   const dayNum = getDayNumber(data);
   const todayData = data.days?.[td()] || {};
+  const doneCount = FOUNDS.filter(f=>todayData[f.key]).length;
   const dayDates = getDayDates(data);
   const dayLabel = (d) => new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short"});
 
@@ -109,20 +123,6 @@ export default function App() {
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
 
-        {/* Reminder */}
-        {!checked && (
-          <div style={{background:B.pri,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,animation:"up .4s cubic-bezier(.22,1,.36,1) .1s both"}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:B.wh,animation:"pulse 2s ease-in-out infinite",minWidth:8}} />
-            <p style={{fontSize:14,color:B.wh,fontWeight:500}}>You haven't checked in today</p>
-          </div>
-        )}
-        {checked && (
-          <div style={{background:B.accentL,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,border:`1px solid ${B.accent}20`}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:B.accent,minWidth:8}} />
-            <p style={{fontSize:14,color:B.accent,fontWeight:500}}>Checked in today</p>
-          </div>
-        )}
-
         {/* Title */}
         <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(.22,1,.36,1) .15s both"}}>
           {dayNum > 0 && (
@@ -137,27 +137,15 @@ export default function App() {
           <p style={{fontSize:15,color:B.txm,lineHeight:1.7,maxWidth:400,margin:"0 auto"}}>No perfection required. This is your proof of concept that consistency is possible.</p>
         </div>
 
-        {/* Settings */}
+        {/* Today's check-in — action-first */}
         <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .2s both",marginBottom:28}}>
-          <div style={{display:"flex",gap:10}}>
-            <div style={{flex:1}}>
-              <label style={{fontSize:11,fontWeight:600,color:B.txm,letterSpacing:1,textTransform:"uppercase",display:"block",marginBottom:6}}>Hydration target</label>
-              <input value={data.hydrationTarget||""} onChange={e=>setData({...data,hydrationTarget:e.target.value})} placeholder="e.g. 80 oz"
-                style={{width:"100%",padding:"10px 0 8px",fontSize:14,fontFamily:F,border:"none",borderBottom:`2px solid ${B.txl}50`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}}
-                onFocus={e=>e.target.style.borderBottomColor=B.accent} onBlur={e=>e.target.style.borderBottomColor=B.txl+"50"} />
+          <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,marginBottom:12}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:12}}>
+              <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
+              <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent,letterSpacing:.2}}>Today's foundations</span>
             </div>
-            <div style={{flex:1}}>
-              <label style={{fontSize:11,fontWeight:600,color:B.txm,letterSpacing:1,textTransform:"uppercase",display:"block",marginBottom:6}}>Sleep window</label>
-              <input value={data.sleepWindow||""} onChange={e=>setData({...data,sleepWindow:e.target.value})} placeholder="e.g. 10pm-6am"
-                style={{width:"100%",padding:"10px 0 8px",fontSize:14,fontFamily:F,border:"none",borderBottom:`2px solid ${B.txl}50`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}}
-                onFocus={e=>e.target.style.borderBottomColor=B.accent} onBlur={e=>e.target.style.borderBottomColor=B.txl+"50"} />
-            </div>
+            <span style={{fontFamily:F,fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:doneCount===4?B.accent:B.txl}}>{doneCount===4?"Complete ✓":`${doneCount} of 4`}</span>
           </div>
-        </div>
-
-        {/* Today's check-in */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .25s both",marginBottom:28}}>
-          <Lbl>Today's foundations</Lbl>
           <div style={{background:B.wh,borderRadius:12,padding:"20px",border:`1px solid ${B.accent}15`}}>
             {FOUNDS.map((f,i)=>{
               const isDone = todayData[f.key];
@@ -225,6 +213,16 @@ export default function App() {
           </div>
         )}
 
+        {/* Streak reward */}
+        <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:32,padding:"24px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+          <p style={{fontFamily:H,fontSize:"clamp(64px,20vw,92px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
+          <div>
+            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
+            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>days rooted</p>
+            {dayNum>0 && <p style={{fontFamily:H,fontSize:15,fontStyle:"italic",color:B.accent,marginTop:6}}>Day {dayNum} of seven</p>}
+          </div>
+        </div>
+
         {/* End-of-week reflection */}
         {dayNum >= 7 && (
           <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .4s both",marginBottom:32}}>
@@ -238,31 +236,45 @@ export default function App() {
           </div>
         )}
 
-        {/* The rule */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .4s both",padding:"22px 20px",borderRadius:12,background:B.accentL,border:`1px solid ${B.accent}18`,marginBottom:32}}>
-          <Lbl>The rule</Lbl>
-          <p style={{fontSize:14,lineHeight:1.8}}>If you miss a day, you do not restart. You pick up the next day. A missed day is a gap in the data, not a reason to quit.</p>
-          <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginTop:12,fontStyle:"italic"}}>If everything falls apart, track two foundations: hydration and sleep window. Two is infinitely better than zero.</p>
-        </div>
+        {/* Your targets (collapsible config) */}
+        <Accordion title="Your targets">
+          <div style={{display:"flex",gap:10}}>
+            <div style={{flex:1}}>
+              <label style={{fontSize:11,fontWeight:600,color:B.txm,letterSpacing:1,textTransform:"uppercase",display:"block",marginBottom:6}}>Hydration target</label>
+              <input value={data.hydrationTarget||""} onChange={e=>setData({...data,hydrationTarget:e.target.value})} placeholder="e.g. 80 oz"
+                style={{width:"100%",padding:"10px 0 8px",fontSize:14,fontFamily:F,border:"none",borderBottom:`2px solid ${B.txl}50`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}}
+                onFocus={e=>e.target.style.borderBottomColor=B.accent} onBlur={e=>e.target.style.borderBottomColor=B.txl+"50"} />
+            </div>
+            <div style={{flex:1}}>
+              <label style={{fontSize:11,fontWeight:600,color:B.txm,letterSpacing:1,textTransform:"uppercase",display:"block",marginBottom:6}}>Sleep window</label>
+              <input value={data.sleepWindow||""} onChange={e=>setData({...data,sleepWindow:e.target.value})} placeholder="e.g. 10pm-6am"
+                style={{width:"100%",padding:"10px 0 8px",fontSize:14,fontFamily:F,border:"none",borderBottom:`2px solid ${B.txl}50`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}}
+                onFocus={e=>e.target.style.borderBottomColor=B.accent} onBlur={e=>e.target.style.borderBottomColor=B.txl+"50"} />
+            </div>
+          </div>
+        </Accordion>
 
-        {/* Why these four */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .45s both",marginBottom:32}}>
-          <Lbl>Why these four</Lbl>
+        {/* Why this works (collapsible) */}
+        <Accordion title="Why this works">
           {[
             { name:"Hydration", why:"Even mild dehydration elevates cortisol and narrows your window of tolerance." },
             { name:"Sleep window", why:"Consistency is a stronger predictor of next-day regulation than total hours." },
             { name:"Movement", why:"Movement completes the stress response cycle. Walking counts. Stretching counts." },
             { name:"Nourish", why:"No calorie counting. Intentionality is the intervention, not the ingredients." },
           ].map((f,i)=>(
-            <div key={i} style={{display:"flex",gap:18,alignItems:"baseline",padding:"20px 0",borderBottom:i<3?`1px solid ${B.tx}12`:"none"}}>
-              <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9,minWidth:38}}>{`0${i+1}`}</span>
+            <div key={i} style={{display:"flex",gap:18,alignItems:"baseline",padding:"16px 0",borderBottom:`1px solid ${B.tx}12`}}>
+              <span style={{fontFamily:H,fontSize:28,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9,minWidth:34}}>{`0${i+1}`}</span>
               <div>
                 <p style={{fontSize:15,fontWeight:600,marginBottom:4}}>{f.name}</p>
                 <p style={{fontSize:13,color:B.txm,lineHeight:1.65}}>{f.why}</p>
               </div>
             </div>
           ))}
-        </div>
+          <div style={{padding:"18px 0 4px"}}>
+            <p style={{fontSize:14,lineHeight:1.8}}>If you miss a day, you do not restart. You pick up the next day. A missed day is a gap in the data, not a reason to quit.</p>
+            <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginTop:12,fontStyle:"italic"}}>If everything falls apart, track two foundations: hydration and sleep window. Two is infinitely better than zero.</p>
+          </div>
+        </Accordion>
 
         {/* Day-3 AI insight + paid CTA */}
         {dayNum >= 3 && (
@@ -274,15 +286,6 @@ export default function App() {
               onMouseEnter={e=>{e.target.style.transform="translateY(-1px)"}} onMouseLeave={e=>{e.target.style.transform="translateY(0)"}}>Get the full challenge</button>
           </div>
         )}
-
-        {/* Streak */}
-        <div style={{display:"flex",alignItems:"center",gap:20,margin:"8px 0 28px",padding:"28px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
-          <p style={{fontFamily:H,fontSize:"clamp(72px,24vw,108px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
-          <div>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>days rooted</p>
-          </div>
-        </div>
 
         {/* Footer */}
         <div style={{textAlign:"center",paddingTop:20}}>

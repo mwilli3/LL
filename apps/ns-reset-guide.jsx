@@ -58,10 +58,23 @@ const PRACTICES = [
 ];
 
 const SEVEN_DAY = [
-  { time:"Morning", task:"5 extended exhale breaths + 2-minute body scan", note:"Before you check your phone. Signals your nervous system that the day begins from regulation." },
-  { time:"Midday", task:"1 physiological sigh + name your state", note:"At 2pm or whenever your energy dips. Builds interoceptive awareness." },
-  { time:"Evening", task:"5 exhale breaths + journal one sentence", note:"30 min before bed, no screens. Creates a closing signal for your stress cycle." },
+  { time:"Morning", task:"5 extended exhale breaths + 2-minute body scan", note:"Before you check your phone. Signals your nervous system that the day begins from regulation.", practice:"exhale" },
+  { time:"Midday", task:"1 physiological sigh + name your state", note:"At 2pm or whenever your energy dips. Builds interoceptive awareness.", practice:"sigh" },
+  { time:"Evening", task:"5 exhale breaths + journal one sentence", note:"30 min before bed, no screens. Creates a closing signal for your stress cycle.", practice:"exhale" },
 ];
+
+function Accordion({ title, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{borderTop:`1px solid ${B.tx}12`}}>
+      <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",width:"100%",justifyContent:"space-between",alignItems:"center",gap:12,padding:"20px 0",background:"none",border:"none",cursor:"pointer",fontFamily:F,textAlign:"left"}}>
+        <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent}}>{title}</span>
+        <span style={{color:B.accent,fontSize:22,fontWeight:400,lineHeight:1,minWidth:20,textAlign:"center"}}>{open?"−":"+"}</span>
+      </button>
+      {open && <div style={{paddingBottom:24,animation:"up .3s cubic-bezier(.22,1,.36,1) both"}}>{children}</div>}
+    </div>
+  );
+}
 
 function BreathTimer({ practice, onDone }) {
   const [phase, setPhase] = useState("ready");
@@ -155,6 +168,7 @@ export default function App() {
   }, []);
   const [view, setView] = useState("home");
   const [practiceId, setPracticeId] = useState(null);
+  const [practiceFor, setPracticeFor] = useState(null);
   const ref = useRef(null);
 
   useEffect(() => { setStore(data); }, [data]);
@@ -163,6 +177,7 @@ export default function App() {
   const streak = getStreak(data);
   const checked = hasCheckedToday(data);
   const todayData = data.days?.[today()] || { morning:false, midday:false, evening:false };
+  const doneCount = SEVEN_DAY.filter(it=>todayData[it.time.toLowerCase()]).length;
 
   const toggleCheck = (period) => {
     const d = { ...data, days: { ...data.days, [today()]: { ...todayData, [period]: !todayData[period] } } };
@@ -171,6 +186,19 @@ export default function App() {
 
   const startDay = () => {
     if (!data.startDate) setData({...data, startDate: today()});
+  };
+
+  const openPractice = (pid, forPeriod=null) => { setPracticeId(pid); setPracticeFor(forPeriod); setView("practice"); };
+  const completePractice = () => {
+    if (practiceFor) {
+      const cur = data.days?.[today()] || {};
+      if (!cur[practiceFor]) {
+        const d = { ...data, days:{ ...data.days, [today()]:{ ...cur, [practiceFor]:true } } };
+        if (!d.startDate) d.startDate = today();
+        setData(d);
+      }
+    }
+    setView("home"); setPracticeId(null); setPracticeFor(null);
   };
 
   const dayNum = () => {
@@ -195,15 +223,16 @@ export default function App() {
       <div style={css}>
         <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
-          <button onClick={()=>{setView("home");setPracticeId(null);}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
+          <button onClick={()=>{setView("home");setPracticeId(null);setPracticeFor(null);}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
           <div style={{animation:"up .4s cubic-bezier(.22,1,.36,1) both"}}>
+            {practiceFor && <p style={{fontFamily:H,fontSize:18,fontStyle:"italic",color:B.accent,marginBottom:6}}>{practiceFor.charAt(0).toUpperCase()+practiceFor.slice(1)} reset</p>}
             <h2 style={{fontSize:22,fontWeight:600,fontFamily:H,marginBottom:8,}}>{p.name}</h2>
             <p style={{fontSize:13,color:B.accent,fontWeight:500,marginBottom:20}}>{p.when}</p>
             <p style={{fontSize:14,lineHeight:1.75,marginBottom:24}}>{p.desc}</p>
 
             {p.id !== "ground" ? (
               <div style={{background:B.wh,borderRadius:12,padding:"28px 24px",border:`1px solid ${B.accent}20`,marginBottom:24}}>
-                <BreathTimer practice={p} onDone={()=>{}} />
+                <BreathTimer practice={p} onDone={()=>{ if(practiceFor){ const cur=data.days?.[today()]||{}; if(!cur[practiceFor]){ const d={...data,days:{...data.days,[today()]:{...cur,[practiceFor]:true}}}; if(!d.startDate)d.startDate=today(); setData(d);} } }} />
               </div>
             ) : (
               <div style={{background:B.wh,borderRadius:12,padding:"28px 24px",border:`1px solid ${B.accent}20`,marginBottom:24}}>
@@ -216,10 +245,15 @@ export default function App() {
               </div>
             )}
 
-            <div style={{padding:"20px",borderRadius:10,background:B.accentL,border:`1px solid ${B.accent}15`}}>
+            <div style={{padding:"20px",borderRadius:10,background:B.accentL,border:`1px solid ${B.accent}15`,marginBottom:24}}>
               <Lbl>The science</Lbl>
               <p style={{fontSize:13,lineHeight:1.75,color:B.txm}}>{p.science}</p>
             </div>
+
+            <button onClick={completePractice} style={{width:"100%",padding:"16px",fontSize:14,fontWeight:600,fontFamily:F,color:B.wh,background:B.accent,border:"none",borderRadius:8,cursor:"pointer",letterSpacing:.5,transition:"background .2s"}}
+              onMouseEnter={e=>e.target.style.background=B.accentD} onMouseLeave={e=>e.target.style.background=B.accent}>
+              {practiceFor ? `Mark ${practiceFor} complete` : "Done"}
+            </button>
           </div>
         </div>
       </div>
@@ -236,20 +270,6 @@ export default function App() {
           <Logo />
         </div>
 
-        {/* Reminder banner */}
-        {!checked && (
-          <div style={{background:B.pri,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,animation:"up .4s cubic-bezier(.22,1,.36,1) .1s both"}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:B.wh,animation:"pulse 2s ease-in-out infinite",minWidth:8}} />
-            <p style={{fontSize:14,color:B.wh,fontWeight:500}}>You haven’t checked in today</p>
-          </div>
-        )}
-        {checked && (
-          <div style={{background:B.accentL,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,animation:"up .4s cubic-bezier(.22,1,.36,1) .1s both",border:`1px solid ${B.accent}20`}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:B.accent,minWidth:8}} />
-            <p style={{fontSize:14,color:B.accent,fontWeight:500}}>Checked in today</p>
-          </div>
-        )}
-
         {/* Title */}
         <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(.22,1,.36,1) .2s both"}}>
           {dayNum() > 0 && (
@@ -264,36 +284,54 @@ export default function App() {
           <p style={{fontSize:15,color:B.txm,lineHeight:1.7,maxWidth:400,margin:"0 auto"}}>Three practices that work at the level of your autonomic nervous system — not the level of thought.</p>
         </div>
 
-        {/* 7-Day Tracker */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .25s both",marginBottom:32}}>
-          <Lbl>Your 7-day protocol</Lbl>
-          <div style={{background:B.wh,borderRadius:12,padding:"20px",border:`1px solid ${B.accent}15`}}>
+        {/* Today's reset — action-first */}
+        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .25s both",marginBottom:28}}>
+          <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,marginBottom:12}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:12}}>
+              <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
+              <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent,letterSpacing:.2}}>Today's reset</span>
+            </div>
+            <span style={{fontFamily:F,fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:doneCount===3?B.accent:B.txl}}>{doneCount===3?"Complete ✓":`${doneCount} of 3`}</span>
+          </div>
+          <p style={{fontSize:13,color:B.txm,lineHeight:1.6,marginBottom:16}}>{doneCount===3?"All three windows complete. Your nervous system has a practiced path back today.":"Tap a window to begin its guided practice — it checks off when you finish."}</p>
+          <div style={{background:B.wh,borderRadius:12,padding:"4px 20px",border:`1px solid ${B.accent}15`}}>
             {SEVEN_DAY.map((item,i)=>{
               const key = item.time.toLowerCase();
               const isDone = todayData[key];
               return (
-                <div key={i} style={{display:"flex",alignItems:"flex-start",gap:14,marginBottom:i<2?18:0,paddingBottom:i<2?18:0,borderBottom:i<2?`1px solid ${B.tx}08`:"none"}}>
-                  <button onClick={()=>{toggleCheck(key);if(!data.startDate)startDay();}} style={{width:28,height:28,minWidth:28,borderRadius:6,border:`2px solid ${isDone?B.accent:B.txl+"60"}`,background:isDone?B.accent:"transparent",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",marginTop:2}}>
+                <div key={i} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 0",borderBottom:i<2?`1px solid ${B.tx}08`:"none"}}>
+                  <button onClick={()=>{toggleCheck(key);if(!data.startDate)startDay();}} aria-label={`Mark ${item.time} done`} style={{width:28,height:28,minWidth:28,borderRadius:6,border:`2px solid ${isDone?B.accent:B.txl+"60"}`,background:isDone?B.accent:"transparent",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}>
                     {isDone && <span style={{color:B.wh,fontSize:14,fontWeight:700}}>{"✓"}</span>}
                   </button>
-                  <div>
-                    <p style={{fontSize:14,fontWeight:600,marginBottom:2}}>{item.time}</p>
-                    <p style={{fontSize:13,color:B.txm,lineHeight:1.6}}>{item.task}</p>
-                    <p style={{fontSize:11,color:B.txl,lineHeight:1.5,marginTop:4,fontStyle:"italic"}}>{item.note}</p>
-                  </div>
+                  <button onClick={()=>openPractice(item.practice,key)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,background:"none",border:"none",cursor:"pointer",fontFamily:F,textAlign:"left",padding:0}}>
+                    <span style={{opacity:isDone?.5:1}}>
+                      <span style={{display:"block",fontSize:14,fontWeight:600,marginBottom:2}}>{item.time}</span>
+                      <span style={{display:"block",fontSize:13,color:B.txm,lineHeight:1.6}}>{item.task}</span>
+                    </span>
+                    <span style={{color:B.accent,fontSize:11,fontWeight:600,letterSpacing:1,textTransform:"uppercase",whiteSpace:"nowrap"}}>{isDone?"Redo":"Begin ›"}</span>
+                  </button>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Practices */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .3s both",marginBottom:32}}>
-          <Lbl>Three reset practices</Lbl>
+        {/* Streak reward */}
+        <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:32,padding:"24px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+          <p style={{fontFamily:H,fontSize:"clamp(64px,20vw,92px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
+          <div>
+            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
+            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>days regulated</p>
+            {dayNum()>0 && <p style={{fontFamily:H,fontSize:15,fontStyle:"italic",color:B.accent,marginTop:6}}>Day {dayNum()} of seven</p>}
+          </div>
+        </div>
+
+        {/* Practice library + education (collapsible) */}
+        <Accordion title="All reset practices">
           {PRACTICES.map((p,i)=>(
-            <button key={i} onClick={()=>{setPracticeId(p.id);setView("practice");}} style={{display:"flex",width:"100%",textAlign:"left",alignItems:"baseline",gap:18,padding:"20px 0",background:"none",border:"none",borderBottom:i<PRACTICES.length-1?`1px solid ${B.tx}12`:"none",cursor:"pointer",fontFamily:F,transition:"opacity .2s"}}
+            <button key={i} onClick={()=>openPractice(p.id)} style={{display:"flex",width:"100%",textAlign:"left",alignItems:"baseline",gap:18,padding:"18px 0",background:"none",border:"none",borderBottom:i<PRACTICES.length-1?`1px solid ${B.tx}12`:"none",cursor:"pointer",fontFamily:F,transition:"opacity .2s"}}
               onMouseEnter={e=>{e.currentTarget.style.opacity=.6}} onMouseLeave={e=>{e.currentTarget.style.opacity=1}}>
-              <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9,minWidth:38}}>{`0${i+1}`}</span>
+              <span style={{fontFamily:H,fontSize:28,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9,minWidth:34}}>{`0${i+1}`}</span>
               <div style={{flex:1}}>
                 <p style={{fontSize:16,fontWeight:600,fontFamily:H,marginBottom:3,color:B.tx}}>{p.name}</p>
                 <p style={{fontSize:13,color:B.txm,lineHeight:1.55}}>{p.when}</p>
@@ -301,10 +339,11 @@ export default function App() {
               <span style={{color:B.accent,fontSize:20,alignSelf:"center",lineHeight:1}}>{"›"}</span>
             </button>
           ))}
-        </div>
+        </Accordion>
 
-        {/* NS States Education */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .35s both",marginBottom:32}}>
+        {/* Understand (collapsible education) */}
+        <Accordion title="Understand your nervous system">
+        <div style={{marginBottom:32}}>
           <Lbl>The three nervous system states</Lbl>
 
           {/* Visual diagram */}
@@ -373,11 +412,12 @@ export default function App() {
         </div>
 
         {/* Window of tolerance */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .4s both",padding:"24px 20px",borderRadius:12,background:B.accentL,border:`1px solid ${B.accent}18`,marginBottom:32}}>
+        <div style={{padding:"24px 20px",borderRadius:12,background:B.accentL,border:`1px solid ${B.accent}18`,marginBottom:8}}>
           <Lbl>Your window of tolerance</Lbl>
           <p style={{fontSize:14,lineHeight:1.8}}>The range of activation within which you can function well. Above it is hyperarousal. Below it is shutdown. The width is not fixed — it narrows when you’re sleep-deprived, hungry, or carrying unprocessed stress. It widens with consistent practices that signal safety.</p>
           <p style={{fontSize:13,lineHeight:1.7,color:B.txm,marginTop:12,fontStyle:"italic"}}>This is why your wellness habits fail on hard weeks: when your window narrows, practices that felt manageable suddenly feel impossible. That’s not weakness. That’s nervous system math.</p>
         </div>
+        </Accordion>
 
         {/* Day-3 AI insight + paid CTA */}
         {dayNum() >= 3 && (
@@ -389,15 +429,6 @@ export default function App() {
               onMouseEnter={e=>{e.target.style.transform="translateY(-1px)"}} onMouseLeave={e=>{e.target.style.transform="translateY(0)"}}>Get the Mastery Kit</button>
           </div>
         )}
-
-        {/* Streak */}
-        <div style={{display:"flex",alignItems:"center",gap:20,margin:"8px 0 28px",padding:"28px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
-          <p style={{fontFamily:H,fontSize:"clamp(72px,24vw,108px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
-          <div>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>days regulated</p>
-          </div>
-        </div>
 
         {/* Footer */}
         <div style={{textAlign:"center",paddingTop:20}}>

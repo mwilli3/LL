@@ -50,6 +50,19 @@ function getDay3Insight(p) {
   return `In ${p.total} nights you've named a boundary ${p.noCount} time${p.noCount===1?"":"s"}. Your nervous system is learning that "no" is survivable — that's the rewire taking hold.`;
 }
 
+function Accordion({ title, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{borderTop:`1px solid ${B.tx}12`}}>
+      <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",width:"100%",justifyContent:"space-between",alignItems:"center",gap:12,padding:"20px 0",background:"none",border:"none",cursor:"pointer",fontFamily:F,textAlign:"left"}}>
+        <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent}}>{title}</span>
+        <span style={{color:B.accent,fontSize:22,fontWeight:400,lineHeight:1,minWidth:20,textAlign:"center"}}>{open?"−":"+"}</span>
+      </button>
+      {open && <div style={{paddingBottom:24,animation:"up .3s cubic-bezier(.22,1,.36,1) both"}}>{children}</div>}
+    </div>
+  );
+}
+
 export default function App() {
   const [data, setData] = useState(load);
   useEffect(() => {
@@ -72,6 +85,7 @@ export default function App() {
   const streak = getStreak(data);
   const checked = hasCheckedToday(data);
   const todayEntry = data.entries?.[td()] || {no:"",protect:"",claim:""};
+  const answeredCount = QUESTIONS.filter(q=>todayEntry[q.key]&&todayEntry[q.key].trim()).length;
   const patterns = getPatterns(data);
 
   const updateToday = (key, val) => {
@@ -120,20 +134,6 @@ export default function App() {
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
 
-        {/* Reminder */}
-        {!checked && (
-          <div style={{background:B.pri,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,animation:"up .4s cubic-bezier(.22,1,.36,1) .1s both"}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:B.wh,animation:"pulse 2s ease-in-out infinite",minWidth:8}} />
-            <p style={{fontSize:14,color:B.wh,fontWeight:500}}>You haven't checked in today</p>
-          </div>
-        )}
-        {checked && (
-          <div style={{background:B.accentL,borderRadius:10,padding:"16px 20px",marginBottom:24,display:"flex",alignItems:"center",gap:14,border:`1px solid ${B.accent}20`}}>
-            <div style={{width:8,height:8,borderRadius:"50%",background:B.accent,minWidth:8}} />
-            <p style={{fontSize:14,color:B.accent,fontWeight:500}}>Boundaries checked tonight</p>
-          </div>
-        )}
-
         {/* Title */}
         <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(.22,1,.36,1) .15s both"}}>
           <h1 style={{fontFamily:H,fontSize:"clamp(40px,13vw,58px)",fontWeight:600,lineHeight:.96,letterSpacing:-1,marginBottom:18}}>
@@ -144,7 +144,13 @@ export default function App() {
 
         {/* Tonight's check-in */}
         <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .2s both",marginBottom:32}}>
-          <Lbl>Tonight's boundary check</Lbl>
+          <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,marginBottom:18}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:12}}>
+              <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
+              <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent,letterSpacing:.2}}>Tonight's boundary check</span>
+            </div>
+            <span style={{fontFamily:F,fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:answeredCount>0?B.accent:B.txl}}>{answeredCount>0?(answeredCount===3?"Complete ✓":`${answeredCount} of 3`):"Optional"}</span>
+          </div>
           {QUESTIONS.map((q,i)=>(
             <div key={i} style={{marginBottom:20}}>
               <div style={{display:"flex",alignItems:"baseline",gap:12,marginBottom:10}}>
@@ -156,6 +162,15 @@ export default function App() {
                 onFocus={e=>e.target.style.borderColor=B.accent} onBlur={e=>e.target.style.borderColor=B.accent+"15"} />
             </div>
           ))}
+        </div>
+
+        {/* Streak reward */}
+        <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:32,padding:"24px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+          <p style={{fontFamily:H,fontSize:"clamp(64px,20vw,92px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
+          <div>
+            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
+            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>nights held</p>
+          </div>
         </div>
 
         {/* Pattern insights */}
@@ -198,20 +213,19 @@ export default function App() {
           </div>
         )}
 
-        {/* Archetype context */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .35s both",padding:"22px 20px",borderRadius:12,background:B.accentL,border:`1px solid ${B.accent}18`,marginBottom:32}}>
-          <Lbl>Why this works</Lbl>
-          <p style={{fontSize:14,lineHeight:1.8}}>The chronic overextension pattern depletes the same systems the Regulator is actively repairing. This journal interrupts the cycle by creating daily evidence of a new identity: someone who holds boundaries, not someone who collapses under pressure to please.</p>
-          <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginTop:12,fontStyle:"italic"}}>The reason saying no feels physically dangerous has nothing to do with your personality. It is a nervous system response. This practice rewires it.</p>
-        </div>
-
         {/* Mantras */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .4s both",marginBottom:32}}>
+        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .4s both",marginBottom:8}}>
           <Lbl>Your mantras</Lbl>
           {["I choose myself without apology.","My power is reclaimed, not given.","Boundaries protect my peace and my energy."].map((m,i)=>(
             <p key={i} style={{fontFamily:H,fontSize:24,fontStyle:"italic",fontWeight:600,lineHeight:1.35,color:B.tx,padding:"18px 0",borderBottom:i<2?`1px solid ${B.tx}12`:"none"}}>{m}</p>
           ))}
         </div>
+
+        {/* Why this works (collapsible) */}
+        <Accordion title="Why this works">
+          <p style={{fontSize:14,lineHeight:1.8}}>The chronic overextension pattern depletes the same systems the Regulator is actively repairing. This journal interrupts the cycle by creating daily evidence of a new identity: someone who holds boundaries, not someone who collapses under pressure to please.</p>
+          <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginTop:12,fontStyle:"italic"}}>The reason saying no feels physically dangerous has nothing to do with your personality. It is a nervous system response. This practice rewires it.</p>
+        </Accordion>
 
         {/* Day-3 AI insight + paid CTA */}
         {patterns.total >= 3 && (
@@ -223,15 +237,6 @@ export default function App() {
               onMouseEnter={e=>{e.target.style.transform="translateY(-1px)"}} onMouseLeave={e=>{e.target.style.transform="translateY(0)"}}>Get the Mastery Kit</button>
           </div>
         )}
-
-        {/* Streak */}
-        <div style={{display:"flex",alignItems:"center",gap:20,margin:"8px 0 28px",padding:"28px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
-          <p style={{fontFamily:H,fontSize:"clamp(72px,24vw,108px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
-          <div>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
-            <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.txl}}>nights held</p>
-          </div>
-        </div>
 
         {/* Footer */}
         <div style={{textAlign:"center",paddingTop:20}}>
