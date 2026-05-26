@@ -91,24 +91,32 @@ Serif italic 20px accent text preceded by a 26px / 1px accent hairline, baseline
 ### Editorial list row (standard list pattern)
 Flat row: large serif-italic numeral (`01`+) in `accent`, title in Espresso, description in Muted Brown, rows separated by `{tx}12` hairlines. **This is the standard list component** — used for foundations, journal questions, NS states, and reset practices. Cards are not used for content lists.
 
-### Reminder banner (recurring)
-Full-width rounded bar (radius 10, padding 16×20), pinned near the top below the logo.
-- **Not-checked-in state:** `Clay #A84A30` fill, white text "You haven't checked in today", 8px white dot pulsing on a 2s loop.
-- **Checked-in state:** `accentL` fill + 1px `{accent}20` border, `accent` text "Checked in today", solid 8px `accent` dot (no pulse).
-- Entrance: rise on the shared curve, ~.1s delay.
+### Action header with status (recurring)
+Every app leads with its primary daily action, not a passive notice. The action's section header carries a live status on the right: a small uppercase Outfit count (`{accent}` when in progress, brightening to `accent` at completion) reading `"{n} of {total}"`, `"Complete ✓"`, or `"Optional"` for the journals. This replaces the old "you haven't checked in today" reminder banner, which is **retired across the suite** — the action now states its own status. (Clay `#A84A30` is therefore no longer used for a banner; it remains the diagram's hyperarousal/alert hue only.)
 
 ### Streak counter (recurring)
-The signature moment. Oversized Cormorant numeral (`clamp(72px,24vw,108px)`, 600, line-height .8, tracking -3) in `accent`, set in a row beside a two-line uppercase Outfit caption (line 1 "consecutive"; line 2 archetype-voiced — "days rooted" / "nights held" / "days regulated"). Bracketed by a top and bottom `{tx}12` hairline. Left-aligned within the column.
+The completion reward, shown **right after the primary action** (single-screen apps) so finishing reveals progress.
+- **Single-screen apps (free):** oversized Cormorant numeral (`clamp(64px,20vw,92px)`, 600, line-height .8) beside a two-line uppercase Outfit caption (line 1 "consecutive"; line 2 archetype-voiced — "days rooted" / "nights held" / "days regulated"), with an optional serif-italic "Day {n} of seven" line. **Center-aligned**, bracketed top and bottom by `{tx}12` hairlines.
+- **Tabbed apps (paid):** a compact centered reward strip — `clamp`-free 46px serif numeral + a wrapped uppercase caption — placed **under the masthead, above the tabs**, so the streak is visible on first paint regardless of active tab. Same hairline brackets.
 
 ### Day-3 AI insight block + paid CTA (recurring)
 Appears once the protocol reaches **day 3**. An **accent-filled card** (`accent` fill, white text, radius 12):
 - Eyebrow: uppercase Outfit, 10–11px, tracking 3, `rgba(255,255,255,.5)` — e.g. "Your first pattern".
 - Insight body: Outfit 13–15px, `rgba(255,255,255,.85)` — one AI-generated observation drawn from the user's logged data (not a generic tip).
-- Paid CTA: one white-filled button, `accent` text, weight 600, routing to this archetype's paid app (Regulator→Regulation Mastery Kit, Rooted→Rooted Reset Challenge Kit, Reclaimer→Reclaimer paid app). Hover: `-1px translateY`. Maximum one CTA; no secondary link.
+- Paid CTA: one white-filled button, `accent` text, weight 600, routing to this archetype's paid app (Regulator→Regulation Mastery Kit, Rooted→Rooted Reset Challenge Kit, Reclaimer→Boundary Mastery Kit). Hover: `-1px translateY`. Maximum one CTA; no secondary link.
 - Every app gets exactly one of these; copy and destination vary by archetype, structure does not.
 
 ### Checkbox / Inputs
 Checkbox: 28px square, 6px radius, 2px border; `accent` fill + white check when done. Text input/textarea: white fill, 1px accent-tint border, radius 10; border brightens to full `accent` on focus; label/eyebrow above.
+
+### Collapsible accordion (recurring)
+Demotes rationale, science, and one-time config below the action so first paint is action-first. A `{tx}12` top hairline, a full-width header button (serif-italic `accent` title + a `+`/`−` toggle in `accent`), and tap-to-expand content that rises on the shared curve. Used for "Why this works", "Understand your nervous system", "All reset practices", and "Your targets". Single-screen free apps use accordions for this; tabbed paid apps lean on their tab bar (Research / Insights / Program) for the same separation.
+
+### Starter chips (journals)
+Under each empty journal prompt: a small "Start with" row of sentence-stem buttons (`accent` outline, 6px radius — not pills, Outfit 12px). Tapping seeds the stem (minus its ellipsis, plus a trailing space) into the field; the row disappears once the field has any text. Lowers the blank-page cold start in both the free Boundary Journal and paid Boundary Mastery.
+
+### Tab bar (paid)
+3 equal pill-outline tabs separating the daily action tab from depth/education tabs. Active: `accent` fill + white text; inactive: `accent` outline + `accent` text. Uppercase Outfit, tracking 1.
 
 ### NS-states diagram
 Stacked-zone SVG, all colors via tokens (see §2 zone tokens): **Hyperarousal** (`fill`, "FIGHT ↑"), **Window of Tolerance** (`accentL`, regulated center, "SAFE ZONE"), **Hypoarousal** (`accL`, "FREEZE ↓"). Used in the Nervous System Reset Guide and the Regulation Mastery Kit. Treat as a shared, locked component.
@@ -134,15 +142,18 @@ Paid apps (Regulation Mastery / Rooted Reset Challenge / Boundary Mastery Kit) r
 - Do separate content with hairlines and whitespace; reserve white cards for interactive containers and the accent-filled card for the Day-3 CTA.
 - Do reference the `B` token object for every color — including inside SVGs.
 - Do center mastheads with no divider; keep section bodies left-aligned editorial; surface the day index only as the masthead kicker.
-- Do give every app exactly one Day-3 AI insight block routing to its paid counterpart.
+- Do lead with the daily action and put its status on the action header; reveal the (center-aligned) streak as the reward right after it.
+- Do demote rationale, science, and one-time config into collapsible accordions (free) or depth tabs (paid).
+- Do give every free app exactly one Day-3 AI insight block routing to its paid counterpart; paid apps deliver the full AI analysis instead.
 - Do animate only with the single `cubic-bezier(.22,1,.36,1)` rise plus small staggered delays.
 
 ### Don'ts
 - Don't introduce a fourth accent or mix two archetype accents on one surface (Slate #5C5470 is a *state* color, not a brand accent).
 - Don't add drop shadows, glows, pill content, decorative dividers, or "3 equal cards" feature rows.
+- Don't reinstate a passive "you haven't checked in" reminder banner — the action header carries its own status.
 - Don't hardcode hex literals in components or SVGs — drift from the `B` object is a bug.
 - Don't use pure black or blue-white; stay on Espresso Ink and Cream Canvas.
-- Don't let the Clay reminder color leak into accent roles, or vice versa.
+- Don't let Clay (`#A84A30`) leak into archetype-accent roles, or vice versa.
 - Don't apply the generic "no serif / no Garamond" rule here — Cormorant Garamond is locked brand.
 - Don't use `ease`/`linear`/bouncy easings for entrances; one settle curve only.
 - Don't surface the day index in more than one place, or render content lists as cards.

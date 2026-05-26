@@ -214,7 +214,7 @@ export default function App() {
         )}
 
         {/* Streak reward */}
-        <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:32,padding:"24px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:20,marginBottom:32,padding:"24px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
           <p style={{fontFamily:H,fontSize:"clamp(64px,20vw,92px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
           <div>
             <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>
