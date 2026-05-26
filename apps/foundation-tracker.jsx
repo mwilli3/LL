@@ -71,7 +71,7 @@ function Accordion({ title, children }) {
         <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent}}>{title}</span>
         <span style={{color:B.accent,fontSize:22,fontWeight:400,lineHeight:1,minWidth:20,textAlign:"center"}}>{open?"−":"+"}</span>
       </button>
-      {open && <div style={{paddingBottom:24,animation:"up .3s cubic-bezier(.22,1,.36,1) both"}}>{children}</div>}
+      {open && <div style={{paddingBottom:24,animation:"up .3s cubic-bezier(0.23,1,0.32,1) both"}}>{children}</div>}
     </div>
   );
 }
@@ -119,12 +119,12 @@ export default function App() {
 
   return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
-        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
+        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
 
         {/* Title */}
-        <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(.22,1,.36,1) .15s both"}}>
+        <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(0.23,1,0.32,1) .15s both"}}>
           {dayNum > 0 && (
             <div style={{display:"flex",justifyContent:"center",alignItems:"baseline",gap:8,marginBottom:14}}>
               <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:1}}>Day {dayNum}</span>
@@ -138,7 +138,7 @@ export default function App() {
         </div>
 
         {/* Today's check-in — action-first */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .2s both",marginBottom:28}}>
+        <div style={{animation:"up .5s cubic-bezier(0.23,1,0.32,1) .2s both",marginBottom:28}}>
           <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,marginBottom:12}}>
             <div style={{display:"flex",alignItems:"baseline",gap:12}}>
               <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
@@ -165,7 +165,7 @@ export default function App() {
         </div>
 
         {/* What I noticed */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .3s both",marginBottom:28}}>
+        <div style={{animation:"up .5s cubic-bezier(0.23,1,0.32,1) .3s both",marginBottom:28}}>
           <Lbl>What I noticed today</Lbl>
           <textarea value={todayData.notice||""} onChange={e=>{
             const d={...data,days:{...data.days,[td()]:{...todayData,notice:e.target.value}}};
@@ -178,7 +178,7 @@ export default function App() {
 
         {/* 7-day progress */}
         {dayDates.length > 0 && (
-          <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .35s both",marginBottom:32}}>
+          <div style={{animation:"up .5s cubic-bezier(0.23,1,0.32,1) .35s both",marginBottom:32}}>
             <Lbl>Your 7-day progress</Lbl>
             <div style={{background:B.wh,borderRadius:12,padding:"20px",border:`1px solid ${B.accent}15`}}>
               <div style={{display:"flex",gap:6}}>
@@ -225,7 +225,7 @@ export default function App() {
 
         {/* End-of-week reflection */}
         {dayNum >= 7 && (
-          <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .4s both",marginBottom:32}}>
+          <div style={{animation:"up .5s cubic-bezier(0.23,1,0.32,1) .4s both",marginBottom:32}}>
             <Lbl>Day 7 reflection</Lbl>
             <div style={{padding:"22px 20px",borderRadius:10,background:B.accentL,border:`1px solid ${B.accent}18`}}>
               <p style={{fontSize:13,color:B.txm,lineHeight:1.65,marginBottom:14,fontStyle:"italic"}}>Which foundation was easiest? Which was hardest? What got in the way?</p>
@@ -278,12 +278,11 @@ export default function App() {
 
         {/* Day-3 AI insight + paid CTA */}
         {dayNum >= 3 && (
-          <div style={{padding:"28px 24px",background:B.accent,borderRadius:12,marginBottom:32,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}>
+          <div style={{padding:"28px 24px",background:B.accent,borderRadius:12,marginBottom:32,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}>
             <p style={{fontSize:10,fontWeight:600,letterSpacing:3,textTransform:"uppercase",color:"rgba(255,255,255,.55)",marginBottom:12}}>Day 3 · Your first pattern</p>
             <p style={{fontSize:15,fontWeight:500,lineHeight:1.6,color:B.wh,marginBottom:18}}>{getDay3Insight(data)}</p>
             <p style={{fontSize:13,lineHeight:1.7,color:"rgba(255,255,255,.75)",marginBottom:20}}>The <strong style={{fontWeight:600,color:B.wh}}>Rooted Reset Challenge Kit</strong> turns this into a 30-day protocol — miss-day recovery, identity prompts, and weekly AI foundation analysis.</p>
-            <button style={{padding:"14px 36px",fontSize:13,fontWeight:600,fontFamily:F,color:B.accent,background:B.wh,border:"none",borderRadius:8,cursor:"pointer",letterSpacing:1,textTransform:"uppercase",transition:"transform .2s"}}
-              onMouseEnter={e=>{e.target.style.transform="translateY(-1px)"}} onMouseLeave={e=>{e.target.style.transform="translateY(0)"}}>Get the full challenge</button>
+            <button className="pressable" style={{padding:"14px 36px",fontSize:13,fontWeight:600,fontFamily:F,color:B.accent,background:B.wh,border:"none",borderRadius:8,cursor:"pointer",letterSpacing:1,textTransform:"uppercase"}}>Get the full challenge</button>
           </div>
         )}
 

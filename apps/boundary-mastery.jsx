@@ -159,14 +159,14 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
 
   if (!verified) return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} input::placeholder{color:${B.txl}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} input::placeholder{color:${B.txl}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:60,paddingBottom:56}}>
-        <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
-        <div style={{textAlign:"center",marginBottom:36,animation:"up .6s cubic-bezier(.22,1,.36,1) .1s both"}}>
+        <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
+        <div style={{textAlign:"center",marginBottom:36,animation:"up .6s cubic-bezier(0.23,1,0.32,1) .1s both"}}>
           <h1 style={{fontFamily:H,fontSize:"clamp(34px,9vw,46px)",fontWeight:600,lineHeight:1,letterSpacing:-.5,marginBottom:14}}>Boundary<br/><span style={{fontStyle:"italic",color:B.accent}}>Mastery Kit</span></h1>
           <p style={{fontSize:14,color:B.txm,lineHeight:1.7}}>Enter the email you used to purchase.</p>
         </div>
-        <div style={{animation:"up .6s cubic-bezier(.22,1,.36,1) .2s both",background:B.wh,padding:"32px 28px",borderRadius:12,border:`1px solid ${B.accent}20`}}>
+        <div style={{animation:"up .6s cubic-bezier(0.23,1,0.32,1) .2s both",background:B.wh,padding:"32px 28px",borderRadius:12,border:`1px solid ${B.accent}20`}}>
           <input type="email" value={gateEmail} onChange={e=>{setGateEmail(e.target.value);setGateErr("");}} onKeyDown={e=>e.key==="Enter"&&verifyPurchase()} placeholder="you@email.com"
             style={{width:"100%",padding:"14px 0 12px",fontSize:16,fontFamily:F,border:"none",borderBottom:`2px solid ${gateErr?B.pri:B.txl+"50"}`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}}
             onFocus={e=>{if(!gateErr)e.target.style.borderBottomColor=B.accent}} onBlur={e=>{if(!gateErr)e.target.style.borderBottomColor=B.txl+"50"}} />
@@ -185,10 +185,10 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
     const s = SCRIPTS.find(x=>x.cat===scriptCat);
     return (
       <div style={css}>
-        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
           <button onClick={()=>{setView("home");setScriptCat(null);}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
-          <h2 style={{fontSize:22,fontWeight:600,fontFamily:H,marginBottom:8,animation:"up .4s cubic-bezier(.22,1,.36,1) both",}}>{s.cat} scripts</h2>
+          <h2 style={{fontSize:22,fontWeight:600,fontFamily:H,marginBottom:8,animation:"up .4s cubic-bezier(0.23,1,0.32,1) both",}}>{s.cat} scripts</h2>
           <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginBottom:24}}>Copy, adapt, and use. These are starting points, not scripts to memorize.</p>
           {s.scripts.map((sc,i)=>(
             <div key={i} style={{padding:"18px 20px",borderRadius:10,background:B.wh,border:`1px solid ${B.accent}12`,marginBottom:10,borderLeft:`4px solid ${B.accent}`,animation:`up .3s ease ${i*.08}s both`}}>
@@ -202,9 +202,9 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
 
   return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
-        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
+        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
 
         <div style={{textAlign:"center",marginBottom:28}}>
           {dayNum>0 && (

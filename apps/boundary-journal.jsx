@@ -58,7 +58,7 @@ function Accordion({ title, children }) {
         <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent}}>{title}</span>
         <span style={{color:B.accent,fontSize:22,fontWeight:400,lineHeight:1,minWidth:20,textAlign:"center"}}>{open?"−":"+"}</span>
       </button>
-      {open && <div style={{paddingBottom:24,animation:"up .3s cubic-bezier(.22,1,.36,1) both"}}>{children}</div>}
+      {open && <div style={{paddingBottom:24,animation:"up .3s cubic-bezier(0.23,1,0.32,1) both"}}>{children}</div>}
     </div>
   );
 }
@@ -108,10 +108,10 @@ export default function App() {
     const entry = data.entries?.[historyDate] || {};
     return (
       <div style={css}>
-        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
           <button onClick={()=>{setView("home");setHistoryDate(null);}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
-          <div style={{animation:"up .4s cubic-bezier(.22,1,.36,1) both"}}>
+          <div style={{animation:"up .4s cubic-bezier(0.23,1,0.32,1) both"}}>
             <h2 style={{fontSize:20,fontWeight:600,fontFamily:H,marginBottom:24,}}>{fmtDate(historyDate)}</h2>
             {QUESTIONS.map((q,i)=>(
               <div key={i} style={{marginBottom:20}}>
@@ -130,12 +130,12 @@ export default function App() {
   /* -- HOME -- */
   return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
-        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
+        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
 
         {/* Title */}
-        <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(.22,1,.36,1) .15s both"}}>
+        <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(0.23,1,0.32,1) .15s both"}}>
           <h1 style={{fontFamily:H,fontSize:"clamp(40px,13vw,58px)",fontWeight:600,lineHeight:.96,letterSpacing:-1,marginBottom:18}}>
             Three questions.<br/><span style={{fontStyle:"italic",color:B.accent}}>Five minutes.</span>
           </h1>
@@ -143,7 +143,7 @@ export default function App() {
         </div>
 
         {/* Tonight's check-in */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .2s both",marginBottom:32}}>
+        <div style={{animation:"up .5s cubic-bezier(0.23,1,0.32,1) .2s both",marginBottom:32}}>
           <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,marginBottom:18}}>
             <div style={{display:"flex",alignItems:"baseline",gap:12}}>
               <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
@@ -186,7 +186,7 @@ export default function App() {
 
         {/* Pattern insights */}
         {patterns.total > 0 && (
-          <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .25s both",marginBottom:32}}>
+          <div style={{animation:"up .5s cubic-bezier(0.23,1,0.32,1) .25s both",marginBottom:32}}>
             <Lbl>Your pattern</Lbl>
             <div style={{display:"flex",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
               {[[patterns.total,"entries"],[patterns.withAll,"complete"],[patterns.noCount,"boundaries set"]].map(([n,l],i)=>(
@@ -201,7 +201,7 @@ export default function App() {
 
         {/* Past entries */}
         {pastEntries.length > 0 && (
-          <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .3s both",marginBottom:32}}>
+          <div style={{animation:"up .5s cubic-bezier(0.23,1,0.32,1) .3s both",marginBottom:32}}>
             <Lbl>Past entries</Lbl>
             {pastEntries.slice(0,7).map(([date,entry],i)=>{
               const preview = entry.no || entry.protect || entry.claim || "";
@@ -225,7 +225,7 @@ export default function App() {
         )}
 
         {/* Mantras */}
-        <div style={{animation:"up .5s cubic-bezier(.22,1,.36,1) .4s both",marginBottom:8}}>
+        <div style={{animation:"up .5s cubic-bezier(0.23,1,0.32,1) .4s both",marginBottom:8}}>
           <Lbl>Your mantras</Lbl>
           {["I choose myself without apology.","My power is reclaimed, not given.","Boundaries protect my peace and my energy."].map((m,i)=>(
             <p key={i} style={{fontFamily:H,fontSize:24,fontStyle:"italic",fontWeight:600,lineHeight:1.35,color:B.tx,padding:"18px 0",borderBottom:i<2?`1px solid ${B.tx}12`:"none"}}>{m}</p>
@@ -240,12 +240,11 @@ export default function App() {
 
         {/* Day-3 AI insight + paid CTA */}
         {patterns.total >= 3 && (
-          <div style={{padding:"28px 24px",background:B.accent,borderRadius:12,marginBottom:32,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}>
+          <div style={{padding:"28px 24px",background:B.accent,borderRadius:12,marginBottom:32,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}>
             <p style={{fontSize:10,fontWeight:600,letterSpacing:3,textTransform:"uppercase",color:"rgba(255,255,255,.55)",marginBottom:12}}>Day 3 · Your first pattern</p>
             <p style={{fontSize:15,fontWeight:500,lineHeight:1.6,color:B.wh,marginBottom:18}}>{getDay3Insight(patterns)}</p>
             <p style={{fontSize:13,lineHeight:1.7,color:"rgba(255,255,255,.75)",marginBottom:20}}>The <strong style={{fontWeight:600,color:B.wh}}>Boundary Mastery Kit</strong> extends this into a 30-day practice — daily boundary scripts, pattern analysis, and the complete reclamation sequence.</p>
-            <button style={{padding:"14px 36px",fontSize:13,fontWeight:600,fontFamily:F,color:B.accent,background:B.wh,border:"none",borderRadius:8,cursor:"pointer",letterSpacing:1,textTransform:"uppercase",transition:"transform .2s"}}
-              onMouseEnter={e=>{e.target.style.transform="translateY(-1px)"}} onMouseLeave={e=>{e.target.style.transform="translateY(0)"}}>Get the Mastery Kit</button>
+            <button className="pressable" style={{padding:"14px 36px",fontSize:13,fontWeight:600,fontFamily:F,color:B.accent,background:B.wh,border:"none",borderRadius:8,cursor:"pointer",letterSpacing:1,textTransform:"uppercase"}}>Get the Mastery Kit</button>
           </div>
         )}
 

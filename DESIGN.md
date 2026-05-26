@@ -13,7 +13,9 @@ Every app — free or paid — is built from the same tokens, type, logo, motion
 ---
 
 ## 1. Overview — Visual Theme & Atmosphere
-Warm, editorial, clinical-but-tender — like a printed wellness journal. A cream page, deep espresso ink, one archetype accent per surface, and a Cormorant Garamond display voice that carries all the drama while Outfit keeps the UI quiet. Density is low-to-medium (long-form, single-column, phone-width). Motion is a single restrained entrance: content rises and settles on `cubic-bezier(.22,1,.36,1)` with small staggered delays — never bouncy or theatrical. The impression: considered, grounded, expensive in its restraint.
+Warm, editorial, clinical-but-tender — like a printed wellness journal. A cream page, deep espresso ink, one archetype accent per surface, and a Cormorant Garamond display voice that carries all the drama while Outfit keeps the UI quiet. Density is low-to-medium (long-form, single-column, phone-width). Motion is a single restrained entrance: content rises and settles on the `--ease-out` curve (`cubic-bezier(0.23,1,0.32,1)`) with small staggered delays — never bouncy or theatrical. The impression: considered, grounded, expensive in its restraint.
+
+**Motion source of truth:** [`tokens/motion-tokens.css`](tokens/motion-tokens.css) and [`tokens/motion-tokens.ts`](tokens/motion-tokens.ts) (derived from the emil-design-eng skill) define all easing + durations, shared with the LoveLarice website. These apps are the **"occasional" tier** (opened <10×/day), so standard animation is correct: real entrance reveals (`--dur-reveal`), modals/drawers at normal timing, and genuine delight reserved for rare/first-time moments (archetype reveal, streak completion). Do **not** animate micro-actions a user repeats in one session (a tracker checkbox gets instant press feedback only). Primary buttons use `.pressable` (scale `0.97` on `:active`) for "the UI heard you"; every app honors `prefers-reduced-motion` (gentler, not zero) — important for a nervous-system audience.
 
 Each app is scoped to **one archetype** and wears exactly **one accent triplet**. Neutrals, typography, logo, spacing, motion, and the recurring components are shared verbatim across the entire suite.
 
@@ -145,7 +147,8 @@ Paid apps (Regulation Mastery / Rooted Reset Challenge / Boundary Mastery Kit) r
 - Do lead with the daily action and put its status on the action header; reveal the (center-aligned) streak as the reward right after it.
 - Do demote rationale, science, and one-time config into collapsible accordions (free) or depth tabs (paid).
 - Do give every free app exactly one Day-3 AI insight block routing to its paid counterpart; paid apps deliver the full AI analysis instead.
-- Do animate only with the single `cubic-bezier(.22,1,.36,1)` rise plus small staggered delays.
+- Do animate entrances with the `--ease-out` rise (`cubic-bezier(0.23,1,0.32,1)`) plus small staggered delays; pull all easing/duration from `tokens/motion-tokens.*`.
+- Do give primary/first-time buttons `.pressable` press feedback, and keep repeated micro-actions (checkboxes) instant; honor `prefers-reduced-motion`.
 
 ### Don'ts
 - Don't introduce a fourth accent or mix two archetype accents on one surface (Slate #5C5470 is a *state* color, not a brand accent).

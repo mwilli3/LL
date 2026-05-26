@@ -214,14 +214,14 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
 
   if (!verified) return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} input::placeholder{color:${B.txl}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} input::placeholder{color:${B.txl}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:60,paddingBottom:56}}>
-        <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
-        <div style={{textAlign:"center",marginBottom:36,animation:"up .6s cubic-bezier(.22,1,.36,1) .1s both"}}>
+        <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
+        <div style={{textAlign:"center",marginBottom:36,animation:"up .6s cubic-bezier(0.23,1,0.32,1) .1s both"}}>
           <h1 style={{fontFamily:H,fontSize:"clamp(34px,9vw,46px)",fontWeight:600,lineHeight:1,letterSpacing:-.5,marginBottom:14}}>Regulation<br/><span style={{fontStyle:"italic",color:B.accent}}>Mastery Kit</span></h1>
           <p style={{fontSize:14,color:B.txm,lineHeight:1.7}}>Enter the email you used to purchase.</p>
         </div>
-        <div style={{animation:"up .6s cubic-bezier(.22,1,.36,1) .2s both",background:B.wh,padding:"32px 28px",borderRadius:12,border:`1px solid ${B.accent}20`}}>
+        <div style={{animation:"up .6s cubic-bezier(0.23,1,0.32,1) .2s both",background:B.wh,padding:"32px 28px",borderRadius:12,border:`1px solid ${B.accent}20`}}>
           <input type="email" value={gateEmail} onChange={e=>{setGateEmail(e.target.value);setGateErr("");}} onKeyDown={e=>e.key==="Enter"&&verifyPurchase()} placeholder="you@email.com"
             style={{width:"100%",padding:"14px 0 12px",fontSize:16,fontFamily:F,border:"none",borderBottom:`2px solid ${gateErr?B.pri:B.txl+"50"}`,background:"transparent",color:B.tx,outline:"none",boxSizing:"border-box"}}
             onFocus={e=>{if(!gateErr)e.target.style.borderBottomColor=B.accent}} onBlur={e=>{if(!gateErr)e.target.style.borderBottomColor=B.txl+"50"}} />
@@ -240,10 +240,10 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
     const p = PRACTICES.find(x=>x.id===practiceId);
     return (
       <div style={css}>
-        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
           <button onClick={()=>{setView("home");setPracticeId(null);}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
-          <div style={{animation:"up .4s cubic-bezier(.22,1,.36,1) both"}}>
+          <div style={{animation:"up .4s cubic-bezier(0.23,1,0.32,1) both"}}>
             <h2 style={{fontSize:22,fontWeight:600,fontFamily:H,marginBottom:6,}}>{p.name}</h2>
             <p style={{fontSize:14,color:B.txm,lineHeight:1.7,marginBottom:24}}>{p.desc}</p>
             <div style={{background:B.wh,borderRadius:12,padding:"24px",border:`1px solid ${B.accent}20`}}>
@@ -259,10 +259,10 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
   if (view === "cycle") {
     return (
       <div style={css}>
-        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
           <button onClick={()=>{setView("home");setCycleTrigger("");setCycleResponse("");setCycleRecovery("");}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
-          <div style={{animation:"up .4s cubic-bezier(.22,1,.36,1) both"}}>
+          <div style={{animation:"up .4s cubic-bezier(0.23,1,0.32,1) both"}}>
             <h2 style={{fontSize:22,fontWeight:600,fontFamily:H,marginBottom:8,}}>Stress Cycle Protocol</h2>
             <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginBottom:24}}>Identify the trigger, name your response, then record how you completed the cycle.</p>
             {[{l:"What triggered the activation?",v:cycleTrigger,s:setCycleTrigger,ph:"The event, thought, or interaction..."},
@@ -289,11 +289,11 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
 
   return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
-        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) both"}}><Logo /></div>
+        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
 
-        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) .15s both"}}>
+        <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) .15s both"}}>
           {dayNum > 0 && (
             <div style={{display:"flex",justifyContent:"center",alignItems:"baseline",gap:8,marginBottom:14}}>
               <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:1}}>Day {dayNum}</span>
@@ -313,7 +313,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
         </div>
 
         {/* Tab nav */}
-        <div style={{display:"flex",gap:6,marginBottom:28,animation:"up .5s cubic-bezier(.22,1,.36,1) .2s both"}}>
+        <div style={{display:"flex",gap:6,marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) .2s both"}}>
           {[{k:"track",l:"Track"},{k:"practice",l:"Practices"},{k:"insights",l:"Insights"}].map(t=>(
             <button key={t.k} onClick={()=>setTab(t.k)} style={{flex:1,padding:"10px 0",fontSize:12,fontWeight:600,fontFamily:F,letterSpacing:1,textTransform:"uppercase",color:tab===t.k?B.wh:B.accent,background:tab===t.k?B.accent:"transparent",border:`1.5px solid ${B.accent}`,borderRadius:6,cursor:"pointer",transition:"all .2s"}}>{t.l}</button>
           ))}
