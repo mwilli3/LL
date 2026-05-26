@@ -78,6 +78,7 @@ export default function App() {
   const [view, setView] = useState("home");
   const [historyDate, setHistoryDate] = useState(null);
   const ref = useRef(null);
+  const [celebrate,setCelebrate]=useState(false);
 
   useEffect(() => { save(data); }, [data]);
   useEffect(() => { ref.current?.scrollIntoView({behavior:"smooth",block:"start"}); }, [view, historyDate]);
@@ -86,6 +87,8 @@ export default function App() {
   const checked = hasCheckedToday(data);
   const todayEntry = data.entries?.[td()] || {no:"",protect:"",claim:""};
   const answeredCount = QUESTIONS.filter(q=>todayEntry[q.key]&&todayEntry[q.key].trim()).length;
+  const _celebPrev = useRef(answeredCount===3);
+  useEffect(()=>{ const c=answeredCount===3; if(c&&!_celebPrev.current){ setCelebrate(true); const t=setTimeout(()=>setCelebrate(false),700); _celebPrev.current=c; return ()=>clearTimeout(t);} _celebPrev.current=c; },[answeredCount===3]);
   const patterns = getPatterns(data);
 
   const updateToday = (key, val) => {
@@ -108,7 +111,7 @@ export default function App() {
     const entry = data.entries?.[historyDate] || {};
     return (
       <div style={css}>
-        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
+        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
           <button onClick={()=>{setView("home");setHistoryDate(null);}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
           <div style={{animation:"up .4s cubic-bezier(0.23,1,0.32,1) both"}}>
@@ -130,7 +133,7 @@ export default function App() {
   /* -- HOME -- */
   return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
 
@@ -176,7 +179,7 @@ export default function App() {
         </div>
 
         {/* Streak reward */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:20,marginBottom:32,padding:"24px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:20,marginBottom:32,padding:"24px 0",animation:celebrate?"pop .6s cubic-bezier(0.23,1,0.32,1)":undefined,borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
           <p style={{fontFamily:H,fontSize:"clamp(64px,20vw,92px)",fontWeight:600,color:B.accent,lineHeight:.8,letterSpacing:-3}}>{streak}</p>
           <div>
             <p style={{fontSize:13,letterSpacing:2.5,textTransform:"uppercase",fontWeight:600,color:B.tx}}>consecutive</p>

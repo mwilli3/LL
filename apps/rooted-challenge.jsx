@@ -109,6 +109,7 @@ export default function App() {
   const [gateErr, setGateErr] = useState("");
   const [gateLoading, setGateLoading] = useState(false);
   const ref = useRef(null);
+  const [celebrate,setCelebrate]=useState(false);
 
   useEffect(() => { save(data); }, [data]);
   useEffect(() => { ref.current?.scrollIntoView({behavior:"smooth",block:"start"}); }, [view,tab,weekView]);
@@ -117,6 +118,8 @@ export default function App() {
   const dayNum = getDayNum(data);
   const todayData = data.days?.[td()] || {};
   const doneCount = FOUNDS.filter(f=>todayData[f.key]).length;
+  const _celebPrev = useRef(doneCount===4);
+  useEffect(()=>{ const c=doneCount===4; if(c&&!_celebPrev.current){ setCelebrate(true); const t=setTimeout(()=>setCelebrate(false),700); _celebPrev.current=c; return ()=>clearTimeout(t);} _celebPrev.current=c; },[doneCount===4]);
   const totals30 = get30(data);
 
   const toggle = (key) => { const d={...data}; if(!d.startDate)d.startDate=td(); d.days={...d.days,[td()]:{...todayData,[key]:!todayData[key]}}; setData(d); };
@@ -183,7 +186,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
 
   if (!verified) return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} input::placeholder{color:${B.txl}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} input::placeholder{color:${B.txl}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:60,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
         <div style={{textAlign:"center",marginBottom:36,animation:"up .6s cubic-bezier(0.23,1,0.32,1) .1s both"}}>
@@ -209,7 +212,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
     const wk=weekView, totals=getWeekTotals(data,wk), daysInWeek=wk===4?9:7;
     return (
       <div style={css}>
-        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
+        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
           <button onClick={()=>{setView("home");setWeekView(null);}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
           <h2 style={{fontSize:22,fontWeight:600,fontFamily:H,marginBottom:20,}}>Week {wk} audit</h2>
@@ -233,7 +236,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
 
   return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
 
@@ -251,7 +254,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
         </div>
 
         {/* Streak reward */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14,marginBottom:28,padding:"16px 0",borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:14,marginBottom:28,padding:"16px 0",animation:celebrate?"pop .6s cubic-bezier(0.23,1,0.32,1)":undefined,borderTop:`1px solid ${B.tx}12`,borderBottom:`1px solid ${B.tx}12`}}>
           <span style={{fontFamily:H,fontSize:46,fontWeight:600,color:B.accent,lineHeight:.85}}>{streak}</span>
           <span style={{fontSize:12,letterSpacing:2,textTransform:"uppercase",fontWeight:600,color:B.txl,maxWidth:120,lineHeight:1.5}}>consecutive days rooted</span>
         </div>
