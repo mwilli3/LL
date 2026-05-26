@@ -233,13 +233,16 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
         {tab==="journal" && <>
           <Lbl>Tonight's boundary check</Lbl>
           {EVENING_QS.map((q,i)=>(
-            <div key={i} style={{marginBottom:16}}>
-              <p style={{fontSize:14,fontWeight:600,marginBottom:8,paddingLeft:14,borderLeft:`3px solid ${B.accent}40`}}>{q.q}</p>
+            <div key={i} style={{marginBottom:20}}>
+              <div style={{display:"flex",alignItems:"baseline",gap:12,marginBottom:10}}>
+                <span style={{fontFamily:H,fontSize:24,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9}}>{`0${i+1}`}</span>
+                <p style={{fontSize:15,fontWeight:600,lineHeight:1.4}}>{q.q}</p>
+              </div>
               <textarea value={todayEntry[q.key]||""} onChange={e=>updateEntry(q.key,e.target.value)} placeholder={q.ph}
                 style={{width:"100%",minHeight:70,padding:14,fontSize:14,fontFamily:F,border:`1px solid ${B.accent}15`,borderRadius:10,background:B.wh,color:B.tx,outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.7}}
                 onFocus={e=>e.target.style.borderColor=B.accent} onBlur={e=>e.target.style.borderColor=B.accent+"15"} />
               {!(todayEntry[q.key]||"").trim() && (
-                <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:10,paddingLeft:14}}>
+                <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:10}}>
                   <span style={{fontSize:11,color:B.txl,fontWeight:500,alignSelf:"center",marginRight:2}}>Start with</span>
                   {q.starters.map((s,j)=>(
                     <button key={j} onClick={()=>updateEntry(q.key, s.replace(/…$/,"")+" ")}
