@@ -82,7 +82,7 @@ Flat and paper-like. Hierarchy comes from hairlines and negative space, not shad
 ## 5. Components
 
 ### Logo
-`Nerve_Branch_Woman_Logo-11.svg`, injected via `dangerouslySetInnerHTML`. Container `width:500 / maxWidth:100% / margin:0 auto / overflow:hidden`; SVG `width` forced to `100%`, `height` removed, `viewBox="0 110 824.88 110"` (crops to the wordmark band). Centered at the top of every app.
+The **LOVELARICE lockup** — wordmark + hairline divider + "REGULATE. ROOT. RECLAIM." tagline — as an inline SVG injected via `dangerouslySetInnerHTML`, recolored from black to **Espresso Ink `#3A2018`** so it sits on cream (no pure black). Container `width:400 / maxWidth:100% / margin:0 auto / overflow:hidden`; SVG `width` forced to `100%`, `height` removed, `viewBox="35 134 760 106"` (crops tightly to the full lockup). Centered at the top of every app. (Marketing-register surfaces — the website/quiz — use the same lockup in their warmer two-tone treatment; see that register's own doc.)
 
 ### Masthead
 Centered. Serif headline with the second line in accent italic; one supporting line in Muted Brown (`maxWidth:400, margin:0 auto`). **No decorative divider.** The **day index is the masthead kicker** — a centered serif-italic line "Day {n} of seven" (free) or "Day {n} of thirty" (paid) sitting above the headline. This is the single canonical location for the day index in every app. Paid apps split the product name across two headline lines (line 2 in accent italic), e.g. "Regulation / *Mastery Kit*"; an optional small uppercase sub-line under the kicker carries phase context (e.g. "Week 1 · Notice").
