@@ -375,14 +375,14 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
           {[1,2,3,4].map(wk => {
             const isActive = dayNum >= ((wk-1)*7+1);
             return (
-              <div key={wk} style={{padding:"16px 18px",marginBottom:8,background:isActive?B.wh:B.bg,border:`1px solid ${isActive?B.accent+"15":B.tx+"08"}`,borderRadius:10,opacity:isActive?1:.5}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:isActive?12:0}}>
-                  <p style={{fontSize:15,fontWeight:600}}>Week {wk}</p>
-                  <p style={{fontSize:12,color:B.txm}}>Days {(wk-1)*7+1}{"–"}{wk===4?30:wk*7}</p>
+              <div key={wk} style={{padding:"20px 0",borderBottom:wk<4?`1px solid ${B.tx}12`:"none",opacity:isActive?1:.4}}>
+                <div style={{display:"flex",alignItems:"baseline",gap:18,marginBottom:isActive?14:0}}>
+                  <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9,minWidth:38}}>{`0${wk}`}</span>
+                  <div style={{flex:1}}><p style={{fontSize:15,fontWeight:600}}>Week {wk}</p><p style={{fontSize:12,color:B.txm}}>Days {(wk-1)*7+1}{"–"}{wk===4?30:wk*7}</p></div>
                 </div>
                 {isActive && <textarea value={data.reflections?.[wk]||""} onChange={e=>setReflection(wk,e.target.value)} placeholder={wk===1?"What patterns are you noticing in your regulation?":wk===2?"Which time of day is hardest to stay regulated?":wk===3?"What has changed about how you respond to stress?":"Complete: I am a person who regulates because..."}
-                  style={{width:"100%",minHeight:60,padding:12,fontSize:13,fontFamily:F,border:`1px solid ${B.accent}12`,borderRadius:8,background:B.bg,color:B.tx,outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.65}}
-                  onFocus={e=>e.target.style.borderColor=B.accent} onBlur={e=>e.target.style.borderColor=B.accent+"12"} />}
+                  style={{width:"100%",minHeight:60,padding:12,fontSize:13,fontFamily:F,border:`1px solid ${B.accent}15`,borderRadius:8,background:B.wh,color:B.tx,outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.65}}
+                  onFocus={e=>e.target.style.borderColor=B.accent} onBlur={e=>e.target.style.borderColor=B.accent+"15"} />}
               </div>
             );
           })}

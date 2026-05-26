@@ -273,10 +273,11 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
           <Lbl>Weekly habit audits</Lbl>
           {[1,2,3,4].map(wk=>{const isActive=dayNum>=((wk-1)*7+1);const totals=getWeekTotals(data,wk);const dw=wk===4?9:7;const tc=totals.hydration+totals.sleep+totals.movement+totals.nourish;return(
             <button key={wk} onClick={()=>{if(isActive){setWeekView(wk);setView("week");}}} disabled={!isActive}
-              style={{display:"flex",width:"100%",justifyContent:"space-between",alignItems:"center",padding:"16px 18px",marginBottom:8,background:isActive?B.wh:B.bg,border:`1px solid ${isActive?B.accent+"15":B.tx+"08"}`,borderRadius:10,cursor:isActive?"pointer":"default",fontFamily:F,opacity:isActive?1:.5,transition:"all .2s"}}
-              onMouseEnter={e=>{if(isActive){e.currentTarget.style.borderColor=B.accent}}} onMouseLeave={e=>{if(isActive){e.currentTarget.style.borderColor=B.accent+"15"}}}>
-              <div style={{textAlign:"left"}}><p style={{fontSize:15,fontWeight:600}}>Week {wk}</p></div>
-              <p style={{fontSize:14,fontWeight:600,color:B.accent}}>{tc}/{dw*4}</p>
+              style={{display:"flex",width:"100%",alignItems:"baseline",gap:18,padding:"20px 0",background:"none",border:"none",borderBottom:wk<4?`1px solid ${B.tx}12`:"none",cursor:isActive?"pointer":"default",fontFamily:F,opacity:isActive?1:.4,transition:"opacity .2s"}}
+              onMouseEnter={e=>{if(isActive){e.currentTarget.style.opacity=.6}}} onMouseLeave={e=>{if(isActive){e.currentTarget.style.opacity=1}}}>
+              <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9,minWidth:38}}>{`0${wk}`}</span>
+              <div style={{flex:1,textAlign:"left"}}><p style={{fontSize:15,fontWeight:600}}>Week {wk}</p><p style={{fontSize:12,color:B.txm}}>Days {(wk-1)*7+1}–{wk===4?30:wk*7}</p></div>
+              <span style={{fontSize:14,fontWeight:600,color:B.accent,alignSelf:"center"}}>{tc}/{dw*4}</span>
             </button>
           );})}
 
@@ -323,9 +324,9 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
           <Lbl>Miss protocol</Lbl>
           <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginBottom:16}}>When you miss a day, this is your recovery sequence. Follow it in order.</p>
           {MISS_PROTOCOL.map((m,i)=>(
-            <div key={i} style={{display:"flex",gap:14,marginBottom:14}}>
-              <span style={{width:28,height:28,minWidth:28,borderRadius:"50%",background:B.accent,color:B.wh,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:600}}>{i+1}</span>
-              <div><p style={{fontSize:14,fontWeight:600,marginBottom:4}}>{m.title}</p><p style={{fontSize:13,lineHeight:1.7,color:B.txm}}>{m.body}</p></div>
+            <div key={i} style={{display:"flex",gap:18,alignItems:"baseline",padding:"20px 0",borderBottom:i<MISS_PROTOCOL.length-1?`1px solid ${B.tx}12`:"none"}}>
+              <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9,minWidth:38}}>{`0${i+1}`}</span>
+              <div><p style={{fontSize:15,fontWeight:600,marginBottom:4}}>{m.title}</p><p style={{fontSize:13,lineHeight:1.7,color:B.txm}}>{m.body}</p></div>
             </div>
           ))}
 

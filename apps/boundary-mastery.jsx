@@ -280,18 +280,21 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
             const isActive = dayNum >= ((wk.num-1)*7+1);
             const isCurrent = week === wk.num;
             return (
-              <div key={i} style={{padding:"22px 20px",borderRadius:12,background:isCurrent?B.accentL:isActive?B.wh:B.bg,border:`1px solid ${isCurrent?B.accent+"25":isActive?B.accent+"12":B.tx+"08"}`,marginBottom:12,opacity:isActive?1:.5}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                  <p style={{fontSize:16,fontWeight:600,fontFamily:H,color:isCurrent?B.accent:B.tx}}>Week {wk.num}: {wk.name}</p>
-                  {isCurrent && <span style={{fontSize:10,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:B.accent,background:B.wh,padding:"3px 8px",borderRadius:4}}>Current</span>}
+              <div key={i} style={{display:"flex",alignItems:"baseline",gap:18,padding:"20px 0",borderBottom:i<WEEKS.length-1?`1px solid ${B.tx}12`:"none",opacity:isActive?1:.4}}>
+                <span style={{fontFamily:H,fontSize:30,fontWeight:600,fontStyle:"italic",color:B.accent,lineHeight:.9,minWidth:38}}>{`0${wk.num}`}</span>
+                <div style={{flex:1}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:10,marginBottom:4}}>
+                    <p style={{fontSize:16,fontWeight:600,fontFamily:H,color:isCurrent?B.accent:B.tx}}>Week {wk.num}: {wk.name}</p>
+                    {isCurrent && <span style={{fontSize:10,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:B.accent,whiteSpace:"nowrap"}}>Current</span>}
+                  </div>
+                  <p style={{fontSize:13,lineHeight:1.7,color:B.txm,marginBottom:isActive?14:0}}>{wk.desc}</p>
+                  {isActive && <>
+                    <p style={{fontSize:12,fontWeight:600,color:B.accent,marginBottom:8,fontStyle:"italic"}}>{wk.prompt}</p>
+                    <textarea value={data.reflections?.[wk.num]||""} onChange={e=>setReflection(wk.num,e.target.value)} placeholder="Write here..."
+                      style={{width:"100%",minHeight:70,padding:12,fontSize:13,fontFamily:F,border:`1px solid ${B.accent}20`,borderRadius:8,background:B.wh,color:B.tx,outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.65}}
+                      onFocus={e=>e.target.style.borderColor=B.accent} onBlur={e=>e.target.style.borderColor=B.accent+"20"} />
+                  </>}
                 </div>
-                <p style={{fontSize:13,lineHeight:1.7,color:B.txm,marginBottom:isActive?14:0}}>{wk.desc}</p>
-                {isActive && <>
-                  <p style={{fontSize:12,fontWeight:600,color:B.accent,marginBottom:8,marginTop:4}}>{wk.prompt}</p>
-                  <textarea value={data.reflections?.[wk.num]||""} onChange={e=>setReflection(wk.num,e.target.value)} placeholder="Write here..."
-                    style={{width:"100%",minHeight:70,padding:12,fontSize:13,fontFamily:F,border:`1px solid ${B.accent}20`,borderRadius:8,background:B.wh,color:B.tx,outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.65}}
-                    onFocus={e=>e.target.style.borderColor=B.accent} onBlur={e=>e.target.style.borderColor=B.accent+"20"} />
-                </>}
               </div>
             );
           })}
