@@ -13,9 +13,9 @@ const td = () => new Date().toISOString().slice(0,10);
 const fmtDate = (d) => new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
 
 const QUESTIONS = [
-  { key:"no", q:"What did I say no to today?", placeholder:"A request, an obligation, an expectation you released..." },
-  { key:"protect", q:"What did I protect?", placeholder:"Your time, your energy, your peace, a commitment to yourself..." },
-  { key:"claim", q:"What will I claim for myself tomorrow?", placeholder:"One thing you will choose, protect, or prioritize..." },
+  { key:"no", q:"What did I say no to today?", placeholder:"A request, an obligation, an expectation you released...", starters:["I declined…","I said no to…","I let go of the expectation that…"] },
+  { key:"protect", q:"What did I protect?", placeholder:"Your time, your energy, your peace, a commitment to yourself...", starters:["I protected my…","I kept space for…","I held a boundary around…"] },
+  { key:"claim", q:"What will I claim for myself tomorrow?", placeholder:"One thing you will choose, protect, or prioritize...", starters:["Tomorrow I will…","I'm choosing…","I will prioritize…"] },
 ];
 
 function getStreak(data) {
@@ -160,6 +160,17 @@ export default function App() {
               <textarea value={todayEntry[q.key]||""} onChange={e=>updateToday(q.key,e.target.value)} placeholder={q.placeholder}
                 style={{width:"100%",minHeight:70,padding:14,fontSize:14,fontFamily:F,border:`1px solid ${B.accent}15`,borderRadius:10,background:B.wh,color:B.tx,outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.7}}
                 onFocus={e=>e.target.style.borderColor=B.accent} onBlur={e=>e.target.style.borderColor=B.accent+"15"} />
+              {!(todayEntry[q.key]||"").trim() && (
+                <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:10}}>
+                  <span style={{fontSize:11,color:B.txl,fontWeight:500,alignSelf:"center",marginRight:2}}>Start with</span>
+                  {q.starters.map((s,j)=>(
+                    <button key={j} onClick={()=>updateToday(q.key, s.replace(/…$/,"")+" ")}
+                      style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.accent,background:"none",border:`1px solid ${B.accent}40`,borderRadius:6,padding:"6px 12px",cursor:"pointer",transition:"all .2s"}}
+                      onMouseEnter={e=>{e.currentTarget.style.background=B.accentL;e.currentTarget.style.borderColor=B.accent;}}
+                      onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.borderColor=B.accent+"40";}}>{s}</button>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
