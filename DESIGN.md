@@ -81,7 +81,7 @@ ease-drawer:      cubic-bezier(0.32, 0.72, 0, 1)
 - Only animate `transform`, `opacity`, `clip-path`, `filter`. Never `width`, `height`, `top`, `left`, or anything that triggers layout.
 - Wipe-up CTA hover: `clip-path: inset(0 0 100% 0)` → `inset(0 0 0 0)` with the darker surface beneath.
 - Active scale feedback on every pressable element: `:active { transform: scale(0.97); }` (smaller for surfaces, 0.985 for large buttons).
-- Honor `prefers-reduced-motion: reduce` globally — everything collapses to 0.01ms.
+- Honor `prefers-reduced-motion: reduce` globally — gentler, not zero: stop looping/entrance movement (animation `0.001ms`, single iteration) but keep short opacity/color transitions (`~200ms`) that aid comprehension. First touch for a nervous-system audience should feel calm, not abruptly snap.
 
 ## Components (canonical patterns)
 

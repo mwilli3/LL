@@ -206,10 +206,13 @@ function App() {
       .ll-cta-light:focus-visible { outline-color: ${T.gold}; }
 
       @media (prefers-reduced-motion: reduce) {
+        /* Gentler, not zero: stop looping/entrance movement but keep short
+           opacity/color transitions that aid comprehension. The quiz is the
+           first touch for a nervous-system audience — calmer than abrupt. */
         *, *::before, *::after {
-          animation-duration: 0.01ms !important;
+          animation-duration: 0.001ms !important;
           animation-iteration-count: 1 !important;
-          transition-duration: 0.01ms !important;
+          transition-duration: 200ms !important;
           scroll-behavior: auto !important;
         }
       }
