@@ -149,7 +149,7 @@ export default function App() {
               <span style={{height:1,width:26,background:B.accent,opacity:.45,transform:"translateY(-5px)"}} />
               <span style={{fontFamily:H,fontSize:20,fontWeight:600,fontStyle:"italic",color:B.accent,letterSpacing:.2}}>Tonight's boundary check</span>
             </div>
-            <span style={{fontFamily:F,fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:answeredCount>0?B.accent:B.txl}}>{answeredCount>0?(answeredCount===3?"Complete ✓":`${answeredCount} of 3`):"Optional"}</span>
+            <span style={{fontFamily:F,fontSize:11,fontWeight:600,letterSpacing:1.5,textTransform:"uppercase",color:answeredCount===3?B.accent:B.txl}}>{answeredCount===3?"Complete ✓":`${answeredCount} of 3`}</span>
           </div>
           {QUESTIONS.map((q,i)=>(
             <div key={i} style={{marginBottom:20}}>
