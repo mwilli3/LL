@@ -11,7 +11,7 @@
     - Quiz URL is set via theme editor (section setting)
 {% endcomment %}
 
-{% assign quiz_url = section.settings.quiz_url | default: '#' %}
+{% assign quiz_url = section.settings.quiz_url | default: 'https://apps.lovelarice.com/quiz' %}
 
 <script>document.documentElement.classList.add('has-js');</script>
 
@@ -1114,7 +1114,7 @@
       "type": "url",
       "id": "quiz_url",
       "label": "Archetype Quiz URL",
-      "info": "Destination for all 'Find Your Archetype' / 'Take the Quiz' CTAs."
+      "info": "Destination for all 'Find Your Archetype' / 'Take the Quiz' CTAs. Defaults to https://apps.lovelarice.com/quiz if left blank."
     }
   ],
   "presets": [
