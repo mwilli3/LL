@@ -36,21 +36,24 @@ purchase check and redirect non-buyers to the product page.
 4. **Do NOT** touch domain/HTTPS config (already verified). Do not reconnect the repo.
 
 ## TODOs / confirmations
-- **Shopify product handles** in `src/lib/gate.js` were taken from the quiz's own
-  purchase CTAs: `regulation-mastery-kit`, `rooted-reset-challenge-kit`,
-  `boundary-mastery-kit`. Confirm these are the live handles.
+- **Shopify product handles** are set in each paid app's `verifyPurchase()`
+  (`apps/regulation-mastery.jsx`, `apps/boundary-mastery.jsx`,
+  `apps/rooted-challenge.jsx`), taken from the quiz's own purchase CTAs:
+  `regulation-mastery-kit`, `rooted-reset-challenge-kit`, `boundary-mastery-kit`.
+  Confirm these are the live handles.
 - Confirm the three `*_PRODUCT_TITLE` env values.
 
 ## Notes
 - The AI function is named **`analyze.js`** (not `ai-proxy.js`) because the apps call
   `/.netlify/functions/analyze`. Same role (Anthropic proxy, key server-side).
-- `verify-purchase.js` accepts `{ email, app }` (from `gate.js`) **and** `{ email, product }`
-  (used by each paid app's own built-in gate), and **fails closed** (`{verified:false}`)
-  if Shopify env is missing or the lookup errors.
-- Each paid app also ships its own styled email gate. `gate.js` writes that app's
-  `verified` localStorage key on success, so buyers are asked **once** (the gate.js
-  prompt), not twice. If you'd rather use the app's styled gate instead of the
-  `window.prompt`, that's a small follow-up — the verify function already supports it.
+- **Gating lives in each paid app's own styled gate screen** (`verifyPurchase()`), not a
+  pre-mount prompt. On load the paid app mounts and shows its email-entry gate; on submit
+  it POSTs `{ email, app }` to `/.netlify/functions/verify-purchase`. On success it caches
+  access (`larice_access_<app>` + the app's verified key) and renders; on a non-match **or
+  any error it redirects to the Shopify product page (fails closed)**. Returning buyers skip
+  the gate via the cached verified key.
+- `verify-purchase.js` accepts `{ email, app }` **and** `{ email, product }`, and **fails
+  closed** (`{verified:false}`) if Shopify env is missing or the lookup errors.
 - Local proof: `npm install && npm run build` emits all 8 HTML entries; `npm run preview`
-  shows free routes rendering and paid routes hitting the gate (redirecting, since there's
-  no real purchase locally — expected).
+  shows free routes rendering, and paid routes showing the styled gate → submitting an email
+  redirects to Shopify (no real purchase / no function locally — expected, fails closed).

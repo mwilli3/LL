@@ -163,18 +163,22 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
   const verifyPurchase = async () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(gateEmail.trim())) { setGateErr("Please enter a valid email address."); return; }
     setGateLoading(true); setGateErr("");
+    const APP = "rooted-challenge";
+    const PRODUCT_URL = "https://lovelarice.com/products/rooted-reset-challenge-kit";
     try {
       const res = await fetch("/.netlify/functions/verify-purchase", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: gateEmail.trim(), product: "Rooted Reset Challenge Kit" })
+        body: JSON.stringify({ email: gateEmail.trim(), app: APP })
       });
       const d = await res.json();
-      if (d.verified) { setVerified(true); localStorage.setItem("larice_rooted_kit_email", gateEmail.trim()); }
-      else { setGateErr("No purchase found for this email. Please use the email you purchased with."); }
-    } catch {
-      setVerified(true); localStorage.setItem("larice_rooted_kit_email", gateEmail.trim());
-    }
-    setGateLoading(false);
+      if (d && d.verified) {
+        localStorage.setItem("larice_rooted_kit_email", gateEmail.trim());
+        try { localStorage.setItem(`larice_access_${APP}`, JSON.stringify({ app: APP, ts: Date.now() })); } catch {}
+        setVerified(true); setGateLoading(false); return;
+      }
+    } catch {}
+    // Not a buyer (or verification unavailable) → fail closed, send to the product page.
+    window.location.href = PRODUCT_URL;
   };
 
   const css = { fontFamily:F, background:B.bg, minHeight:"100vh", color:B.tx, WebkitFontSmoothing:"antialiased" };
