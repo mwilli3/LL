@@ -104,7 +104,7 @@ const ARCH = {
       note: "This signals your nervous system that the day begins from regulation, not reaction." },
     supp: "Pure Magnesium Power supports the magnesium-dependent processes your nervous system runs on. The Nervous System Bundle ($44.99) pairs it with Ashwagandha for HPA-axis support.",
     content: ["Your exhaustion isn’t laziness. Your nervous system is overloaded.", "The real reason you can’t focus after 2pm.", "You don’t need more motivation. You need a regulated brain."],
-    shopifyUrl: "https://lovelarice.com/products/regulation-mastery-kit"
+    shopifyUrl: "https://lovelarice.com/cart/61863893467506:1"
   },
   root: {
     name: "The Rooted One", italic: "Rooted One", pillar: "Rooted Wellness",
@@ -121,7 +121,7 @@ const ARCH = {
       note: "The streak becomes your identity anchor. Every day you track is evidence that you follow through." },
     supp: "Resveratrol is the cellular-maintenance layer of the Rooted practice. Effects are measured in biomarkers over months: the long-game supplement for the long-game woman.",
     content: ["Here’s why every plan you’ve tried hasn’t stuck, and it has nothing to do with discipline.", "The wellness industry profits from your inconsistency.", "You don’t need a new program. You need a foundation."],
-    shopifyUrl: "https://lovelarice.com/products/rooted-reset-challenge-kit"
+    shopifyUrl: "https://lovelarice.com/cart/61863893500274:1"
   },
   rec: {
     name: "The Power Reclaimer", italic: "Reclaimer", pillar: "Reclaimed Power",
@@ -138,7 +138,7 @@ const ARCH = {
       note: "This builds daily evidence that you hold boundaries." },
     supp: "The Nervous System Bundle (Magnesium plus Ashwagandha, $44.99) addresses the depletion pattern most Power Reclaimers share with the Regulator.",
     content: ["The reason saying no feels physically dangerous, and it has nothing to do with your personality.", "You cannot pour from an empty vessel, and yet here we are.", "We are not in our burnout era anymore."],
-    shopifyUrl: "https://lovelarice.com/products/boundary-mastery-kit"
+    shopifyUrl: "https://lovelarice.com/cart/61863893533042:1"
   },
 };
 
