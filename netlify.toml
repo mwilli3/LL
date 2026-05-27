@@ -1,0 +1,45 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Clean paths -> built HTML (200 = rewrite, URL stays clean)
+[[redirects]]
+  from = "/calm"
+  to = "/calm.html"
+  status = 200
+[[redirects]]
+  from = "/rooted"
+  to = "/rooted.html"
+  status = 200
+[[redirects]]
+  from = "/reclaim"
+  to = "/reclaim.html"
+  status = 200
+[[redirects]]
+  from = "/quiz"
+  to = "/quiz.html"
+  status = 200
+[[redirects]]
+  from = "/regulation-mastery"
+  to = "/regulation-mastery.html"
+  status = 200
+[[redirects]]
+  from = "/boundary-mastery"
+  to = "/boundary-mastery.html"
+  status = 200
+[[redirects]]
+  from = "/rooted-challenge"
+  to = "/rooted-challenge.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
