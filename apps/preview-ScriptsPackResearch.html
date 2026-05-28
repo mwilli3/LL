@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/><title>Scripts Pack (Research Edition) — Preview</title><style>html,body{margin:0;padding:0;background:#f5f1ec}</style></head><body><div id="root"></div><script>(() => {
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/><title>Scripts Pack Research Edition — Preview</title><style>html,body{margin:0;padding:0;background:#f5f1ec}</style></head><body><div id="root"></div><script>(() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -7288,13 +7288,13 @@
     bg: "oklch(0.975 0.008 70)",
     surface: "oklch(0.995 0.004 75)",
     line: "oklch(0.90 0.01 60)",
-    brand: "oklch(0.45 0.07 300)",
-    brandDark: "oklch(0.38 0.06 300)",
+    brand: "oklch(0.53 0.12 40)",
+    brandDark: "oklch(0.44 0.11 40)",
     terracotta: "oklch(0.53 0.12 40)",
     success: "oklch(0.50 0.04 150)",
     successTint: "oklch(0.94 0.02 150)"
   };
-  var BRAND_TINT = "oklch(0.93 0.025 300)";
+  var BRAND_TINT = "oklch(0.945 0.035 42)";
   var DISPLAY = "'Young Serif', serif";
   var UI = "'Outfit', sans-serif";
   var EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
@@ -7778,10 +7778,15 @@ Keep it under 150 words.`);
       ] })
     ] });
   }
+  var PRODUCT_URLS = {
+    research: "https://theregulatedchild.com/products/in-the-moment-scripts-pack",
+    scripts: "https://theregulatedchild.com/products/in-the-moment-scripts-pack"
+  };
   function PurchaseGate({ productId, productName, onVerified }) {
     const [email, setEmail] = (0, import_react.useState)("");
     const [error, setError] = (0, import_react.useState)("");
     const [loading, setLoading] = (0, import_react.useState)(false);
+    const productUrl = PRODUCT_URLS[productId] || "https://regulatedchild.com";
     const handleVerify = async () => {
       if (!email.trim()) return;
       setLoading(true);
@@ -7794,22 +7799,22 @@ Keep it under 150 words.`);
         });
         const data = await r.json();
         if (data.verified) {
+          const rec = JSON.stringify({ verified: true, product: productId, ts: Date.now() });
           try {
-            localStorage.setItem("rc-access-" + productId, JSON.stringify({ verified: true, product: productId }));
+            localStorage.setItem("rc-access-" + productId, rec);
           } catch {
           }
           try {
-            if (window.storage?.set) window.storage.set("rc-access-" + productId, JSON.stringify({ verified: true, product: productId }));
+            if (window.storage?.set) window.storage.set("rc-access-" + productId, rec);
           } catch {
           }
           onVerified();
-        } else {
-          setError(data.message || "No matching purchase found for this email.");
+          return;
         }
+        window.location.href = productUrl;
       } catch {
-        setError("preview");
+        window.location.href = productUrl;
       }
-      setLoading(false);
     };
     const inputStyle = {
       width: "100%",
@@ -7866,10 +7871,6 @@ Keep it under 150 words.`);
             transition: `all .3s ${EASE}`
           }, children: loading ? "Verifying your purchase..." : "Access my purchase" })
         ] }),
-        error === "preview" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "rc-rise", style: { marginTop: 20, textAlign: "center" }, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 13, color: C.muted, marginBottom: 12, fontFamily: UI }, children: "Purchase verification requires Netlify deployment." }),
-          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: onVerified, style: { padding: "12px 22px", borderRadius: 12, border: `1px solid ${C.line}`, background: C.surface, color: C.text, fontSize: 13, fontWeight: 600, fontFamily: UI, cursor: "pointer" }, children: "Enter preview mode" })
-        ] }) : error ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "rc-rise", style: { marginTop: 20, background: "oklch(0.945 0.035 42)", borderRadius: 12, padding: "14px 16px" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 13, color: C.terracotta, lineHeight: 1.55, margin: 0, fontFamily: UI }, children: error }) }) : null,
         /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "rc-rise", style: { animationDelay: ".3s", marginTop: 34, paddingTop: 26, borderTop: `1px solid ${C.line}` }, children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { fontSize: 13, color: C.muted, lineHeight: 1.55, margin: "0 0 6px", fontFamily: UI }, children: "Haven\u2019t purchased yet?" }),
           /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", { href: "https://regulatedchild.com", target: "_blank", rel: "noopener", style: { fontSize: 14, fontWeight: 600, color: C.brand, textDecoration: "none", fontFamily: UI }, children: "Visit regulatedchild.com to get started" })
@@ -7883,13 +7884,14 @@ Keep it under 150 words.`);
     const [worked, setWorked] = (0, import_react.useState)([]);
     const ref = (0, import_react.useRef)(null);
     (0, import_react.useEffect)(() => {
+      const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1e3;
+      const fresh = (d) => d && d.verified && d.ts && Date.now() - d.ts < SEVEN_DAYS;
       (async () => {
         try {
           if (window.storage?.get) {
             const r = await window.storage.get("rc-access-research");
             if (r?.value) {
-              const d = JSON.parse(r.value);
-              if (d.verified) {
+              if (fresh(JSON.parse(r.value))) {
                 setScreen("app");
                 return;
               }
@@ -7900,8 +7902,7 @@ Keep it under 150 words.`);
         try {
           const s = localStorage.getItem("rc-access-research");
           if (s) {
-            const d = JSON.parse(s);
-            if (d.verified) setScreen("app");
+            if (fresh(JSON.parse(s))) setScreen("app");
           }
         } catch {
         }
