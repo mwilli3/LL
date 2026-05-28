@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "lovelarice_home": {
+      "type": "lovelarice-home",
+      "settings": {}
+    }
+  },
+  "order": ["lovelarice_home"]
+}
