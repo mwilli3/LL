@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>The Regulated Child · Apps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: oklch(0.975 0.008 70);
+        --surface: oklch(0.995 0.004 75);
+        --text: oklch(0.26 0.03 45);
+        --muted: oklch(0.50 0.02 55);
+        --line: oklch(0.90 0.01 60);
+        --brand: oklch(0.53 0.12 40);
+        --brand-tint: oklch(0.945 0.035 42);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Outfit", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
+      }
+      .wrap { max-width: 760px; margin: 0 auto; padding: clamp(40px, 10vw, 88px) 24px 64px; }
+      .kicker {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
+        text-transform: uppercase; color: var(--brand); margin-bottom: 18px;
+      }
+      .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--brand); display: inline-block; }
+      h1 {
+        font-family: "Young Serif", serif; font-weight: 400;
+        font-size: clamp(34px, 8vw, 52px); line-height: 1.05;
+        letter-spacing: -0.01em; margin: 0 0 14px;
+      }
+      .lede { font-size: 17px; color: var(--muted); margin: 0 0 clamp(36px, 8vw, 52px); max-width: 46ch; }
+      .section-label {
+        font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--muted); margin: 0 0 14px;
+      }
+      .grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 40px; }
+      @media (min-width: 560px) { .grid { grid-template-columns: 1fr 1fr; } }
+      a.card {
+        display: block; text-decoration: none; color: inherit;
+        background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+        padding: 20px 22px; transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      a.card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 8px 24px oklch(0.53 0.12 40 / 0.10); }
+      .card-title { font-family: "Young Serif", serif; font-size: 19px; margin: 0 0 6px; letter-spacing: -0.005em; }
+      .card-desc { font-size: 13.5px; color: var(--muted); margin: 0; }
+      .tag {
+        float: right; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+        padding: 3px 9px; border-radius: 999px; background: var(--brand-tint); color: var(--brand);
+      }
+      footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 24px; }
+      footer a { color: var(--brand); text-decoration: none; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <span class="kicker"><span class="dot"></span>The Regulated Child</span>
+      <h1>The apps</h1>
+      <p class="lede">Tools to understand your child's behavior through the lens of their nervous system.</p>
+
+      <p class="section-label">Free tools</p>
+      <div class="grid">
+        <a class="card" href="/quiz">
+          <h2 class="card-title">Regulation Profile Quiz</h2>
+          <p class="card-desc">Discover your child's regulation profile.</p>
+        </a>
+        <a class="card" href="/body">
+          <h2 class="card-title">The Body Behind the Behavior</h2>
+          <p class="card-desc">What the nervous system is really saying.</p>
+        </a>
+        <a class="card" href="/coregulation">
+          <h2 class="card-title">The Co-Regulation Guide</h2>
+          <p class="card-desc">Steadying your child by steadying yourself.</p>
+        </a>
+        <a class="card" href="/decoder-free">
+          <h2 class="card-title">Behavior Decoder</h2>
+          <p class="card-desc">Translate a behavior into a body state.</p>
+        </a>
+        <a class="card" href="/scripts-free">
+          <h2 class="card-title">In-the-Moment Scripts</h2>
+          <p class="card-desc">What to say when it counts.</p>
+        </a>
+      </div>
+
+      <p class="section-label">Premium</p>
+      <div class="grid">
+        <a class="card" href="/decoder">
+          <span class="tag">Purchase</span>
+          <h2 class="card-title">Behavior Decoder Workbook</h2>
+          <p class="card-desc">The complete decoding system and tracker.</p>
+        </a>
+        <a class="card" href="/scripts">
+          <span class="tag">Purchase</span>
+          <h2 class="card-title">Scripts Pack — Research Edition</h2>
+          <p class="card-desc">Every script, with the science behind it.</p>
+        </a>
+      </div>
+
+      <footer>
+        Made by <a href="https://regulatedchild.com">The Regulated Child</a>. Not medical or clinical advice.
+      </footer>
+    </main>
+  </body>
+</html>
