@@ -10,11 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "posthog-js": "^1.376.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "vite": "^5.4.10",
-    "@vitejs/plugin-react": "^4.3.3"
+    "@vitejs/plugin-react": "^4.3.3",
+    "vite": "^5.4.10"
   }
 }

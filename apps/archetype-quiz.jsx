@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  trackQuizStarted, trackQuestionAnswered, trackQuizCompleted, trackEmailCaptured,
+  trackResultsViewed, trackOfferBlockViewed, trackCheckoutOpened, trackProfileExpanded,
+} from "./analytics.js";
 
 /* ─────────────────────────────────────────────────────────────
    LoveLarice Archetype Quiz
@@ -159,15 +163,9 @@ export default function App() {
   const [expanded, setExpanded] = useState(false);
   const ref = useRef(null);
   const offerRef = useRef(null);
-  const trackedOffer = useRef(false);
 
-  /* PostHog */
-  useEffect(() => {
-    if (window.posthog) return;
-    const s = document.createElement("script");
-    s.textContent = `!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onFeatureFlags".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);posthog.init('YOUR_POSTHOG_KEY',{api_host:'https://app.posthog.com'})`;
-    document.head.appendChild(s);
-  }, []);
+  /* Analytics: funnel top (PostHog is initialized once in src/quiz/main.jsx) */
+  useEffect(() => { trackQuizStarted(); }, []);
 
   /* Global styles: reduced-motion, focus-visible, narrow-viewport overrides */
   useEffect(() => {
@@ -221,33 +219,25 @@ export default function App() {
   useEffect(() => { ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }, [v, qi]);
 
   useEffect(() => {
-    if (v === "result" && res && window.posthog) {
-      window.posthog.capture("results_page_viewed", { archetype: res, email: email.trim() });
-    }
+    if (v === "result" && res) trackResultsViewed(res);
   }, [v, res]);
 
   useEffect(() => {
-    if (v !== "result" || !offerRef.current) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !trackedOffer.current) {
-        trackedOffer.current = true;
-        if (window.posthog) window.posthog.capture("offer_block_viewed", { archetype: res, price_shown: 47 });
-      }
-    }, { threshold: 0.5 });
-    observer.observe(offerRef.current);
-    return () => observer.disconnect();
+    if (v !== "result") return;
+    return trackOfferBlockViewed(offerRef.current, res);
   }, [v, res]);
 
   const begin = () => { setErr(""); setV("quiz"); };
 
   const pick = k => {
     const n = [...ans]; n[qi] = k; setAns(n);
+    trackQuestionAnswered(qi + 1, k);
     if (qi < 7) { setTimeout(() => setQi(qi + 1), 450); return; }
     setLd(true);
     setTimeout(() => {
       const archetype = score(n);
       setRes(archetype); setLd(false); setV("email");
-      if (window.posthog) window.posthog.capture("quiz_completed", { archetype });
+      trackQuizCompleted(archetype);
     }, 1500);
   };
 
@@ -256,10 +246,7 @@ export default function App() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setErr("Please enter a valid email address."); return; }
     setErr("");
     const e = email.trim();
-    if (window.posthog) {
-      window.posthog.identify(e, { email: e });
-      window.posthog.capture("email_captured", { archetype: res, email: e });
-    }
+    trackEmailCaptured(res);
     fetch("https://a.klaviyo.com/api/track", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -848,9 +835,7 @@ export default function App() {
               className="ll-cta-light"
               aria-label={`Claim your ${a.offer.name}`}
               onClick={() => {
-                if (window.posthog) window.posthog.capture("checkout_opened", {
-                  archetype: res, price: 47, discounted: true, email: email.trim(),
-                });
+                trackCheckoutOpened(res);
                 const url = (a.shopifyUrl || "#") + "?discount=ARCHETYPE10";
                 window.open(url, "_blank");
               }}
@@ -896,7 +881,7 @@ export default function App() {
             <button
               type="button"
               aria-expanded={false}
-              onClick={() => { setExpanded(true); if (window.posthog) window.posthog.capture("full_profile_expanded", { archetype: res }); }}
+              onClick={() => { setExpanded(true); trackProfileExpanded(res); }}
               style={{
                 display: "block", width: "100%", marginBottom: 8, padding: "16px 0",
                 fontFamily: F, fontSize: 11.5, fontWeight: 500,
