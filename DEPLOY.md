@@ -33,6 +33,14 @@ purchase check and redirect non-buyers to the product page.
    - `ROOTED_CHALLENGE_PRODUCT_TITLE`
    The `*_PRODUCT_TITLE` values must match the exact Shopify product titles so
    `verify-purchase.js` can match order line items.
+   - `VITE_POSTHOG_KEY` — PostHog project API key for the quiz analytics
+     (`apps/analytics.js`). **Build-time** var (Vite inlines `VITE_*`), so it must be
+     present at build; the quiz silently disables analytics if it's unset.
+     Optional `VITE_POSTHOG_HOST` (defaults to `https://us.i.posthog.com`).
+
+   **TODO (pre-existing):** the quiz's Klaviyo email capture in
+   `apps/archetype-quiz.jsx` still uses a placeholder token `YOUR_KLAVIYO_PUBLIC_KEY` —
+   replace with the real Klaviyo public key for email capture to work.
 4. **Do NOT** touch domain/HTTPS config (already verified). Do not reconnect the repo.
 
 ## TODOs / confirmations
