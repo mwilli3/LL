@@ -37,10 +37,22 @@ purchase check and redirect non-buyers to the product page.
      (`apps/analytics.js`). **Build-time** var (Vite inlines `VITE_*`), so it must be
      present at build; the quiz silently disables analytics if it's unset.
      Optional `VITE_POSTHOG_HOST` (defaults to `https://us.i.posthog.com`).
+   - `VITE_KLAVIYO_PUBLIC_KEY` — Klaviyo **public** company_id (e.g. `abc123`).
+     **Build-time** var. Used by the free-app email gate (`apps/email-gate.jsx`) and
+     by the quiz reveal to call Klaviyo Client Subscriptions. If unset, the gate
+     grants access without subscribing (logged warning); the quiz silently skips
+     the list subscribe.
 
-   **TODO (pre-existing):** the quiz's Klaviyo email capture in
-   `apps/archetype-quiz.jsx` still uses a placeholder token `YOUR_KLAVIYO_PUBLIC_KEY` —
-   replace with the real Klaviyo public key for email capture to work.
+   **Klaviyo list mapping** (per-app archetype lists, single opt-in):
+   | App / Route | Source tag | Klaviyo list ID |
+   |---|---|---|
+   | CALM (`/calm`) | `calm` | `XpHLZZ` (Regulator) |
+   | ROOTED (`/rooted`) | `rooted` | `WZKZmK` (Rooted) |
+   | RECLAIM (`/reclaim`) | `reclaim` | `RdVj9G` (Reclaimer) |
+   | QUIZ (`/quiz`) | `quiz` | routed by result: `reg→XpHLZZ`, `root→WZKZmK`, `rec→RdVj9G` |
+
+   Each subscription includes a `source_app` profile property so flows can
+   segment by entry point.
 4. **Do NOT** touch domain/HTTPS config (already verified). Do not reconnect the repo.
 
 ## TODOs / confirmations

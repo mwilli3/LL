@@ -247,14 +247,41 @@ export default function App() {
     setErr("");
     const e = email.trim();
     trackEmailCaptured(res);
+
+    // Subscribe to the archetype-routed Klaviyo list (single opt-in if the
+    // list is set that way). Public company_id via env; if unset, skip.
+    const KLAVIYO_LIST_BY_ARCHETYPE = { reg: "XpHLZZ", root: "WZKZmK", rec: "RdVj9G" };
+    const klaviyoKey = import.meta.env.VITE_KLAVIYO_PUBLIC_KEY;
+    const listId = KLAVIYO_LIST_BY_ARCHETYPE[res];
+    if (klaviyoKey && listId) {
+      fetch(`https://a.klaviyo.com/client/subscriptions/?company_id=${encodeURIComponent(klaviyoKey)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "revision": "2024-10-15" },
+        body: JSON.stringify({
+          data: {
+            type: "subscription",
+            attributes: {
+              profile: { data: { type: "profile", attributes: { email: e, properties: { source_app: "quiz", archetype: res, archetype_name: ARCH[res].name, pillar: ARCH[res].pillar } } } },
+              custom_source: "quiz",
+            },
+            relationships: { list: { data: { type: "list", id: listId } } },
+          },
+        }),
+      }).catch(() => {});
+    }
+
+    // Keep the legacy event call so any existing Klaviyo flow triggered on
+    // "Archetype Revealed" continues to fire. Token still uses the placeholder
+    // until VITE_KLAVIYO_PUBLIC_KEY is also wired into it (TODO).
     fetch("https://a.klaviyo.com/api/track", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        token: "YOUR_KLAVIYO_PUBLIC_KEY", event: "Archetype Revealed",
+        token: klaviyoKey || "YOUR_KLAVIYO_PUBLIC_KEY", event: "Archetype Revealed",
         customer_properties: { "$email": e },
         properties: { archetype: res, archetype_name: ARCH[res].name, pillar: ARCH[res].pillar }
       })
     }).catch(() => {});
+
     setV("result");
   };
 
