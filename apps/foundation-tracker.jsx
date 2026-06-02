@@ -122,7 +122,7 @@ export default function App() {
 
   return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} button{color:inherit} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
 

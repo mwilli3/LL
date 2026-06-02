@@ -221,7 +221,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
 
   if (!verified) return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} input::placeholder{color:${B.txl}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} button{color:inherit} input::placeholder{color:${B.txl}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:60,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:40,animation:"up .6s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
         <div style={{textAlign:"center",marginBottom:36,animation:"up .6s cubic-bezier(0.23,1,0.32,1) .1s both"}}>
@@ -247,7 +247,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
     const p = PRACTICES.find(x=>x.id===practiceId);
     return (
       <div style={css}>
-        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
+        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} button{color:inherit}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
           <button onClick={()=>{setView("home");setPracticeId(null);}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
           <div style={{animation:"up .4s cubic-bezier(0.23,1,0.32,1) both"}}>
@@ -266,7 +266,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
   if (view === "cycle") {
     return (
       <div style={css}>
-        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)}`}</style>
+        <style>{`@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} button{color:inherit}`}</style>
         <div ref={ref} style={{...wrap,paddingTop:28,paddingBottom:48}}>
           <button onClick={()=>{setView("home");setCycleTrigger("");setCycleResponse("");setCycleRecovery("");}} style={{fontSize:12,fontFamily:F,fontWeight:500,color:B.txl,background:"none",border:"none",cursor:"pointer",padding:"8px 0",marginBottom:24,borderBottom:`1.5px solid ${B.txl}30`}}>Back</button>
           <div style={{animation:"up .4s cubic-bezier(0.23,1,0.32,1) both"}}>
@@ -296,7 +296,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
 
   return (
     <div style={css}>
-      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
+      <style>{`@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}} /*mo*/ @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.05)}70%{transform:scale(.99)}100%{transform:scale(1)}} @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:200ms!important}} .pressable{transition:transform 140ms cubic-bezier(0.23,1,0.32,1)} .pressable:active{transform:scale(0.97)} button{color:inherit} @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}`}</style>
       <div ref={ref} style={{...wrap,paddingTop:40,paddingBottom:56}}>
         <div style={{textAlign:"center",marginBottom:28,animation:"up .5s cubic-bezier(0.23,1,0.32,1) both"}}><Logo /></div>
 
