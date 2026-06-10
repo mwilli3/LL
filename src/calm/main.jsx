@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import EmailGate, { hasEmail } from "../../apps/email-gate.jsx";
 import App from "../../apps/ns-reset-guide.jsx";
 
-const LIST_ID = "XpHLZZ"; // Regulator archetype list
+const LIST_ID = "XnHKSj"; // CALM Keyword list
 const SOURCE  = "calm";
 const ACCENT  = "#2C6E6A"; // Regulator teal
 

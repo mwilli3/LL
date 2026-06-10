@@ -46,7 +46,7 @@ purchase check and redirect non-buyers to the product page.
    **Klaviyo list mapping** (per-app archetype lists, single opt-in):
    | App / Route | Source tag | Klaviyo list ID |
    |---|---|---|
-   | CALM (`/calm`) | `calm` | `XpHLZZ` (Regulator) |
+   | CALM (`/calm`) | `calm` | `XnHKSj` (CALM Keyword) |
    | ROOTED (`/rooted`) | `rooted` | `WZKZmK` (Rooted) |
    | RECLAIM (`/reclaim`) | `reclaim` | `RdVj9G` (Reclaimer) |
    | QUIZ (`/quiz`) | `quiz` | routed by result: `reg→XpHLZZ`, `root→WZKZmK`, `rec→RdVj9G` |
