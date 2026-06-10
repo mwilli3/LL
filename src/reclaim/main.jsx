@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import EmailGate, { hasEmail } from "../../apps/email-gate.jsx";
 import App from "../../apps/boundary-journal.jsx";
 
-const LIST_ID = "RdVj9G"; // Reclaimer archetype list
+const LIST_ID = "XJyhhy"; // RECLAIM Keyword list
 const SOURCE  = "reclaim";
 const ACCENT  = "#8B3A4A"; // Reclaimer rose
 

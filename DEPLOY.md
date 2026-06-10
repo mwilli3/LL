@@ -47,8 +47,8 @@ purchase check and redirect non-buyers to the product page.
    | App / Route | Source tag | Klaviyo list ID |
    |---|---|---|
    | CALM (`/calm`) | `calm` | `XnHKSj` (CALM Keyword) |
-   | ROOTED (`/rooted`) | `rooted` | `WZKZmK` (Rooted) |
-   | RECLAIM (`/reclaim`) | `reclaim` | `RdVj9G` (Reclaimer) |
+   | ROOTED (`/rooted`) | `rooted` | `XTdxVY` (ROOTED Keyword) |
+   | RECLAIM (`/reclaim`) | `reclaim` | `XJyhhy` (RECLAIM Keyword) |
    | QUIZ (`/quiz`) | `quiz` | routed by result: `reg→XpHLZZ`, `root→WZKZmK`, `rec→RdVj9G` |
 
    Each subscription includes a `source_app` profile property so flows can

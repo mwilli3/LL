@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import EmailGate, { hasEmail } from "../../apps/email-gate.jsx";
 import App from "../../apps/foundation-tracker.jsx";
 
-const LIST_ID = "WZKZmK"; // Rooted archetype list
+const LIST_ID = "XTdxVY"; // ROOTED Keyword list
 const SOURCE  = "rooted";
 const ACCENT  = "#5A7F3C"; // Rooted green
 
