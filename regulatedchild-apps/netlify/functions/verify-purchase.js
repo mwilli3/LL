@@ -7,8 +7,18 @@
 //
 // No Shopify Admin API call at runtime. Auth-free, fast, no token mess.
 
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { getStore } from "@netlify/blobs";
-import backfill from "./purchases-backfill.json" with { type: "json" };
+
+let backfill = { emails: {} };
+try {
+  const here = dirname(fileURLToPath(import.meta.url));
+  backfill = JSON.parse(readFileSync(join(here, "purchases-backfill.json"), "utf8"));
+} catch {
+  // Missing file is fine -> Blobs + env override still work.
+}
 
 const ALLOW_ORIGIN = "https://apps.regulatedchild.com";
 
