@@ -31,15 +31,19 @@ exports.handler = async (event) => {
     messages: body.messages || [],
   };
   if (body.system) payload.system = body.system;
+  if (Array.isArray(body.mcp_servers) && body.mcp_servers.length) payload.mcp_servers = body.mcp_servers;
+
+  const headers = {
+    "x-api-key": key,
+    "anthropic-version": "2023-06-01",
+    "Content-Type": "application/json",
+  };
+  if (payload.mcp_servers) headers["anthropic-beta"] = "mcp-client-2025-04-04";
 
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: {
-        "x-api-key": key,
-        "anthropic-version": "2023-06-01",
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(payload),
     });
     const data = await res.json();

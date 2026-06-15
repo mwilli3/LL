@@ -18,6 +18,7 @@ export default defineConfig({
         "regulation-mastery": resolve(__dirname, "regulation-mastery.html"),
         "boundary-mastery": resolve(__dirname, "boundary-mastery.html"),
         "rooted-challenge": resolve(__dirname, "rooted-challenge.html"),
+        journal: resolve(__dirname, "journal.html"),
         index: resolve(__dirname, "index.html"),
       },
     },
