@@ -1,0 +1,4 @@
+{
+  "_note": "Past Shopify orders, seeded once. Future orders land in Netlify Blobs via shopify-order-webhook. Email -> app slugs owned.",
+  "emails": {}
+}
