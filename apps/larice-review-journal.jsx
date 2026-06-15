@@ -428,6 +428,24 @@ async function saveAll(data) {
   catch (e) { console.error("save failed", e); }
 }
 
+/* Animated three-dot loader for AI calls — subtle, occasional, on-purpose. */
+function LoadingDots({ color = C.gold, label }) {
+  return (
+    <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }} role="status" aria-live="polite">
+      <span style={{ display: "inline-flex", gap: 4 }} aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <motion.span key={i}
+            style={{ width: 6, height: 6, borderRadius: 999, background: color, display: "inline-block" }}
+            animate={{ opacity: [0.35, 1, 0.35], y: [0, -2, 0] }}
+            transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.18, ease: [0.23, 1, 0.32, 1] }}
+          />
+        ))}
+      </span>
+      {label && <span style={{ fontSize: 13, color: "inherit", opacity: .85 }}>{label}</span>}
+    </div>
+  );
+}
+
 /* ── Nerve-branch signature ──────────────────────────────── */
 function NerveBranch({ h = 220, active }) {
   return (
@@ -472,7 +490,9 @@ export default function LariceReviewJournal() {
   const [draft, setDraft] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [dayDate, setDayDate] = useState(periodKey("daily"));
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useState(null);
+  const [draftDirty, setDraftDirty] = useState(false);
+  const showToast = (message, undo) => setToast({ message, undo, id: Date.now() });
   const [ai, setAi] = useState({ open: false, loading: false, data: null, error: "" });
   const [scan, setScan] = useState({ loading: false, data: null, error: "" });
   const [notion, setNotion] = useState({ loading: false, msg: "", error: "" });
@@ -481,7 +501,7 @@ export default function LariceReviewJournal() {
   const lc = launchContext();
 
   useEffect(() => { (async () => { const d = await loadAll(); setEntries(d.entries || []); setPlans(d.plans || { weekly: {}, monthly: {} }); setManych(d.manych || {}); setLive(d.live || null); setRoadmap(d.roadmap || { exit: {}, streams: {} }); setComm(d.comm || { talks: [], drills: {}, reps: {} }); setReady(true); })(); }, []);
-  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(""), 2600); return () => clearTimeout(t); } }, [toast]);
+  useEffect(() => { if (!toast) return; const ms = toast.undo ? 5200 : 2600; const t = setTimeout(() => setToast(null), ms); return () => clearTimeout(t); }, [toast]);
 
   const REVIEW_TABS = ["weekly", "monthly", "quarterly"];
   const TAB_KEYS = { "1": "daily", "2": "plan", "3": "practices", "4": "comms", "5": "weekly", "6": "monthly", "7": "quarterly", "8": "roadmap", "9": "dashboard" };
@@ -532,14 +552,16 @@ export default function LariceReviewJournal() {
   const isReview = REVIEW_TABS.includes(tab);
   const schema = isReview ? SCHEMAS[tab] : null;
 
-  const setField = (sectionKey, fieldKey, val) =>
+  const setField = (sectionKey, fieldKey, val) => {
     setDraft((d) => ({ ...d, [sectionKey]: { ...(d[sectionKey] || {}), [fieldKey]: val } }));
+    setDraftDirty(true);
+  };
 
-  function newDraft() { setDraft({}); setEditingId(null); setAi({ open: false, loading: false, data: null, error: "" }); }
+  function newDraft() { setDraft({}); setEditingId(null); setDraftDirty(false); setAi({ open: false, loading: false, data: null, error: "" }); }
 
   function loadEntry(e) {
     if (e.type === "daily") { setTab("daily"); setDayDate(e.period); topRef.current?.scrollIntoView({ behavior: "smooth" }); return; }
-    setTab(e.type); setDraft(e.data || {}); setEditingId(e.id);
+    setTab(e.type); setDraft(e.data || {}); setEditingId(e.id); setDraftDirty(false);
     setAi({ open: !!e.ai, loading: false, data: e.ai || null, error: "" });
     topRef.current?.scrollIntoView({ behavior: "smooth" });
   }
@@ -556,14 +578,20 @@ export default function LariceReviewJournal() {
     const cur = comm.drills?.[dateKey] || [];
     const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
     saveComm({ ...comm, drills: { ...(comm.drills || {}), [dateKey]: next } });
-    if (dateKey === periodKey("daily") && cur.length < 5 && next.length >= 5) setToast("Daily drill block complete · 20 min");
+    if (dateKey === periodKey("daily") && cur.length < 5 && next.length >= 5) showToast("Daily drill block complete · 20 min");
   }
   function saveTalk(t) {
     const talk = { id: `talk-${Date.now()}`, date: new Date().toISOString(), ...t };
     saveComm({ ...comm, talks: [talk, ...(comm.talks || [])] });
-    setToast(`Talk scored · ${t.total}/50`);
+    showToast(`Talk scored · ${t.total}/50`);
   }
-  function deleteTalk(id) { saveComm({ ...comm, talks: (comm.talks || []).filter((x) => x.id !== id) }); }
+  function deleteTalk(id) {
+    const removed = (comm.talks || []).find((x) => x.id === id);
+    if (!removed) return;
+    const kept = (comm.talks || []).filter((x) => x.id !== id);
+    saveComm({ ...comm, talks: kept });
+    showToast("Talk removed", () => saveComm({ ...comm, talks: [removed, ...kept] }));
+  }
   function toggleRep(weekKey, repId) {
     const cur = comm.reps?.[weekKey] || {};
     saveComm({ ...comm, reps: { ...(comm.reps || {}), [weekKey]: { ...cur, [repId]: !cur[repId] } } });
@@ -577,18 +605,22 @@ export default function LariceReviewJournal() {
     const now = new Date().toISOString();
     if (editingId) {
       const next = entries.map((e) => e.id === editingId ? { ...e, data: draft, ai: ai.data, updated: now } : e);
-      await persist(next); setToast("Review updated");
+      await persist(next); setDraftDirty(false); showToast("Review updated");
     } else {
       const entry = { id: `${tab}-${Date.now()}`, type: tab, period: periodKey(tab),
         created: now, data: draft, ai: ai.data };
-      await persist([entry, ...entries]); setEditingId(entry.id); setToast("Review saved");
+      await persist([entry, ...entries]); setEditingId(entry.id); setDraftDirty(false); showToast("Review saved");
     }
   }
 
   async function deleteEntry(id) {
-    await persist(entries.filter((e) => e.id !== id));
+    const removed = entries.find((e) => e.id === id);
+    if (!removed) return;
+    const next = entries.filter((e) => e.id !== id);
+    await persist(next);
     if (editingId === id) newDraft();
-    setToast("Deleted");
+    const label = removed.type === "daily" ? "Daily entry removed" : `${SCHEMAS[removed.type]?.label || "Entry"} removed`;
+    showToast(label, () => persist([removed, ...next]));
   }
 
   /* ── Daily check-in (generic upsert by date) ── */
@@ -1015,10 +1047,19 @@ After creating the page, reply in one sentence with the page title and its URL.`
             <div>
               {/* altitude banner */}
               <div className="lj-card" style={{ display: "flex", gap: 18, alignItems: "center", padding: "22px 24px", borderRadius: 16,
-                background: C.sand, borderLeft: `5px solid ${schema.accent}` }}>
+                background: C.sand }}>
                 <NerveBranch h={120} active={tab} />
                 <div>
-                  <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: schema.accent, fontWeight: 600 }}>{schema.altitude} altitude</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: schema.accent, fontWeight: 600 }}>{schema.altitude} altitude</div>
+                    {draftDirty && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
+                        style={{ fontSize: 10.5, letterSpacing: ".18em", textTransform: "uppercase", color: C.clay, fontWeight: 700, padding: "2px 8px", background: "#fff", border: `1px solid ${C.taupe}`, borderRadius: 999 }}
+                        title="Unsaved changes — Cmd+S to save"
+                      >Unsaved · ⌘S</motion.span>
+                    )}
+                  </div>
                   <div style={{ ...S.serif, fontSize: 28, fontWeight: 600, color: C.brown, margin: "2px 0 4px" }}>{schema.label}</div>
                   <div style={{ fontSize: 13, color: C.clay }}>{schema.cadence}</div>
                   <div style={{ ...S.serif, fontStyle: "italic", fontSize: 15, color: C.charcoal, marginTop: 8, opacity: .85 }}>{schema.note}</div>
@@ -1042,7 +1083,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
 
               {/* sections */}
               {schema.sections.map((s) => (
-                <div key={s.key} className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `0 1px 0 ${C.sand}, 0 8px 24px -18px rgba(74,58,50,.4)` }}>
+                <div key={s.key} className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
                   <div style={{ ...S.serif, fontSize: 19, fontWeight: 600, color: C.brown }}>{s.title}</div>
                   {s.sub && <div style={{ fontSize: 12.5, color: C.clay, marginTop: 3, marginBottom: 14 }}>{s.sub}</div>}
 
@@ -1102,8 +1143,13 @@ After creating the page, reply in one sentence with the page title and its URL.`
               {ai.open && (
                 <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: C.brown, color: C.offwhite }}>
                   <div style={{ fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: C.gold, fontWeight: 600 }}>Synthesis</div>
-                  {ai.loading && <div style={{ marginTop: 10, opacity: .8 }}>Reading your review…</div>}
-                  {ai.error && <div style={{ marginTop: 10, color: C.taupe }}>{ai.error}</div>}
+                  {ai.loading && <div style={{ marginTop: 10 }}><LoadingDots color={C.gold} label="Reading your review" /></div>}
+                  {ai.error && (
+                    <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                      <span style={{ color: C.taupe }}>{ai.error}</span>
+                      <button className="pressable" onClick={synthesize} style={{ background: "transparent", border: `1px solid ${C.gold}`, color: C.gold, padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Try again</button>
+                    </div>
+                  )}
                   {ai.data && (
                     <motion.div
                       style={{ display: "grid", gap: 14, marginTop: 12 }}
@@ -1183,7 +1229,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
               const lastTalk = talksAsc2.length ? talksAsc2[talksAsc2.length - 1].total : null;
               const talkV = lastTalk == null ? { label: "score a talk", color: C.taupe } : { label: lastTalk >= 35 ? "public-ready" : lastTalk >= 25 ? "developing" : "rebuild basics", color: lastTalk >= 35 ? ARCH.Rooted : lastTalk >= 25 ? C.gold : "#a85a4a" };
               return (
-                <div className="lj-card" style={{ padding: "18px 22px", borderRadius: 16, background: C.sand, marginBottom: 18, borderLeft: `5px solid ${C.clay}` }}>
+                <div className="lj-card" style={{ padding: "18px 22px", borderRadius: 16, background: C.sand, marginBottom: 18 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
                     <div style={{ ...S.serif, fontSize: 19, fontWeight: 600, color: C.brown }}>{mi <= 0 ? "Pre-launch" : `Month ${mi}`} · Phase {ph.n} — {ph.name}</div>
                     <span style={{ fontSize: 12, color: C.clay }}>{ph.dates}</span>
@@ -1241,7 +1287,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
               {KPIS.map((k) => {
                 const st = kpiStat(k.k);
                 return (
-                  <div key={k.k} className="lj-card" style={{ padding: "16px 16px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)`, borderTop: `3px solid ${k.color}` }}>
+                  <div key={k.k} className="lj-card" style={{ padding: "16px 16px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
                     <div style={{ fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", color: C.clay }}>{k.label}</div>
                     <div style={{ ...S.serif, fontSize: 26, fontWeight: 700, color: C.brown, marginTop: 4 }}>
                       {st.latest === null ? "—" : k.fmt(st.latest)}
@@ -1322,8 +1368,13 @@ After creating the page, reply in one sentence with the page title and its URL.`
                 </div>
                 <button onClick={patternScan} style={goldBtn}>✦ Scan recent weeks</button>
               </div>
-              {scan.loading && <div style={{ marginTop: 14, color: C.clay }}>Scanning…</div>}
-              {scan.error && <div style={{ marginTop: 14, color: "#a85a4a" }}>{scan.error}</div>}
+              {scan.loading && <div style={{ marginTop: 14, color: C.clay }}><LoadingDots color={C.clay} label="Scanning recent weeks" /></div>}
+              {scan.error && (
+                <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                  <span style={{ color: "#a85a4a" }}>{scan.error}</span>
+                  <button className="pressable" onClick={patternScan} style={{ background: "transparent", border: `1px solid ${C.clay}`, color: C.clay, padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Try again</button>
+                </div>
+              )}
               {scan.data && (
                 <motion.div
                   style={{ display: "grid", gap: 14, marginTop: 16 }}
@@ -1333,7 +1384,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
                 >
                   {[["Recurring bottleneck", scan.data.recurring], ["Where momentum is building", scan.data.momentum], ["Steering adjustment", scan.data.recommendation]]
                     .filter(([, v]) => v).map(([t, v], i) => (
-                    <motion.div key={t} style={{ padding: "12px 14px", background: "#fff", borderRadius: 10, borderLeft: `4px solid ${C.clay}` }}
+                    <motion.div key={t} style={{ padding: "12px 14px", background: "#fff", borderRadius: 10 }}
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ type: "spring", duration: 0.5, bounce: 0.18, delay: 0.06 + i * 0.06 }}
@@ -1372,7 +1423,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
             )}
 
             {/* Export to Notion */}
-            <div className="lj-card" style={{ marginTop: 18, padding: "22px 24px", borderRadius: 16, background: "#fff", boxShadow: `0 8px 26px -20px rgba(74,58,50,.5)`, borderLeft: `5px solid ${C.gold}` }}>
+            <div className="lj-card" style={{ marginTop: 18, padding: "22px 24px", borderRadius: 16, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                 <div>
                   <div style={{ ...S.serif, fontSize: 20, fontWeight: 600, color: C.brown }}>Export summary to Notion</div>
@@ -1432,7 +1483,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
         <PracticePlayer
           practice={player}
           onClose={() => setPlayer(null)}
-          onComplete={(id, extra) => { markPracticeDone(periodKey("daily"), id, extra); setToast("Practice logged"); }}
+          onComplete={(id, extra) => { markPracticeDone(periodKey("daily"), id, extra); showToast("Practice logged"); }}
         />
       )}
 
@@ -1473,9 +1524,29 @@ After creating the page, reply in one sentence with the page title and its URL.`
         )}
       </AnimatePresence>
 
-      {toast && (
-        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: C.brown, color: C.offwhite, padding: "10px 20px", borderRadius: 999, fontSize: 13, boxShadow: "0 10px 30px -10px rgba(0,0,0,.4)", zIndex: 50 }}>{toast}</div>
-      )}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key={toast.id}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ type: "spring", duration: 0.4, bounce: 0.22 }}
+            style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: C.brown, color: C.offwhite, padding: toast.undo ? "8px 8px 8px 18px" : "10px 20px", borderRadius: 999, fontSize: 13, boxShadow: "0 10px 30px -10px rgba(0,0,0,.4)", zIndex: 50, display: "flex", alignItems: "center", gap: 14 }}
+          >
+            <span>{toast.message}</span>
+            {toast.undo && (
+              <button
+                className="pressable"
+                onClick={() => { toast.undo(); setToast(null); }}
+                style={{ background: C.gold, color: C.brown, border: "none", padding: "6px 14px", borderRadius: 999, fontSize: 12.5, fontWeight: 700, letterSpacing: ".04em", cursor: "pointer" }}
+              >
+                Undo
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <style>{`
         @media (max-width: 880px){
@@ -1491,7 +1562,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
 /* ── small pieces ── */
 function StatCard({ S, label, value, color, foot }) {
   return (
-    <div className="lj-card" style={{ padding: "16px 16px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)`, borderTop: `3px solid ${color}` }}>
+    <div className="lj-card" style={{ padding: "16px 16px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
       <div style={{ fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", color: C.clay }}>{label}</div>
       <div style={{ ...S.serif, fontSize: 26, fontWeight: 700, color: C.brown, marginTop: 4 }}>{value}</div>
       {foot && <div style={{ fontSize: 11.5, color: C.taupe, marginTop: 2 }}>{foot}</div>}
@@ -1522,7 +1593,7 @@ function PulseStat({ label, actual, target, v }) {
 
 function ChartCard({ title, children, serif }) {
   return (
-    <div className="lj-card" style={{ padding: "16px 16px 8px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 26px -20px rgba(74,58,50,.5)` }}>
+    <div className="lj-card" style={{ padding: "16px 16px 8px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
       <div style={{ ...serif, fontSize: 16, fontWeight: 600, color: C.brown, marginBottom: 6 }}>{title}</div>
       {children}
     </div>
@@ -1586,7 +1657,7 @@ function DailyView({ S, dayDate, setDayDate, dayData, setDay, entries, loadEntry
   return (
     <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 300px", gap: 28, marginTop: 28 }} className="lj-grid">
       <div>
-        <div className="lj-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, padding: "22px 24px", borderRadius: 16, background: C.sand, borderLeft: `5px solid ${C.gold}`, flexWrap: "wrap" }}>
+        <div className="lj-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, padding: "22px 24px", borderRadius: 16, background: C.sand, flexWrap: "wrap" }}>
           <div>
             <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: C.gold, fontWeight: 600 }}>{isToday ? (lc.pre ? "Pre-launch" : lc.label) : "Daily check-in"}</div>
             <div style={{ ...serifStyle, fontSize: 26, fontWeight: 600, color: C.brown, margin: "2px 0" }}>
@@ -1811,7 +1882,7 @@ function PlanView({ S, wkPlan, setWeekPlan, moPlan, setMonthPlan, wkKey, lc }) {
   const monthName = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
   return (
     <div style={{ marginTop: 28 }}>
-      <div className="lj-card" style={{ padding: "22px 24px", borderRadius: 16, background: C.sand, borderLeft: `5px solid ${C.clay}` }}>
+      <div className="lj-card" style={{ padding: "22px 24px", borderRadius: 16, background: C.sand }}>
         <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: C.clay, fontWeight: 600 }}>Forward plan</div>
         <div style={{ ...serifStyle, fontSize: 26, fontWeight: 600, color: C.brown, margin: "2px 0 2px" }}>This week's plan</div>
         <div style={{ fontSize: 13, color: C.clay }}>{wkKey}{!lc.pre && lc.week ? ` · ${lc.label}` : ""}</div>
@@ -1873,7 +1944,7 @@ function PracticesView({ S, today, entries, togglePractice, practicesDone, openP
   ];
   return (
     <div style={{ marginTop: 28 }}>
-      <div className="lj-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, padding: "22px 24px", borderRadius: 16, background: C.sand, borderLeft: `5px solid ${ARCH.Rooted}`, flexWrap: "wrap" }}>
+      <div className="lj-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, padding: "22px 24px", borderRadius: 16, background: C.sand, flexWrap: "wrap" }}>
         <div>
           <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: ARCH.Rooted, fontWeight: 600 }}>Reset library</div>
           <div style={{ ...serifStyle, fontSize: 26, fontWeight: 600, color: C.brown, margin: "2px 0" }}>Nervous-system reset practices</div>
@@ -1901,7 +1972,7 @@ function PracticesView({ S, today, entries, togglePractice, practicesDone, openP
               {items.map((p) => {
                 const on = done.includes(p.id);
                 return (
-                  <div key={p.id} className="lj-card" style={{ padding: "16px 18px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)`, borderTop: `3px solid ${ARCH[p.arch]}` }}>
+                  <div key={p.id} className="lj-card" style={{ padding: "16px 18px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
                       <div style={{ ...serifStyle, fontSize: 17, fontWeight: 600, color: C.brown }}>{p.name}</div>
                       <span style={{ fontSize: 11, color: C.taupe, whiteSpace: "nowrap" }}>{p.dur}</span>
@@ -2004,7 +2075,7 @@ function PracticePlayer({ practice, onClose, onComplete }) {
   const endEarly = () => { if (!doneRef.current) { doneRef.current = true; onComplete(practice.id, run.mode === "note" ? { affirmation: note } : undefined); } onClose(); };
 
   const overlay = { position: "fixed", inset: 0, background: "rgba(43,43,43,.62)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: 20, animation: "ljovl .25s ease both" };
-  const card = { width: "100%", maxWidth: 460, background: C.offwhite, borderRadius: 22, padding: "26px 26px 24px", boxShadow: "0 30px 80px -30px rgba(0,0,0,.6)", textAlign: "center" };
+  const card = { width: "100%", maxWidth: 460, background: C.offwhite, borderRadius: 22, padding: "26px 26px 24px", boxShadow: "0 4px 20px -8px rgba(74,58,50,.25)", textAlign: "center" };
 
   return (
     <div style={overlay} onClick={onClose} role="dialog" aria-modal="true">
@@ -2167,7 +2238,7 @@ function RoadmapView({ S, roadmap, saveRoadmap, manych, weeklySorted }) {
       </div>
 
       {/* current phase header */}
-      <div className="lj-card" style={{ marginTop: 16, padding: "22px 24px", borderRadius: 16, background: C.sand, borderLeft: `5px solid ${C.clay}` }}>
+      <div className="lj-card" style={{ marginTop: 16, padding: "22px 24px", borderRadius: 16, background: C.sand }}>
         <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: C.clay, fontWeight: 600 }}>
           {prelaunch ? "Pre-launch · Phase 1 begins June 15" : `Month ${mi} · Phase ${phase.n}`}
         </div>
@@ -2183,7 +2254,7 @@ function RoadmapView({ S, roadmap, saveRoadmap, manych, weeklySorted }) {
           band={phase.mrr} value={curMRR ?? (streamTotal || null)} v={mrrV} />
         <TargetCard S={S} label="Email list vs phase target" target={phase.emailLabel}
           actual={curEmail != null ? curEmail.toLocaleString() : "—"} band={phase.emails} value={curEmail} v={emailV} />
-        <div className="lj-card" style={{ padding: "16px 16px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)`, borderTop: `3px solid ${C.gold}` }}>
+        <div className="lj-card" style={{ padding: "16px 16px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
           <div style={{ fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", color: C.clay }}>Cumulative target</div>
           <div style={{ ...S.serif, fontSize: 20, fontWeight: 700, color: C.brown, marginTop: 6 }}>{phase.cum}</div>
           <div style={{ fontSize: 11.5, color: C.taupe, marginTop: 4 }}>Conservative baseline (Section 6.5)</div>
@@ -2191,7 +2262,7 @@ function RoadmapView({ S, roadmap, saveRoadmap, manych, weeklySorted }) {
       </div>
 
       {/* exit criteria */}
-      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)` }}>
+      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
           <div style={{ ...S.serif, fontSize: 19, fontWeight: 600, color: C.brown }}>Phase {phase.n} exit criteria</div>
           <span style={{ fontSize: 13, fontWeight: 700, color: exitDone.length === phase.exit.length ? ARCH.Rooted : C.clay }}>{exitDone.length} / {phase.exit.length} met</span>
@@ -2214,7 +2285,7 @@ function RoadmapView({ S, roadmap, saveRoadmap, manych, weeklySorted }) {
       </div>
 
       {/* revenue mix vs targets */}
-      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)` }}>
+      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
           <div style={{ ...S.serif, fontSize: 19, fontWeight: 600, color: C.brown }}>Revenue mix vs phase targets</div>
           <span style={{ fontSize: 13, fontWeight: 700, color: mrrV.color }}>{streamTotal ? fmtUSD(streamTotal) + " / mo · " + mrrV.label : "enter current MRR by stream"}</span>
@@ -2244,7 +2315,7 @@ function RoadmapView({ S, roadmap, saveRoadmap, manych, weeklySorted }) {
       </div>
 
       {/* hire triggers */}
-      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)` }}>
+      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
         <div style={{ ...S.serif, fontSize: 19, fontWeight: 600, color: C.brown, marginBottom: 10 }}>Hire-trigger framework</div>
         <div style={{ display: "grid", gap: 8 }}>
           {HIRES.map((h) => {
@@ -2268,7 +2339,7 @@ function RoadmapView({ S, roadmap, saveRoadmap, manych, weeklySorted }) {
 
       {/* 5-block week + MVD */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 18 }} className="lj-grid">
-        <div className="lj-card" style={{ padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)` }}>
+        <div className="lj-card" style={{ padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
           <div style={{ ...S.serif, fontSize: 18, fontWeight: 600, color: C.brown }}>The 5-block week</div>
           <div style={{ fontSize: 12, color: C.taupe, marginBottom: 10 }}>35-hour cap (Phases 1–3) → 20–25h by Phase 5. Blocks don't bleed.</div>
           <div style={{ display: "grid", gap: 6 }}>
@@ -2281,7 +2352,7 @@ function RoadmapView({ S, roadmap, saveRoadmap, manych, weeklySorted }) {
             ))}
           </div>
         </div>
-        <div className="lj-card" style={{ padding: "20px 22px", borderRadius: 14, background: C.brown, color: C.offwhite, boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)` }}>
+        <div className="lj-card" style={{ padding: "20px 22px", borderRadius: 14, background: C.brown, color: C.offwhite, boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
           <div style={{ ...S.serif, fontSize: 18, fontWeight: 600, color: C.gold }}>Minimum Viable Day</div>
           <div style={{ fontSize: 13, lineHeight: 1.55, marginTop: 8, opacity: .9 }}>
             For crisis days only — illness, family emergency, doctoral crunch. A 50-minute protocol that keeps forward motion on every outcome without the full 35-hour week. Return to full schedule within 1–2 weeks of the crisis stabilizing.
@@ -2298,7 +2369,7 @@ function RoadmapView({ S, roadmap, saveRoadmap, manych, weeklySorted }) {
 function TargetCard({ S, label, target, actual, band, value, v }) {
   const pct = band && value != null && band[1] ? Math.min(100, (+value / band[1]) * 100) : 0;
   return (
-    <div className="lj-card" style={{ padding: "16px 16px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)`, borderTop: `3px solid ${v.color}` }}>
+    <div className="lj-card" style={{ padding: "16px 16px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
       <div style={{ fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", color: C.clay }}>{label}</div>
       <div style={{ ...S.serif, fontSize: 24, fontWeight: 700, color: C.brown, marginTop: 4 }}>{actual}</div>
       <div style={{ fontSize: 11.5, color: C.taupe, marginTop: 2 }}>target {target}</div>
@@ -2330,7 +2401,7 @@ function CommView({ S, comm, today, wkKey, logDrill, toggleRep, setCommEnergy, d
 
   return (
     <div style={{ marginTop: 28 }}>
-      <div className="lj-card" style={{ padding: "22px 24px", borderRadius: 16, background: C.sand, borderLeft: `5px solid ${COMM}` }}>
+      <div className="lj-card" style={{ padding: "22px 24px", borderRadius: 16, background: C.sand }}>
         <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: COMM, fontWeight: 600 }}>Fifth outcome · Deliberate practice</div>
         <div style={{ ...S.serif, fontSize: 26, fontWeight: 600, color: C.brown, margin: "2px 0" }}>Communication Mastery</div>
         <div style={{ fontSize: 13, color: C.clay }}>20-minute drill block + weekly hard reps. Record every rep — playback is the feedback loop. Gains compound on a 60–90 day horizon.</div>
@@ -2343,7 +2414,7 @@ function CommView({ S, comm, today, wkKey, logDrill, toggleRep, setCommEnergy, d
         <StatCard S={S} label="Drill block streak" value={streak ? `${streak} d` : "—"} color={ARCH.Rooted} foot="5/5 drills/day" />
       </div>
 
-      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)` }}>
+      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
           <div style={{ ...S.serif, fontSize: 19, fontWeight: 600, color: C.brown }}>The 5 daily drills</div>
           <span style={{ fontSize: 13, fontWeight: 700, color: todayDrills.length >= 5 ? ARCH.Rooted : COMM }}>{todayDrills.length} / 5 · 20-min block</span>
@@ -2373,7 +2444,7 @@ function CommView({ S, comm, today, wkKey, logDrill, toggleRep, setCommEnergy, d
         </div>
       </div>
 
-      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)` }}>
+      <div className="lj-card" style={{ marginTop: 18, padding: "20px 22px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           <div style={{ ...S.serif, fontSize: 19, fontWeight: 600, color: C.brown }}>This week's hard reps</div>
           <button onClick={openScorer} style={{ border: `1px solid ${C.gold}`, background: "#fff", color: C.brown, padding: "8px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>✦ Score a recorded talk</button>
@@ -2410,7 +2481,7 @@ function CommView({ S, comm, today, wkKey, logDrill, toggleRep, setCommEnergy, d
       </div>
 
       {chartData.length > 0 && (
-        <div className="lj-card" style={{ marginTop: 18, padding: "16px 18px 8px", borderRadius: 14, background: "#fff", boxShadow: `0 8px 24px -20px rgba(74,58,50,.5)` }}>
+        <div className="lj-card" style={{ marginTop: 18, padding: "16px 18px 8px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>
           <div style={{ ...S.serif, fontSize: 17, fontWeight: 600, color: C.brown, marginBottom: 2 }}>Rubric trend · talk totals /50</div>
           <div style={{ fontSize: 11.5, color: C.taupe, marginBottom: 8 }}>Compare talks 60–90 days apart — that's where the jump shows. 35+ = public-ready, 25–34 developing.</div>
           <ResponsiveContainer width="100%" height={220}>
@@ -2522,7 +2593,7 @@ function RubricScorer({ onClose, onSave }) {
   const set = (k, v) => setScores((s) => ({ ...s, [k]: +v }));
   return (
     <div onClick={onClose} role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(43,43,43,.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, animation: "ljovl .25s ease both" }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: C.offwhite, borderRadius: 20, padding: "24px 24px 22px", boxShadow: "0 30px 80px -30px rgba(0,0,0,.6)", maxHeight: "90vh", overflowY: "auto" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: C.offwhite, borderRadius: 20, padding: "24px 24px 22px", boxShadow: "0 4px 20px -8px rgba(74,58,50,.25)", maxHeight: "90vh", overflowY: "auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
             <div style={{ fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", color: COMM, fontWeight: 600 }}>Record · review · score</div>
@@ -2562,7 +2633,7 @@ function RubricScorer({ onClose, onSave }) {
 
 /* ── tiny layout helpers for daily/plan ── */
 function DCard({ children }) {
-  return <div className="lj-card" style={{ marginTop: 16, padding: "18px 20px", borderRadius: 14, background: "#fff", boxShadow: `0 1px 0 ${C.sand}, 0 8px 24px -18px rgba(74,58,50,.4)` }}>{children}</div>;
+  return <div className="lj-card" style={{ marginTop: 16, padding: "18px 20px", borderRadius: 14, background: "#fff", boxShadow: `inset 0 0 0 1px ${C.sand}` }}>{children}</div>;
 }
 function Lbl({ children, c }) {
   return <div style={{ fontSize: 12, fontWeight: 600, color: c, letterSpacing: ".02em" }}>{children}</div>;
