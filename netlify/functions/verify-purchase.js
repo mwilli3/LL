@@ -16,6 +16,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { getStore } = require("@netlify/blobs");
 
+function purchasesStore() {
+  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN;
+  if (siteID && token) return getStore({ name: "purchases", siteID, token });
+  return getStore("purchases");
+}
+
 const APP_TITLE_ENV = {
   "regulation-mastery": "REGULATION_MASTERY_PRODUCT_TITLE",
   "boundary-mastery":   "BOUNDARY_MASTERY_PRODUCT_TITLE",
@@ -64,7 +71,7 @@ exports.handler = async (event) => {
 
   // 1. Live webhook allowlist (Netlify Blobs).
   try {
-    const rec = await getStore("purchases").get(email, { type: "json" });
+    const rec = await purchasesStore().get(email, { type: "json" });
     if (rec?.apps?.includes(app)) return ok(true);
   } catch {
     // Blobs not configured yet -> fall through.
