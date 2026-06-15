@@ -20,6 +20,13 @@
 const crypto = require("node:crypto");
 const { getStore } = require("@netlify/blobs");
 
+function purchasesStore() {
+  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN;
+  if (siteID && token) return getStore({ name: "purchases", siteID, token });
+  return getStore("purchases");
+}
+
 const APP_TITLE_ENV = {
   "regulation-mastery": "REGULATION_MASTERY_PRODUCT_TITLE",
   "boundary-mastery":   "BOUNDARY_MASTERY_PRODUCT_TITLE",
@@ -69,7 +76,7 @@ exports.handler = async (event) => {
   const owned = classifyTitles(titles);
   if (owned.length === 0) return { statusCode: 200, body: "No gated product on order; ignored." };
 
-  const store = getStore("purchases");
+  const store = purchasesStore();
   const existing = (await store.get(email, { type: "json" })) || { apps: [] };
   const merged = [...new Set([...(existing.apps || []), ...owned])];
   await store.setJSON(email, { apps: merged, updatedAt: Date.now() });
