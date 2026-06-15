@@ -218,8 +218,11 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const STEP_GOAL = 8000;
 const uid = () => Math.random().toString(36).slice(2, 9);
 
-/* Documented archetype colors (handbook §2.3) */
-const ARCH = { Regulator: "#2C6E6A", Rooted: "#5A7F3C", Reclaimer: "#A8536B", All: C.gold };
+/* Larice palette functional roles — no customer-suite archetype colors leak in.
+   `arch` data stays as source-of-truth attribution (Regulator/Rooted/Reclaimer/All);
+   the color it maps to is a Larice token chosen for functional separation, not
+   for matching the customer app it came from. */
+const ARCH = { Regulator: C.brown, Rooted: C.brown, Reclaimer: C.clay, All: C.gold };
 
 /* ── Real LL nervous-system reset practices (from the apps + Claim Cards) ── */
 const PRACTICES = [
@@ -333,7 +336,7 @@ const verdict = (val, band) => {
 const fmtUSD = (n) => `$${Math.round(+n).toLocaleString()}`;
 
 /* ── Communication Mastery (Section 9) ── */
-ARCH.Comm = "#5b6479";
+ARCH.Comm = C.brown;
 const COMM = ARCH.Comm;
 const DRILLS = [
   { id: "spine", name: "Story Spine", min: 5, why: "Default to story structure under pressure, not information dumping.",
@@ -809,15 +812,14 @@ After creating the page, reply in one sentence with the page title and its URL.`
 
   /* ── styles ── */
   const S = {
-    page: { minHeight: "100vh", background: C.offwhite, color: C.charcoal, fontFamily: "Inter, system-ui, sans-serif" },
+    page: { minHeight: "100vh", background: C.offwhite, color: C.charcoal, fontFamily: "'Outfit', system-ui, sans-serif" },
     shell: { maxWidth: 1180, margin: "0 auto", padding: "0 20px 80px" },
-    serif: { fontFamily: "'Playfair Display', Georgia, serif" },
+    serif: { fontFamily: "'Cormorant Garamond', Georgia, serif" },
   };
 
   return (
     <div style={S.page}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap');
         * { box-sizing: border-box; }
         .lj-tab { transition: all .2s ease; cursor: pointer; }
         .lj-card { animation: ljfade .45s ease both; }
@@ -1388,7 +1390,7 @@ function PulseStat({ label, actual, target, v }) {
   return (
     <div style={{ background: "#fff", borderRadius: 12, padding: "12px 13px", boxShadow: `inset 0 0 0 1px rgba(203,184,169,.5)` }}>
       <div style={{ fontSize: 10.5, letterSpacing: ".08em", textTransform: "uppercase", color: C.clay }}>{label}</div>
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 21, fontWeight: 700, color: C.brown, marginTop: 2 }}>{actual}</div>
+      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 21, fontWeight: 700, color: C.brown, marginTop: 2 }}>{actual}</div>
       <div style={{ fontSize: 10.5, color: C.taupe }}>{target}</div>
       <div style={{ fontSize: 11, fontWeight: 600, color: v.color, marginTop: 2 }}>{v.label}</div>
     </div>
@@ -1413,7 +1415,7 @@ const primaryBtn = { border: "none", background: C.clay, color: C.offwhite, padd
 const goldBtn = { border: `1px solid ${C.gold}`, background: "#fff", color: C.brown, padding: "11px 18px", borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: "pointer" };
 const ghostBtn = { border: "none", background: "transparent", cursor: "pointer", fontSize: 13 };
 const tipStyle = { background: C.brown, border: "none", borderRadius: 8, color: C.offwhite, fontSize: 12 };
-const serifStyle = { fontFamily: "'Playfair Display', Georgia, serif" };
+const serifStyle = { fontFamily: "'Cormorant Garamond', Georgia, serif" };
 
 /* ── Daily check-in view ── */
 function DailyView({ S, dayDate, setDayDate, dayData, setDay, entries, loadEntry, deleteEntry, lc, togglePractice, comm, personal, savePersonal }) {
@@ -1887,7 +1889,7 @@ function PracticePlayer({ practice, onClose, onComplete }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div style={{ textAlign: "left" }}>
             <div style={{ fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", color: accent, fontWeight: 600 }}>{practice.arch === "All" ? "Cross-archetype" : practice.arch}</div>
-            <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 600, color: C.brown }}>{practice.name}</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 600, color: C.brown }}>{practice.name}</div>
           </div>
           <button onClick={onClose} aria-label="Close" style={{ border: "none", background: "transparent", fontSize: 22, color: C.clay, cursor: "pointer", lineHeight: 1 }}>×</button>
         </div>
@@ -1896,10 +1898,10 @@ function PracticePlayer({ practice, onClose, onComplete }) {
         {run.mode === "breath" && (
           <div style={{ padding: "18px 0 6px" }}>
             <div style={{ position: "relative", height: 240, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div className="breath-ring" style={{ width: 200, height: 200, borderRadius: "50%", background: `radial-gradient(circle at 40% 35%, ${C.gold}, ${accent})`, animationPlayState: running ? "running" : "paused", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 50px -8px ${accent}66` }}>
+              <div className="breath-ring" style={{ width: 200, height: 200, borderRadius: "50%", background: accent, animationPlayState: running ? "running" : "paused", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div style={{ color: "#fff" }}>
                   <div style={{ fontSize: 17, fontWeight: 600 }}>{finished ? "Done" : phaseLabel}</div>
-                  {!finished && <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 30, fontWeight: 700 }}>{phaseCount}</div>}
+                  {!finished && <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, fontWeight: 700 }}>{phaseCount}</div>}
                 </div>
               </div>
             </div>
@@ -1910,7 +1912,7 @@ function PracticePlayer({ practice, onClose, onComplete }) {
         {/* TIMER */}
         {run.mode === "timer" && (
           <div style={{ padding: "20px 0 8px" }}>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 60, fontWeight: 700, color: finished ? accent : C.brown }}>{finished ? "✓" : mmss}</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 60, fontWeight: 700, color: finished ? accent : C.brown }}>{finished ? "✓" : mmss}</div>
             <div style={{ fontSize: 16, color: C.charcoal, minHeight: 24, marginTop: 6 }}>{finished ? "That's logged." : (run.cues ? run.cues[cueIdx] : "")}</div>
           </div>
         )}
@@ -1918,7 +1920,7 @@ function PracticePlayer({ practice, onClose, onComplete }) {
         {/* NOTE */}
         {run.mode === "note" && (
           <div style={{ padding: "16px 0 4px", textAlign: "left" }}>
-            <div style={{ textAlign: "center", fontFamily: "'Playfair Display', serif", fontSize: 36, fontWeight: 700, color: finished ? accent : C.brown }}>{finished ? "✓" : mmss}</div>
+            <div style={{ textAlign: "center", fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 700, color: finished ? accent : C.brown }}>{finished ? "✓" : mmss}</div>
             <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Write your affirmation…" rows={4}
               style={{ width: "100%", marginTop: 12, padding: "11px 12px", border: `1px solid ${C.taupe}`, borderRadius: 10, fontSize: 14, color: C.charcoal, background: "#fff", resize: "vertical", fontFamily: "inherit" }} />
           </div>
@@ -1971,15 +1973,15 @@ function RewardOverlay({ streak, onClose }) {
   const branch = ARCH.Rooted;
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 120, background: "rgba(43,43,43,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, animation: "ljovl .25s ease both" }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ position: "relative", width: "100%", maxWidth: 360, background: C.offwhite, borderRadius: 22, padding: "32px 26px 26px", textAlign: "center", boxShadow: "0 30px 80px -30px rgba(0,0,0,.6)", animation: "ljpop .4s ease both" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ position: "relative", width: "100%", maxWidth: 360, background: C.offwhite, borderRadius: 22, padding: "32px 26px 26px", textAlign: "center", boxShadow: "0 4px 20px -8px rgba(74,58,50,.25)", animation: "ljpop .4s ease both" }}>
         {[..."✦✦✦✦✦"].map((s, i) => (
           <span key={i} style={{ position: "absolute", top: 18 + (i % 2) * 8, left: `${12 + i * 18}%`, color: C.gold, fontSize: 14, animation: `spark 1.1s ${i * 0.12}s ease-out both` }}>✦</span>
         ))}
-        <div style={{ width: 84, height: 84, borderRadius: "50%", margin: "0 auto 14px", background: `radial-gradient(circle at 40% 35%, ${C.gold}, ${branch})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 40px -8px ${branch}88` }}>
-          <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 30, fontWeight: 700, color: "#fff" }}>{streak}</span>
+        <div style={{ width: 84, height: 84, borderRadius: "50%", margin: "0 auto 14px", background: branch, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, fontWeight: 700, color: "#fff" }}>{streak}</span>
         </div>
         <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: branch, fontWeight: 600 }}>{streak === 1 ? "5 / 5 today" : `${streak}-day 5/5 streak`}</div>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 600, color: C.brown, margin: "6px 0 4px", lineHeight: 1.3 }}>{line}</div>
+        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 600, color: C.brown, margin: "6px 0 4px", lineHeight: 1.3 }}>{line}</div>
         <button onClick={onClose} style={{ marginTop: 14, border: "none", background: branch, color: "#fff", padding: "9px 22px", borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Keep going</button>
       </div>
     </div>
