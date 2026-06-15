@@ -1,17 +1,33 @@
-// verify-purchase.js — confirm a buyer purchased a given paid app.
-// Looks up Shopify orders by email and checks line-item titles against the
-// product title for the requested app. Fails closed ({ verified: false }).
+// verify-purchase.js — confirm a buyer is allowed into a paid LoveLarice app.
+// Checks three sources, in order:
+//   1. Netlify Blobs "purchases" store — populated by shopify-order-webhook
+//      on every paid order from Shopify.
+//   2. purchases-backfill.json — past orders seeded once.
+//   3. ALLOWED_EMAILS env var — manual override (comma-separated).
 //
 // Accepts either:
 //   { email, app }      app = "regulation-mastery" | "boundary-mastery" | "rooted-challenge"
-//   { email, product }  product = exact/partial product title (used by the apps' built-in gate)
+//   { email, product }  product = exact/partial product title; resolved to an app
+//                       slug via the *_PRODUCT_TITLE env vars.
 //
-// Env (set in Netlify):
-//   SHOPIFY_STORE_DOMAIN          e.g. lovelarice.myshopify.com
-//   SHOPIFY_ACCESS_TOKEN          Admin API token with read_orders
-//   REGULATION_MASTERY_PRODUCT_TITLE
-//   BOUNDARY_MASTERY_PRODUCT_TITLE
-//   ROOTED_CHALLENGE_PRODUCT_TITLE
+// No Shopify Admin API call at runtime.
+
+const fs = require("node:fs");
+const path = require("node:path");
+const { getStore } = require("@netlify/blobs");
+
+const APP_TITLE_ENV = {
+  "regulation-mastery": "REGULATION_MASTERY_PRODUCT_TITLE",
+  "boundary-mastery":   "BOUNDARY_MASTERY_PRODUCT_TITLE",
+  "rooted-challenge":   "ROOTED_CHALLENGE_PRODUCT_TITLE",
+};
+
+let backfill = { emails: {} };
+try {
+  backfill = JSON.parse(fs.readFileSync(path.join(__dirname, "purchases-backfill.json"), "utf8"));
+} catch {
+  // Missing file is fine -> Blobs + env override still work.
+}
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -20,16 +36,18 @@ const CORS = {
   "Content-Type": "application/json",
 };
 
-function productTitleFor(app) {
-  switch (app) {
-    case "regulation-mastery": return process.env.REGULATION_MASTERY_PRODUCT_TITLE;
-    case "boundary-mastery":   return process.env.BOUNDARY_MASTERY_PRODUCT_TITLE;
-    case "rooted-challenge":   return process.env.ROOTED_CHALLENGE_PRODUCT_TITLE;
-    default: return null;
-  }
-}
-
 const ok = (verified) => ({ statusCode: 200, headers: CORS, body: JSON.stringify({ verified }) });
+
+function resolveApp(body) {
+  if (body.app && APP_TITLE_ENV[body.app]) return body.app;
+  const product = (body.product || "").trim().toLowerCase();
+  if (!product) return null;
+  for (const [app, envKey] of Object.entries(APP_TITLE_ENV)) {
+    const title = (process.env[envKey] || "").trim().toLowerCase();
+    if (title && product.includes(title)) return app;
+  }
+  return null;
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: CORS, body: "" };
@@ -41,26 +59,25 @@ exports.handler = async (event) => {
   try { body = JSON.parse(event.body || "{}"); } catch { return ok(false); }
 
   const email = (body.email || "").trim().toLowerCase();
-  const wantedTitle = (body.product || productTitleFor(body.app) || "").trim();
-  if (!email || !wantedTitle) return ok(false);
+  const app = resolveApp(body);
+  if (!email || !app) return ok(false);
 
-  const domain = process.env.SHOPIFY_STORE_DOMAIN;
-  const token = process.env.SHOPIFY_ACCESS_TOKEN;
-  if (!domain || !token) return ok(false); // not configured → fail closed
-
+  // 1. Live webhook allowlist (Netlify Blobs).
   try {
-    const url = `https://${domain}/admin/api/2024-01/orders.json?status=any&email=${encodeURIComponent(email)}&fields=line_items,email&limit=250`;
-    const res = await fetch(url, {
-      headers: { "X-Shopify-Access-Token": token, "Content-Type": "application/json" },
-    });
-    if (!res.ok) return ok(false);
-    const data = await res.json();
-    const want = wantedTitle.toLowerCase();
-    const purchased = (data.orders || []).some((o) =>
-      (o.line_items || []).some((li) => (li.title || "").toLowerCase().includes(want))
-    );
-    return ok(purchased);
+    const rec = await getStore("purchases").get(email, { type: "json" });
+    if (rec?.apps?.includes(app)) return ok(true);
   } catch {
-    return ok(false);
+    // Blobs not configured yet -> fall through.
   }
+
+  // 2. Backfilled past orders.
+  const seeded = backfill?.emails?.[email];
+  if (Array.isArray(seeded) && seeded.includes(app)) return ok(true);
+
+  // 3. Manual env-var override.
+  const allowed = (process.env.ALLOWED_EMAILS || "")
+    .toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
+  if (allowed.includes(email)) return ok(true);
+
+  return ok(false);
 };
