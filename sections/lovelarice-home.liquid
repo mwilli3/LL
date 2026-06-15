@@ -626,48 +626,6 @@
     margin-left: auto; margin-right: auto;
   }
 
-  /* ── EVIDENCE ROOM ── no side stripes, use full surround + quote glyph ── */
-  .evidence-teasers {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem; margin-top: 3rem;
-  }
-  .evidence-card {
-    background: var(--cream); padding: 2.8rem 2rem 2.2rem;
-    position: relative; text-align: left;
-    border: 1px solid rgba(203,184,169,0.4);
-    transition: transform 380ms var(--ease-out-quart),
-                box-shadow 380ms var(--ease-out-quart),
-                border-color 380ms var(--ease-out-quart);
-  }
-  .evidence-card::before {
-    content: '\201C'; /* curly open quote */
-    position: absolute; top: -0.4rem; left: 1.4rem;
-    font-family: var(--font-heading); font-style: italic;
-    font-size: 4.5rem; color: var(--gold); opacity: 0.4;
-    line-height: 1; pointer-events: none;
-    transition: opacity 320ms var(--ease-out-quart),
-                transform 320ms var(--ease-out-quart);
-  }
-  .evidence-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 40px rgba(74,58,50,0.10);
-    border-color: rgba(198,167,125,0.6);
-  }
-  .evidence-card:hover::before { opacity: 0.7; transform: translateY(-2px); }
-  .evidence-card p {
-    font-family: var(--font-heading); font-size: var(--text-h4); font-weight: 400;
-    font-style: italic; line-height: 1.4; color: var(--dark-brown);
-    position: relative; z-index: 1;
-    letter-spacing: -0.008em; text-wrap: pretty;
-  }
-  .evidence-card__source {
-    margin-top: 1.4rem; padding-top: 1rem;
-    border-top: 1px solid rgba(203,184,169,0.4);
-    font-family: var(--font-body); font-size: 0.68rem; font-weight: 500;
-    letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-brown);
-  }
-  .evidence-intro { text-align: center; margin: 0 auto 1rem; }
-
   /* ── ABOUT ── */
   .about-layout { max-width: 720px; margin: 0 auto; text-align: center; }
   .about-text .section-body { margin-bottom: 1.4rem; text-align: left; }
@@ -843,7 +801,6 @@
     .ll-section { padding: 5.5rem 1.5rem; }
     .hero { padding: 4.5rem 1.5rem 2rem; }
     .final-cta, .brand-statement { padding: 6rem 1.5rem; }
-    .evidence-teasers { grid-template-columns: 1fr; }
     .footer-links a { display: inline-block; margin: 0.3rem 0.6rem; }
     .breath-pacer { bottom: 1rem; right: 1rem; width: 48px; height: 48px; }
   }
@@ -871,7 +828,7 @@
 
   /* ── TOUCH-DEVICE HOVER FIX ── */
   @media not all and (hover: hover) and (pointer: fine) {
-    .archetype-card:hover, .evidence-card:hover, .step-item:hover .step-number { transform: none; }
+    .archetype-card:hover, .step-item:hover .step-number { transform: none; }
   }
 
   /* ── SHOPIFY OVERRIDES ── */
@@ -1057,11 +1014,6 @@
     </div>
   </div>
 </section>
-
-<!-- ════════════ EVIDENCE ROOM ════════════ -->
-<!-- Removed until Claim Card system is introduced earlier on the site.
-     Section CSS (.evidence-card, .evidence-teasers, etc.) retained for
-     when we add it back. -->
 
 <!-- ════════════ ABOUT ════════════ -->
 <section class="ll-section ll-section--alt">
