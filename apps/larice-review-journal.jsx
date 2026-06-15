@@ -3,6 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
 } from "recharts";
+import { motion, AnimatePresence } from "framer-motion";
 
 /* ── Larice palette (locked) ─────────────────────────────── */
 const C = {
@@ -475,6 +476,7 @@ export default function LariceReviewJournal() {
   const [ai, setAi] = useState({ open: false, loading: false, data: null, error: "" });
   const [scan, setScan] = useState({ loading: false, data: null, error: "" });
   const [notion, setNotion] = useState({ loading: false, msg: "", error: "" });
+  const [shortcutHelp, setShortcutHelp] = useState(false);
   const topRef = useRef(null);
   const lc = launchContext();
 
@@ -482,6 +484,51 @@ export default function LariceReviewJournal() {
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(""), 2600); return () => clearTimeout(t); } }, [toast]);
 
   const REVIEW_TABS = ["weekly", "monthly", "quarterly"];
+  const TAB_KEYS = { "1": "daily", "2": "plan", "3": "practices", "4": "comms", "5": "weekly", "6": "monthly", "7": "quarterly", "8": "roadmap", "9": "dashboard" };
+
+  /* ── Keyboard shortcuts (Emil: never animate keyboard-initiated actions — these snap) ── */
+  useEffect(() => {
+    function isTyping(e) {
+      const t = e.target;
+      if (!t || !t.tagName) return false;
+      const tag = t.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t.isContentEditable;
+    }
+    function shiftDayBy(back) {
+      const today = periodKey("daily");
+      setDayDate((d) => {
+        const base = new Date(d + "T12:00:00");
+        const next = periodKey("daily", shiftPeriod("daily", base, back));
+        return next > today ? today : next;
+      });
+    }
+    function handler(e) {
+      const mod = e.metaKey || e.ctrlKey;
+      // Modifier shortcuts fire even from inside inputs
+      if (mod && (e.key === "s" || e.key === "S") && REVIEW_TABS.includes(tab)) {
+        e.preventDefault(); saveReview(); return;
+      }
+      if (mod && e.key === "Enter" && REVIEW_TABS.includes(tab)) {
+        e.preventDefault(); synthesize(); return;
+      }
+      if (e.key === "Escape" && shortcutHelp) { setShortcutHelp(false); return; }
+      if (isTyping(e)) return;
+      if (TAB_KEYS[e.key]) {
+        const next = TAB_KEYS[e.key];
+        setTab(next);
+        if (REVIEW_TABS.includes(next)) newDraft();
+        return;
+      }
+      if (tab === "daily") {
+        if (e.key === "[") { shiftDayBy(1); return; }
+        if (e.key === "]") { shiftDayBy(-1); return; }
+        if (e.key === "t" || e.key === "T") { setDayDate(periodKey("daily")); return; }
+      }
+      if (e.key === "?" || (e.shiftKey && e.key === "/")) { e.preventDefault(); setShortcutHelp((v) => !v); return; }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  });
   const isReview = REVIEW_TABS.includes(tab);
   const schema = isReview ? SCHEMAS[tab] : null;
 
@@ -835,21 +882,28 @@ After creating the page, reply in one sentence with the page title and its URL.`
   return (
     <div style={S.page}>
       <style>{`
+        :root {
+          --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+          --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+          --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+          --dur-press:   140ms;
+          --dur-tooltip: 180ms;
+          --press-scale: 0.97;
+        }
         * { box-sizing: border-box; }
-        .lj-tab { transition: all .2s ease; cursor: pointer; }
-        .lj-card { animation: ljfade .45s ease both; }
-        @keyframes ljfade { from { opacity: 0; transform: translateY(8px);} to { opacity:1; transform:none;} }
+        .lj-tab { cursor: pointer; }
+        .pressable { transition: transform var(--dur-press) var(--ease-out); }
+        .pressable:active { transform: scale(var(--press-scale)); }
         textarea, input, select { font-family: inherit; }
         .lj-in:focus { outline: 2px solid ${C.clay}; outline-offset: 1px; }
         button:focus-visible { outline: 2px solid ${C.clay}; outline-offset: 2px; }
-        @media (prefers-reduced-motion: reduce){ .lj-card{ animation:none; } .breath-ring{ animation:none !important; } }
         ::placeholder { color: #b7aaa0; opacity:.7; }
-        @keyframes breathe { 0%{ transform: scale(.55);} 33.33%{ transform: scale(1);} 100%{ transform: scale(.55);} }
         @keyframes ljovl { from{ opacity:0;} to{ opacity:1;} }
-        .breath-ring{ animation: breathe 12s ease-in-out infinite; }
-        @keyframes ljpop { 0%{ transform: scale(.7); opacity:0;} 55%{ transform: scale(1.04);} 100%{ transform: scale(1); opacity:1;} }
-        @keyframes ljrise { from{ transform: translateY(14px); opacity:0;} to{ transform:none; opacity:1;} }
         @keyframes spark { 0%{ transform: scale(0) rotate(0); opacity:0;} 30%{ opacity:1;} 100%{ transform: scale(1) rotate(35deg); opacity:0;} }
+        @keyframes pulse { 0%, 100% { transform: scale(.7); opacity: .7; } 50% { transform: scale(1); opacity: 1; } }
+        @media (prefers-reduced-motion: reduce){
+          *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+        }
       `}</style>
 
       {/* Header */}
@@ -860,7 +914,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
             {NAV.map((item) => {
               const on = groupOf(tab) === item.key;
               return (
-                <button key={item.key} className="lj-tab" onClick={() => {
+                <button key={item.key} className="lj-tab pressable" onClick={() => {
                   if (item.subs) { if (groupOf(tab) !== item.key) { const first = item.subs[0][0]; setTab(first); if (REVIEW_TABS.includes(first)) newDraft(); } }
                   else { setTab(item.key); }
                 }}
@@ -882,7 +936,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
               {g.subs.map(([k, lb]) => {
                 const on = tab === k;
                 return (
-                  <button key={k} className="lj-tab" onClick={() => { setTab(k); if (REVIEW_TABS.includes(k)) newDraft(); }}
+                  <button key={k} className="lj-tab pressable" onClick={() => { setTab(k); if (REVIEW_TABS.includes(k)) newDraft(); }}
                     style={{ border: "none", padding: "6px 13px", borderRadius: 999, fontSize: 12.5, fontWeight: 600,
                       background: on ? C.clay : C.sand, color: on ? C.offwhite : C.brown }}>
                     {lb}{REVIEW_TABS.includes(k) && counts[k] ? ` · ${counts[k]}` : ""}
@@ -1051,15 +1105,24 @@ After creating the page, reply in one sentence with the page title and its URL.`
                   {ai.loading && <div style={{ marginTop: 10, opacity: .8 }}>Reading your review…</div>}
                   {ai.error && <div style={{ marginTop: 10, color: C.taupe }}>{ai.error}</div>}
                   {ai.data && (
-                    <div style={{ display: "grid", gap: 14, marginTop: 12 }}>
+                    <motion.div
+                      style={{ display: "grid", gap: 14, marginTop: 12 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ type: "spring", duration: 0.5, bounce: 0.18 }}
+                    >
                       {[["What this reveals", ai.data.reflection], ["Highest-leverage move", ai.data.action], ["Watch", ai.data.watch]]
-                        .filter(([, v]) => v).map(([t, v]) => (
-                        <div key={t}>
+                        .filter(([, v]) => v).map(([t, v], i) => (
+                        <motion.div key={t}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ type: "spring", duration: 0.5, bounce: 0.18, delay: 0.06 + i * 0.06 }}
+                        >
                           <div style={{ ...S.serif, fontSize: 16, color: C.gold }}>{t}</div>
                           <div style={{ fontSize: 14, lineHeight: 1.55, marginTop: 3 }}>{v}</div>
-                        </div>
+                        </motion.div>
                       ))}
-                    </div>
+                    </motion.div>
                   )}
                 </div>
               )}
@@ -1262,15 +1325,24 @@ After creating the page, reply in one sentence with the page title and its URL.`
               {scan.loading && <div style={{ marginTop: 14, color: C.clay }}>Scanning…</div>}
               {scan.error && <div style={{ marginTop: 14, color: "#a85a4a" }}>{scan.error}</div>}
               {scan.data && (
-                <div style={{ display: "grid", gap: 14, marginTop: 16 }}>
+                <motion.div
+                  style={{ display: "grid", gap: 14, marginTop: 16 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", duration: 0.5, bounce: 0.18 }}
+                >
                   {[["Recurring bottleneck", scan.data.recurring], ["Where momentum is building", scan.data.momentum], ["Steering adjustment", scan.data.recommendation]]
-                    .filter(([, v]) => v).map(([t, v]) => (
-                    <div key={t} style={{ padding: "12px 14px", background: "#fff", borderRadius: 10, borderLeft: `4px solid ${C.clay}` }}>
+                    .filter(([, v]) => v).map(([t, v], i) => (
+                    <motion.div key={t} style={{ padding: "12px 14px", background: "#fff", borderRadius: 10, borderLeft: `4px solid ${C.clay}` }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ type: "spring", duration: 0.5, bounce: 0.18, delay: 0.06 + i * 0.06 }}
+                    >
                       <div style={{ ...S.serif, fontSize: 15, color: C.brown }}>{t}</div>
                       <div style={{ fontSize: 14, lineHeight: 1.5, color: C.charcoal, marginTop: 3 }}>{v}</div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               )}
             </div>
 
@@ -1340,7 +1412,9 @@ After creating the page, reply in one sentence with the page title and its URL.`
         )}
       </div>
 
-      {reward && <RewardOverlay streak={reward.streak} onClose={() => setReward(null)} />}
+      <AnimatePresence>
+        {reward && <RewardOverlay streak={reward.streak} onClose={() => setReward(null)} />}
+      </AnimatePresence>
 
       {drillPlayer && (
         <PracticePlayer
@@ -1361,6 +1435,43 @@ After creating the page, reply in one sentence with the page title and its URL.`
           onComplete={(id, extra) => { markPracticeDone(periodKey("daily"), id, extra); setToast("Practice logged"); }}
         />
       )}
+
+      <AnimatePresence>
+        {shortcutHelp && (
+          <motion.div
+            onClick={() => setShortcutHelp(false)}
+            style={{ position: "fixed", inset: 0, zIndex: 130, background: "rgba(43,43,43,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+          >
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: "100%", maxWidth: 460, background: C.offwhite, borderRadius: 16, padding: "26px 28px", boxShadow: "0 4px 20px -8px rgba(74,58,50,.25)" }}
+              initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ type: "spring", duration: 0.45, bounce: 0.2 }}
+            >
+              <div style={{ ...S.serif, fontSize: 22, fontWeight: 600, color: C.brown, marginBottom: 4 }}>Keyboard shortcuts</div>
+              <div style={{ fontSize: 12.5, color: C.taupe, marginBottom: 18 }}>Press <kbd style={{ background: C.sand, padding: "1px 6px", borderRadius: 4, fontFamily: "inherit", fontSize: 12 }}>?</kbd> or <kbd style={{ background: C.sand, padding: "1px 6px", borderRadius: 4, fontFamily: "inherit", fontSize: 12 }}>Esc</kbd> to close.</div>
+              {[
+                ["Navigate", [["1", "Today"], ["2", "Plan"], ["3", "Reset practices"], ["4", "Communication"], ["5", "Weekly review"], ["6", "Monthly review"], ["7", "Quarterly review"], ["8", "Roadmap"], ["9", "Dashboard"]]],
+                ["On the Today tab", [["[", "Previous day"], ["]", "Next day"], ["t", "Jump to today"]]],
+                ["In a review", [["⌘ S", "Save review"], ["⌘ ⏎", "Synthesize with Claude"]]],
+              ].map(([section, rows]) => (
+                <div key={section} style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 10.5, letterSpacing: ".22em", textTransform: "uppercase", color: C.clay, fontWeight: 600, marginBottom: 8 }}>{section}</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 14px", fontSize: 13.5 }}>
+                    {rows.map(([k, v]) => (
+                      <React.Fragment key={k}>
+                        <kbd style={{ justifySelf: "start", background: "#fff", border: `1px solid ${C.sand}`, padding: "2px 8px", borderRadius: 5, fontFamily: "inherit", fontSize: 12, color: C.brown }}>{k}</kbd>
+                        <span style={{ color: C.brown }}>{v}</span>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {toast && (
         <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: C.brown, color: C.offwhite, padding: "10px 20px", borderRadius: 999, fontSize: 13, boxShadow: "0 10px 30px -10px rgba(0,0,0,.4)", zIndex: 50 }}>{toast}</div>
@@ -1484,9 +1595,9 @@ function DailyView({ S, dayDate, setDayDate, dayData, setDay, entries, loadEntry
             <div style={{ fontSize: 13, color: C.clay }}>{dateObj.toLocaleDateString("en-US", { weekday: isToday ? undefined : "long", month: "long", day: "numeric", year: "numeric" })}</div>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => shiftDay(-1)} style={goldBtn} aria-label="Previous day">←</button>
-            {!isToday && <button onClick={() => setDayDate(periodKey("daily"))} style={goldBtn}>Today</button>}
-            <button onClick={() => shiftDay(1)} disabled={isToday} style={{ ...goldBtn, opacity: isToday ? .4 : 1 }} aria-label="Next day">→</button>
+            <button className="pressable" onClick={() => shiftDay(-1)} style={goldBtn} aria-label="Previous day">←</button>
+            {!isToday && <button className="pressable" onClick={() => setDayDate(periodKey("daily"))} style={goldBtn}>Today</button>}
+            <button className="pressable" onClick={() => shiftDay(1)} disabled={isToday} style={{ ...goldBtn, opacity: isToday ? .4 : 1 }} aria-label="Next day">→</button>
           </div>
         </div>
 
@@ -1910,12 +2021,16 @@ function PracticePlayer({ practice, onClose, onComplete }) {
         {run.mode === "breath" && (
           <div style={{ padding: "18px 0 6px" }}>
             <div style={{ position: "relative", height: 240, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div className="breath-ring" style={{ width: 200, height: 200, borderRadius: "50%", background: accent, animationPlayState: running ? "running" : "paused", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <motion.div
+                style={{ width: 200, height: 200, borderRadius: "50%", background: accent, display: "flex", alignItems: "center", justifyContent: "center", willChange: "transform" }}
+                animate={{ scale: running && !finished ? (inhaling ? 1 : 0.6) : 1 }}
+                transition={{ type: "spring", stiffness: 26, damping: 14, mass: 1.2 }}
+              >
                 <div style={{ color: "#fff" }}>
                   <div style={{ fontSize: 17, fontWeight: 600 }}>{finished ? "Done" : phaseLabel}</div>
                   {!finished && <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, fontWeight: 700 }}>{phaseCount}</div>}
                 </div>
-              </div>
+              </motion.div>
             </div>
             <div style={{ fontSize: 13, color: C.clay, marginTop: 4 }}>4 counts in · 8 counts out · {mmss} left</div>
           </div>
@@ -1984,8 +2099,21 @@ function RewardOverlay({ streak, onClose }) {
     : "Five resets logged. That's a full day's regulation.";
   const branch = ARCH.Rooted;
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 120, background: "rgba(43,43,43,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, animation: "ljovl .25s ease both" }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ position: "relative", width: "100%", maxWidth: 360, background: C.offwhite, borderRadius: 22, padding: "32px 26px 26px", textAlign: "center", boxShadow: "0 4px 20px -8px rgba(74,58,50,.25)", animation: "ljpop .4s ease both" }}>
+    <motion.div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 120, background: "rgba(43,43,43,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
+    >
+      <motion.div
+        onClick={(e) => e.stopPropagation()}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.35}
+        onDragEnd={(_, info) => { if (Math.abs(info.offset.y) > 90 || Math.abs(info.velocity.y) > 500) onClose(); }}
+        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 12 }}
+        transition={{ type: "spring", duration: 0.55, bounce: 0.28 }}
+        style={{ position: "relative", width: "100%", maxWidth: 360, background: C.offwhite, borderRadius: 22, padding: "32px 26px 26px", textAlign: "center", boxShadow: "0 4px 20px -8px rgba(74,58,50,.25)", cursor: "grab", willChange: "transform" }}
+      >
         {[..."✦✦✦✦✦"].map((s, i) => (
           <span key={i} style={{ position: "absolute", top: 18 + (i % 2) * 8, left: `${12 + i * 18}%`, color: C.gold, fontSize: 14, animation: `spark 1.1s ${i * 0.12}s ease-out both` }}>✦</span>
         ))}
@@ -1994,9 +2122,9 @@ function RewardOverlay({ streak, onClose }) {
         </div>
         <div style={{ fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: branch, fontWeight: 600 }}>{streak === 1 ? "5 / 5 today" : `${streak}-day 5/5 streak`}</div>
         <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 20, fontWeight: 600, color: C.brown, margin: "6px 0 4px", lineHeight: 1.3 }}>{line}</div>
-        <button onClick={onClose} style={{ marginTop: 14, border: "none", background: branch, color: "#fff", padding: "9px 22px", borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Keep going</button>
-      </div>
-    </div>
+        <button className="pressable" onClick={onClose} style={{ marginTop: 14, border: "none", background: branch, color: "#fff", padding: "9px 22px", borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Keep going</button>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -2374,7 +2502,7 @@ function Recorder() {
         {status === "recorded" && url && (
           <a href={url} download={`talk-${new Date().toISOString().slice(0, 10)}.webm`} style={{ fontSize: 13, fontWeight: 600, color: COMM, textDecoration: "none" }}>↓ Download</a>
         )}
-        {status === "recording" && <span style={{ width: 9, height: 9, borderRadius: 999, background: "#a85a4a", animation: "breathe 1.4s ease-in-out infinite" }} />}
+        {status === "recording" && <span style={{ width: 9, height: 9, borderRadius: 999, background: "#a85a4a", animation: "pulse 1.4s ease-in-out infinite" }} />}
       </div>
       {status === "recorded" && url && <audio controls src={url} style={{ width: "100%", marginTop: 10, height: 34 }} />}
       {status === "error" && (
