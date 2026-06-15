@@ -8,24 +8,13 @@
   @param {string} add_to_cart_text - The text of the add to cart button
 {%- enddoc -%}
 
-{% liquid
-  assign class = 'add-to-cart-button ' | append: block.settings.style_class
-  assign id = 'BuyButtons-ProductSubmitButton-' | append: block.id
-%}
-
-<span
-  {{ block.shopify_attributes }}
-  style="--add-to-cart-font-case: {{ settings.button_text_case }};"
->
-  {% render 'add-to-cart-button',
-    id: id,
-    class: class,
-    can_add_to_cart: can_add_to_cart,
-    product: closest.product,
-    add_to_cart_text: add_to_cart_text,
-    data_testid: 'standalone-add-to-cart'
-  %}
-</span>
+{%- comment -%}
+  Add to cart button intentionally removed for this store: product pages
+  offer only the dynamic checkout ("Buy now") button. This block renders
+  nothing so no "Add to cart" button appears in the buy-buttons area.
+  Quick-add on product cards is unaffected — it renders the
+  add-to-cart-button snippet directly, not this block.
+{%- endcomment -%}
 
 {% schema %}
 {
