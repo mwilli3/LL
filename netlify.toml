@@ -35,6 +35,15 @@
   from = "/rooted-challenge"
   to = "/rooted-challenge.html"
   status = 200
+[[redirects]]
+  from = "/journal"
+  to = "/journal.html"
+  status = 200
+
+[[headers]]
+  for = "/journal*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
 
 [[headers]]
   for = "/*"
