@@ -1,0 +1,449 @@
+{% comment %}
+  THE REGULATED CHILD — HOMEPAGE (served at the storefront root /)
+  File: templates/index.liquid
+
+  This is a copy of templates/page.trc-landing.liquid wired as the
+  storefront index, replacing the previous index.json bounce. It uses
+  {% layout none %} for a fully custom document, but injects
+  {{ content_for_header }} high in the <head> so Shopify's web pixels
+  (TikTok, GA4 via the Google channel, consent, app embeds) keep firing.
+
+  Section order (cold-visitor flow: hook → reframe → product → proof → offer):
+    1. Hero        — hook
+    2. Problem     — agitate
+    3. Reframe     — the "why" payoff + bridge to the free tool
+    4. Free Tools  — PRODUCT (what she can do tonight)
+    5. About       — PROOF (founder authority + stats, before any price)
+    6. Pillars     — the system behind the tools (depth + SEO/FAQ schema)
+    7. Paid Tools  — OFFER (lands on a warm visitor)
+    8. Manifesto   — emotional close
+    9. Final CTA   — re-ask free tool
+{% endcomment %}
+
+{% layout none %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  {{ content_for_header }}
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.shopify.com/s/files/1/0807/4045/0555/files/arc_cycle_transparent.png?v=1777067460">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.shopify.com/s/files/1/0807/4045/0555/files/arc_cycle_transparent.png?v=1777067460">
+
+  <!-- Primary SEO -->
+  <title>The Regulated Child — Nervous System Education for Parents</title>
+  <meta name="description" content="Behavior is body language. When you read the body first, the behavior finally makes sense. Free nervous system tools for parents — no account required, under 5 minutes.">
+  <link rel="canonical" href="https://regulatedchild.com/">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph (Facebook, LinkedIn, iMessage previews) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://regulatedchild.com/">
+  <meta property="og:title" content="The Regulated Child — Behavior is Body Language">
+  <meta property="og:description" content="Your child's nervous system is communicating the only way it knows how. Free body-first tools for parents — no account, no paywall.">
+  <meta property="og:site_name" content="The Regulated Child">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://cdn.shopify.com/s/files/1/0807/4045/0555/files/trc-og-1200x630-v2.png?v=1781627291">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter/X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Regulated Child — Behavior is Body Language">
+  <meta name="twitter:description" content="Your child's nervous system is communicating the only way it knows how. Free body-first tools for parents.">
+  <meta name="twitter:image" content="https://cdn.shopify.com/s/files/1/0807/4045/0555/files/trc-og-1200x630-v2.png?v=1781627291">
+
+  <!-- Structured Data: Organization -->
+  {% raw %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "The Regulated Child",
+    "url": "https://regulatedchild.com",
+    "description": "Nervous system education for parents. Body-first tools grounded in regulation science.",
+    "founder": {
+      "@type": "Person",
+      "name": "Marisa",
+      "jobTitle": "Educator and Doctoral Student",
+      "description": "14+ year educator working with hundreds of children and families"
+    },
+    "sameAs": [
+      "https://www.tiktok.com/@regulatedchild",
+      "https://www.instagram.com/regulatedchild1"
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "The Regulated Child — Nervous System Education for Parents",
+    "description": "Behavior is body language. When you read the body first, the behavior finally makes sense. Free nervous system tools for parents.",
+    "url": "https://regulatedchild.com",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "The Regulated Child",
+      "url": "https://regulatedchild.com"
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does The Regulated Child teach?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Regulated Child teaches parents to understand their child's behavior through nervous system science. The framework is built on six pillars: The Regulated Brain, Behavior is Body Language, The Regulated Parent, The Regulated Home, Emotions from the Inside Out, and Respond Don't React."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why doesn't gentle parenting work for my child?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Most parenting approaches start with the behavior instead of the body. When a child's nervous system is dysregulated, strategies that target behavior — whether firm consequences or gentle language — cannot reach the prefrontal cortex. Co-regulation addresses the body first, which is why it works when other approaches have not."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is co-regulation and why does it matter?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Co-regulation is the process of a regulated adult helping a child's nervous system return to a regulated state. Children cannot regulate alone — their nervous systems are built to borrow regulation from the adults around them. Co-regulation works before correction because a dysregulated brain cannot access reasoning, problem-solving, or behavioral change."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What free tools does The Regulated Child offer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Regulated Child offers five free tools: Body Behind the Behavior (understanding body signals), Behavior Decoder (six-question nervous system assessment), Co-Regulation Guide (state-matched strategies), In-the-Moment Scripts (what to say during meltdowns), and Regulation Profile Quiz (identifying your child's regulation pattern). All are free, require no account, and take under five minutes."
+        }
+      }
+    ]
+  }
+  </script>
+  {% endraw %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ 'trc-landing.css' | asset_url }}">
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav-brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="28" height="28"><path d="M100 22 A78 78 0 0 1 178 100" stroke="#A84A30" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M178 100 A78 78 0 0 1 100 178" stroke="#D4856A" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M100 178 A78 78 0 0 1 22 100" stroke="#5C5080" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M22 100 A78 78 0 0 1 100 22" stroke="#A84A30" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.35"/><circle cx="100" cy="100" r="16" fill="#A84A30"/></svg>
+      <span class="nav-name">The Regulated Child</span>
+    </div>
+    <div class="nav-links">
+      <a href="#tools">Tools</a>
+      <a href="#about">About</a>
+      <a href="#pillars">Framework</a>
+      <a href="#deeper">Go Deeper</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-ring1"></div>
+    <div class="hero-ring2"></div>
+    <div class="hero-glow"></div>
+
+    <div class="fade">
+      <div class="badge"><span class="badge-dot"></span> Nervous System Education for Parents</div>
+      <h1>Behavior is <span class="grad">body language.</span></h1>
+      <p class="hero-sub">When you read the body first, the behavior finally makes sense.</p>
+      <p class="hero-desc">Your child isn't giving you a hard time. Their nervous system is communicating the only way it knows how. Learn to read it — and everything changes.</p>
+      <a href="https://apps.regulatedchild.com/body" class="btn">Start with Body Behind the Behavior →</a>
+      <p class="hero-micro">Free · No account required · Under 5 minutes</p>
+    </div>
+
+    <div class="scroll-line"></div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="problem-inner">
+      <div class="fade">
+        <p class="section-label" style="color:var(--secondary);">The pattern you already know</p>
+        <h2>You've tried the gentle phrases.<br>You've tried the firm boundaries.<br><span style="color:var(--secondary);">Nothing has worked consistently.</span></h2>
+        <div class="problem-quotes">
+          <p class="problem-quote">You've been told to give consequences — but the consequences escalate the behavior instead of stopping it.</p>
+          <p class="problem-quote">You've tried naming feelings — but the feelings keep overwhelming the same way, because the vocabulary isn't reaching the body.</p>
+          <p class="problem-quote">You've read the books on gentle parenting — but no one explained the biology underneath the behavior.</p>
+          <p class="problem-quote">You're alternating between too firm and too soft, and the guilt from both directions is exhausting.</p>
+        </div>
+        <p class="problem-closing">The approaches didn't fail because you did them wrong. They failed because they started with the behavior — not the body.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFRAME -->
+  <section class="reframe">
+    <div class="reframe-glow"></div>
+    <div class="fade">
+      <div class="reframe-inner">
+        <p class="section-label" style="color:var(--accent);">A different starting point</p>
+        <h2>What if the behavior was never the problem?</h2>
+        <p>Your child's nervous system is communicating the only way it can. The meltdown at 4 PM. The resistance at bedtime. The shutdown when plans change. These aren't defiance. They're data.</p>
+        <p>When you learn to read the body first, you stop reacting to the behavior — and start responding to the need underneath it. That's the whole shift: not a new technique, but a new place to start.</p>
+        <p style="margin-top:8px;"><a href="https://apps.regulatedchild.com/body" style="color:var(--accent);font-weight:600;border-bottom:1px solid rgba(92,80,128,0.3);padding-bottom:2px;">Here's where you start — Body Behind the Behavior →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="divider" style="background:var(--bg);">
+    <div class="divider-dot">
+      <div style="flex:1;height:1px;background:rgba(92,80,128,0.12);"></div>
+      <div style="width:6px;height:6px;border-radius:50%;background:#5C5080;opacity:0.25;"></div>
+      <div style="flex:1;height:1px;background:rgba(92,80,128,0.12);"></div>
+    </div>
+  </div>
+
+  <!-- FREE TOOLS -->
+  <section id="tools" class="tools">
+    <div class="tools-inner">
+      <div class="fade">
+        <p class="section-label center" style="color:var(--accent);">Start here — free</p>
+        <h2 class="section-h2 center">Five tools built for the body first.</h2>
+        <p class="section-intro" style="max-width:480px;">No account. No paywall. Just the framework — applied to your child's specific pattern.</p>
+
+        <div class="tools-list">
+          <a href="https://apps.regulatedchild.com/body" class="app-card">
+            <div class="app-icon" style="background:rgba(168,74,48,0.05);"><div class="app-dot" style="border-color:#A84A30;"><div class="app-dot-inner" style="background:#A84A30;"></div></div></div>
+            <div class="app-body"><div class="app-header"><h3>Body Behind the Behavior</h3><span class="app-badge" style="background:rgba(168,74,48,0.07);color:#A84A30;">Start here</span></div><p>Understand what your child's body is communicating before you respond to the behavior.</p></div>
+            <svg class="app-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="#3A2018" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://apps.regulatedchild.com/decoder-free" class="app-card">
+            <div class="app-icon" style="background:rgba(92,80,128,0.05);"><div class="app-dot" style="border-color:#5C5080;"><div class="app-dot-inner" style="background:#5C5080;"></div></div></div>
+            <div class="app-body"><div class="app-header"><h3>Behavior Decoder</h3></div><p>Six questions. Under five minutes. See your child's behavior through the nervous system lens.</p></div>
+            <svg class="app-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="#3A2018" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://apps.regulatedchild.com/coregulation" class="app-card">
+            <div class="app-icon" style="background:rgba(212,133,106,0.05);"><div class="app-dot" style="border-color:#D4856A;"><div class="app-dot-inner" style="background:#D4856A;"></div></div></div>
+            <div class="app-body"><div class="app-header"><h3>Co-Regulation Guide</h3></div><p>Practical co-regulation strategies matched to your child's state — not generic calm-down techniques.</p></div>
+            <svg class="app-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="#3A2018" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://apps.regulatedchild.com/scripts-free" class="app-card">
+            <div class="app-icon" style="background:rgba(122,154,126,0.08);"><div class="app-dot" style="border-color:#7A9A7E;"><div class="app-dot-inner" style="background:#7A9A7E;"></div></div></div>
+            <div class="app-body"><div class="app-header"><h3>In-the-Moment Scripts</h3></div><p>What to actually say when your child is mid-meltdown — grounded in regulation science, not guesswork.</p></div>
+            <svg class="app-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="#3A2018" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="https://apps.regulatedchild.com/quiz" class="app-card">
+            <div class="app-icon" style="background:rgba(92,80,128,0.05);"><div class="app-dot" style="border-color:#5C5080;"><div class="app-dot-inner" style="background:#5C5080;"></div></div></div>
+            <div class="app-body"><div class="app-header"><h3>Regulation Profile Quiz</h3><span class="app-badge" style="background:rgba(92,80,128,0.07);color:#5C5080;">Most popular</span></div><p>Discover whether your child is a Sensory Seeker, Sensitive Regulator, or Slow-to-Recover — and what that means for your approach.</p></div>
+            <svg class="app-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3L11 8L6 13" stroke="#3A2018" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+        <p class="tools-note">All tools are free, instant-access, and designed to work on your phone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <div class="about-inner">
+      <div class="fade">
+        <p class="section-label" style="color:var(--accent-light);">About the educator behind TRC</p>
+        <h2>14+ years in classrooms.<br><span style="color:var(--accent-light);">A career built on patterns, not assumptions.</span></h2>
+        <div class="about-copy">
+          <p>In 14 years in classrooms, I've worked with hundreds of children and families. The same patterns repeat. The child whose behavior is called "too much" is running a regulation profile, not a character flaw. The parent who feels like she's failing has been given strategies that don't match her child's nervous system.</p>
+          <p>Pattern recognition across many children is broader-base authority than any single parent's experience. I've watched the same environment land completely differently across kids — and the variable is always the nervous system, not the child's choices.</p>
+          <p>I'm also a doctoral student building on over a decade of classroom observation and interventions with advanced research. The Regulated Child is where the science meets the real — body-first, parent-accessible, grounded in what I've watched work across hundreds of children.</p>
+        </div>
+        <div class="about-stats">
+          <div style="text-align:center;"><div class="stat-num">14</div><div class="stat-label">Years in education</div></div>
+          <div style="text-align:center;"><div class="stat-num">100s</div><div class="stat-label">Children & families</div></div>
+          <div style="text-align:center;"><div class="stat-num">EdD</div><div class="stat-label">Doctoral student</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILLARS -->
+  <section id="pillars" class="pillars">
+    <div class="pillars-inner">
+      <div class="fade">
+        <p class="section-label center" style="color:var(--accent);">The TRC Framework</p>
+        <h2 class="section-h2 center">The system behind the tools.</h2>
+        <p class="section-intro" style="max-width:500px;">Each pillar builds on the one before it. Together, they create a complete framework for understanding your child's nervous system.</p>
+
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <div class="icon-48"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="16" stroke="#A84A30" stroke-width="2" fill="none"/><path d="M24 8 C20 16,28 16,24 24 C20 32,28 32,24 40" stroke="#A84A30" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="24" cy="24" r="3" fill="#A84A30" opacity="0.3"/></svg></div>
+            <p class="pillar-num" style="color:#A84A30;">Pillar 1</p>
+            <h3>The Regulated Brain</h3>
+            <p>What regulation actually means neurologically — and why your child's brain is doing exactly what it was built to do under stress.</p>
+          </div>
+          <div class="pillar-card">
+            <div class="icon-48"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="12" r="5" stroke="#D4856A" stroke-width="2" fill="none"/><path d="M24 17 V30 M18 22 H30 M20 40 L24 30 L28 40" stroke="#D4856A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 18 Q17 24 10 30" stroke="#D4856A" stroke-width="1.5" fill="none" opacity="0.4" stroke-linecap="round"/><path d="M38 18 Q31 24 38 30" stroke="#D4856A" stroke-width="1.5" fill="none" opacity="0.4" stroke-linecap="round"/></svg></div>
+            <p class="pillar-num" style="color:#D4856A;">Pillar 2</p>
+            <h3>Behavior is Body Language</h3>
+            <p>Every behavior is a signal from the nervous system. When you read the body first, the behavior finally makes sense.</p>
+          </div>
+          <div class="pillar-card">
+            <div class="icon-48"><svg viewBox="0 0 48 48" fill="none"><circle cx="20" cy="14" r="6" stroke="#5C5080" stroke-width="2" fill="none"/><circle cx="32" cy="18" r="4" stroke="#5C5080" stroke-width="2" fill="none"/><path d="M20 20 V32 M14 26 H26" stroke="#5C5080" stroke-width="2" stroke-linecap="round"/><path d="M32 22 V30" stroke="#5C5080" stroke-width="2" stroke-linecap="round"/><path d="M22 34 Q26 38 30 34" stroke="#5C5080" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/></svg></div>
+            <p class="pillar-num" style="color:#5C5080;">Pillar 3</p>
+            <h3>The Regulated Parent</h3>
+            <p>Your nervous system matters first. Co-regulation requires a regulated adult — and that work starts with your own body.</p>
+          </div>
+          <div class="pillar-card">
+            <div class="icon-48"><svg viewBox="0 0 48 48" fill="none"><path d="M8 24 L24 10 L40 24 V40 H8 Z" stroke="#A84A30" stroke-width="2" fill="none" stroke-linejoin="round"/><rect x="19" y="28" width="10" height="12" stroke="#A84A30" stroke-width="2" fill="none" rx="1"/><circle cx="24" cy="20" r="3" fill="#A84A30" opacity="0.2"/></svg></div>
+            <p class="pillar-num" style="color:#A84A30;">Pillar 4</p>
+            <h3>The Regulated Home</h3>
+            <p>Environment is a regulatory tool. Routines, transitions, sensory input, and physical space shape your child's nervous system daily.</p>
+          </div>
+          <div class="pillar-card">
+            <div class="icon-48"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="14" stroke="#D4856A" stroke-width="2" fill="none"/><circle cx="24" cy="24" r="8" stroke="#D4856A" stroke-width="1.5" fill="none" opacity="0.5"/><circle cx="24" cy="24" r="3" fill="#D4856A" opacity="0.3"/><path d="M24 10 V6 M24 42 V38 M10 24 H6 M42 24 H38" stroke="#D4856A" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/></svg></div>
+            <p class="pillar-num" style="color:#D4856A;">Pillar 5</p>
+            <h3>Emotions from the Inside Out</h3>
+            <p>Emotional literacy grounded in biology — not suppression, not performance. Understanding feelings through the body that produces them.</p>
+          </div>
+          <div class="pillar-card">
+            <div class="icon-48"><svg viewBox="0 0 48 48" fill="none"><path d="M12 36 Q12 12 24 12 Q36 12 36 36" stroke="#5C5080" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M18 30 L24 24 L30 30" stroke="#5C5080" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="38" r="3" fill="#5C5080" opacity="0.3"/></svg></div>
+            <p class="pillar-num" style="color:#5C5080;">Pillar 6</p>
+            <h3>Respond, Don't React</h3>
+            <p>In-the-moment strategies that meet your child's nervous system where it is — not where you wish it were.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="divider" style="background:var(--bg-warm);">
+    <div class="divider-logo">
+      <div class="divider-line" style="background:linear-gradient(to right,transparent,rgba(92,80,128,0.15));"></div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="28" height="28"><path d="M100 22 A78 78 0 0 1 178 100" stroke="#A84A30" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M178 100 A78 78 0 0 1 100 178" stroke="#D4856A" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M100 178 A78 78 0 0 1 22 100" stroke="#5C5080" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M22 100 A78 78 0 0 1 100 22" stroke="#A84A30" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.35"/><circle cx="100" cy="100" r="16" fill="#A84A30"/></svg>
+      <div class="divider-line" style="background:linear-gradient(to left,transparent,rgba(92,80,128,0.15));"></div>
+    </div>
+  </div>
+
+  <!-- PAID TOOLS -->
+  <section id="deeper" class="deeper">
+    <div class="deeper-inner">
+      <div class="fade">
+        <p class="section-label center" style="color:var(--accent);">Go deeper</p>
+        <h2 class="section-h2 center">When observation turns into protocol.</h2>
+        <p class="section-intro" style="max-width:520px;">The free tools help you see the pattern. These help you track it, understand it, and build a protocol around it.</p>
+
+        <div class="deeper-grid">
+          <div class="paid-card">
+            <div class="paid-header" style="background:var(--slate);"><h3>Behavior Decoder Workbook</h3><span class="paid-price">$49</span><span class="paid-once">one-time</span></div>
+            <div class="paid-body">
+              <p class="paid-desc">Track patterns across weeks, surface what the behavior is actually communicating, and build a regulation profile you can share with your child's care team.</p>
+              <div class="paid-features">
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(58,80,104,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#3A5068" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Rolling behavior tracker</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(58,80,104,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#3A5068" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Co-regulation audit</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(58,80,104,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#3A5068" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Regulation clock</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(58,80,104,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#3A5068" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>State signature mapping</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(58,80,104,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#3A5068" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Misread visuals library</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(58,80,104,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#3A5068" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Provider-ready report</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(58,80,104,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#3A5068" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>4 AI-powered features</span></div>
+              </div>
+              <a href="/products/behavior-decoder-workbook" class="paid-btn" style="background:var(--slate);display:block;text-align:center;box-sizing:border-box;">Get the Behavior Decoder Workbook</a>
+            </div>
+          </div>
+
+          <div class="paid-card">
+            <div class="paid-header" style="background:var(--forest);"><h3>Scripts — Research Edition</h3><span class="paid-price">$49</span><span class="paid-once">one-time</span></div>
+            <div class="paid-body">
+              <p class="paid-desc">Map your child's escalation patterns, track which responses land, and understand the science behind why co-regulation works before correction.</p>
+              <div class="paid-features">
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(45,107,90,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#2D6B5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Dysregulation arc mapping</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(45,107,90,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#2D6B5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Escalation pattern library</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(45,107,90,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#2D6B5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Script effectiveness tracker</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(45,107,90,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#2D6B5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Nervous system science diagrams</span></div>
+                <div class="paid-feature"><div class="paid-check" style="background:rgba(45,107,90,0.06);"><svg class="check-svg" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4.5 7.5 L8 3" stroke="#2D6B5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>2 AI-powered features</span></div>
+              </div>
+              <a href="/products/in-the-moment-scripts-pack-full-edition" class="paid-btn" style="background:var(--forest);display:block;text-align:center;box-sizing:border-box;">Get the Scripts Research Edition</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto">
+    <div class="manifesto-line"></div>
+    <div class="fade">
+      <div class="manifesto-inner">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="40" height="40"><path d="M100 22 A78 78 0 0 1 178 100" stroke="#A84A30" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M178 100 A78 78 0 0 1 100 178" stroke="#D4856A" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M100 178 A78 78 0 0 1 22 100" stroke="#5C5080" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M22 100 A78 78 0 0 1 100 22" stroke="#A84A30" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.35"/><circle cx="100" cy="100" r="16" fill="#A84A30"/></svg>
+        <blockquote>"We believe that no parent has ever failed a child by trying to understand his biology. We believe that no child should be pathologized for behavior his prefrontal cortex cannot yet access."</blockquote>
+        <p class="manifesto-attr">— The Regulated Child Manifesto</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta">
+    <div class="fade">
+      <h2>Start reading the body. <span style="color:var(--primary);">The behavior will finally make sense.</span></h2>
+      <p>Body Behind the Behavior is free, takes under five minutes, and gives you a framework you can use tonight.</p>
+      <a href="https://apps.regulatedchild.com/body" class="btn">Get Started Free →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-brand">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="26" height="26"><path d="M100 22 A78 78 0 0 1 178 100" stroke="#A84A30" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M178 100 A78 78 0 0 1 100 178" stroke="#D4856A" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M100 178 A78 78 0 0 1 22 100" stroke="#5C5080" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M22 100 A78 78 0 0 1 100 22" stroke="#A84A30" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.35"/><circle cx="100" cy="100" r="16" fill="#A84A30"/></svg>
+      <span>The Regulated Child</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.tiktok.com/@regulatedchild">TikTok @regulatedchild</a>
+      <a href="https://www.instagram.com/regulatedchild1">Instagram @regulatedchild1</a>
+    </div>
+    <p class="footer-disclaimer">This is educational information about nervous system science. For clinical concerns about your child's development or behavior, please consult a licensed professional.</p>
+    <p class="footer-copy">© 2026 Larice Media LLC. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Nav scroll
+    window.addEventListener('scroll', function() {
+      document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    // Smooth scroll
+    document.querySelectorAll('.nav-links a').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        var t = document.querySelector(this.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Fade in
+    var fades = document.querySelectorAll('.fade');
+    if ('IntersectionObserver' in window) {
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.1 });
+      fades.forEach(function(el) { obs.observe(el); });
+    } else {
+      fades.forEach(function(el) { el.classList.add('visible'); });
+    }
+  </script>
+
+</body>
+</html>
