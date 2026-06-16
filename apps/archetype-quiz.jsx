@@ -106,7 +106,7 @@ const ARCH = {
     ritual: { name: "The five-minute morning regulation practice",
       steps: ["Sixty seconds of extended-exhale breathing before you check your phone.", "Two minutes of body-scan awareness.", "Two minutes of affirmation journaling."],
       note: "This signals your nervous system that the day begins from regulation, not reaction." },
-    supp: "Pure Magnesium Power supports the magnesium-dependent processes your nervous system runs on. The Nervous System Bundle ($44.99) pairs it with Ashwagandha for HPA-axis support.",
+    supp: "Pure Magnesium Power supports the magnesium-dependent processes your nervous system runs on. The Nervous System Bundle ($45.99) pairs it with Ashwagandha for HPA-axis support.",
     content: ["Your exhaustion isn’t laziness. Your nervous system is overloaded.", "The real reason you can’t focus after 2pm.", "You don’t need more motivation. You need a regulated brain."],
     shopifyUrl: "https://lovelarice.com/cart/61863893467506:1"
   },
@@ -140,7 +140,7 @@ const ARCH = {
     ritual: { name: "The evening boundary check",
       steps: ["What did I say no to today?", "What did I protect?", "What will I claim for myself tomorrow?"],
       note: "This builds daily evidence that you hold boundaries." },
-    supp: "The Nervous System Bundle (Magnesium plus Ashwagandha, $44.99) addresses the depletion pattern most Power Reclaimers share with the Regulator.",
+    supp: "The Nervous System Bundle (Magnesium plus Ashwagandha, $45.99) addresses the depletion pattern most Power Reclaimers share with the Regulator.",
     content: ["The reason saying no feels physically dangerous, and it has nothing to do with your personality.", "You cannot pour from an empty vessel, and yet here we are.", "We are not in our burnout era anymore."],
     shopifyUrl: "https://lovelarice.com/cart/61863893533042:1"
   },
