@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #A84A30;
+    --secondary: #D4856A;
+    --accent: #5C5080;
+    --bg: #FAF6F2;
+    --bg-warm: #F2ECE5;
+    --text: #3A2018;
+  }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    background: var(--bg);
+    font-family: 'Outfit', sans-serif;
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* decorative rings, mirroring the hero */
+  .ring1 { position: absolute; top: -180px; right: -180px; width: 540px; height: 540px; border-radius: 50%; border: 1px solid rgba(168,74,48,0.10); }
+  .ring2 { position: absolute; bottom: -160px; left: -160px; width: 420px; height: 420px; border-radius: 50%; border: 1px solid rgba(92,80,128,0.10); }
+  .glow1 { position: absolute; top: 22%; left: 6%; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(212,133,106,0.08) 0%, transparent 70%); }
+  .glow2 { position: absolute; bottom: 12%; right: 8%; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(92,80,128,0.06) 0%, transparent 70%); }
+
+  .card {
+    position: relative; z-index: 1;
+    width: 1200px; height: 630px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0 96px;
+    text-align: center;
+  }
+  .logo { width: 76px; height: 76px; margin-bottom: 22px; }
+  .wordmark {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 44px;
+  }
+  h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 88px;
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -0.028em;
+    max-width: 1000px;
+    margin-bottom: 28px;
+  }
+  .grad {
+    background: linear-gradient(135deg, #A84A30 10%, #D4856A 50%, #5C5080 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .sub {
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.5;
+    opacity: 0.62;
+    letter-spacing: 0.005em;
+  }
+</style>
+</head>
+<body>
+  <div class="ring1"></div>
+  <div class="ring2"></div>
+  <div class="glow1"></div>
+  <div class="glow2"></div>
+
+  <div class="card">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" aria-hidden="true">
+      <path d="M100 22 A78 78 0 0 1 178 100" stroke="#A84A30" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M178 100 A78 78 0 0 1 100 178" stroke="#D4856A" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M100 178 A78 78 0 0 1 22 100" stroke="#5C5080" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M22 100 A78 78 0 0 1 100 22" stroke="#A84A30" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.35"/>
+      <circle cx="100" cy="100" r="16" fill="#A84A30"/>
+    </svg>
+    <div class="wordmark">The Regulated Child</div>
+    <h1>Behavior is <span class="grad">body language.</span></h1>
+    <p class="sub">Nervous system education for parents.</p>
+  </div>
+</body>
+</html>
