@@ -51,10 +51,10 @@ function getWeek(dn){return Math.min(Math.ceil(dn/7),4);}
 
 
 const RECS = {
-  chronic_depletion: { product:"Nervous System Bundle", desc:"Your boundary and energy data shows a depletion pattern — giving consistently more than you receive. The Nervous System Bundle pairs Magnesium (parasympathetic support) with Ashwagandha (HPA axis modulation) to address the physiological cost of chronic overextension.", price:"$45.99", url:"https://bdyalign.com/products/nervous-system-bundle" },
+  chronic_depletion: { product:"Nervous System Bundle", desc:"Your boundary and energy data shows a depletion pattern — giving consistently more than you receive. The Nervous System Bundle pairs Magnesium (parasympathetic support) with Ashwagandha (HPA axis modulation) to address the physiological cost of chronic overextension.", price:"$45.99", url:"https://bdyalign.com/products/ns-bundle" },
   fawn_activation: { product:"Ashwagandha", desc:"Your journal patterns suggest the fawn response is still activating regularly. Ashwagandha is classified as an adaptogen — research suggests it may help modulate the cortisol spikes that fire when your nervous system interprets boundary-setting as a threat.", price:"$23.99", url:"https://bdyalign.com/products/ashwagandha" },
-  energy_imbalance: { product:"Nervous System Bundle", desc:"Your energy audit shows a sustained imbalance between what you give and what you receive. This pattern shares the same HPA axis cascade as the Regulator’s chronic activation. The Nervous System Bundle addresses both the depletion and the recovery.", price:"$45.99", url:"https://bdyalign.com/products/nervous-system-bundle" },
-  nervous_system_fatigue: { product:"Pure Magnesium Power", desc:"Your data suggests nervous system fatigue from sustained boundary work. Magnesium is involved in the parasympathetic processes that support recovery after high-demand interactions. It may help your nervous system process the cost of holding boundaries.", price:"$26.99", url:"https://bdyalign.com/products/pure-magnesium-power" },
+  energy_imbalance: { product:"Nervous System Bundle", desc:"Your energy audit shows a sustained imbalance between what you give and what you receive. This pattern shares the same HPA axis cascade as the Regulator’s chronic activation. The Nervous System Bundle addresses both the depletion and the recovery.", price:"$45.99", url:"https://bdyalign.com/products/ns-bundle" },
+  nervous_system_fatigue: { product:"Pure Magnesium Power", desc:"Your data suggests nervous system fatigue from sustained boundary work. Magnesium is involved in the parasympathetic processes that support recovery after high-demand interactions. It may help your nervous system process the cost of holding boundaries.", price:"$26.99", url:"https://bdyalign.com/products/magnesium-glycinate" },
 };
 
 export default function App() {
@@ -350,7 +350,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
                 <p style={{fontSize:16,fontWeight:600,marginBottom:6,fontFamily:H}}>{aiRec.product}</p>
                 <p style={{fontSize:13,lineHeight:1.75,color:B.txm,marginBottom:12}}>{aiRec.desc}</p>
                 <div style={{display:"flex",alignItems:"center",gap:12}}>
-                  <a href={aiRec.url} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px",fontSize:13,fontWeight:600,fontFamily:F,color:B.wh,background:B.pri,border:"none",borderRadius:6,cursor:"pointer",textDecoration:"none",letterSpacing:.5}}>Learn more</a>
+                  <a href={aiRec.url} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px",fontSize:13,fontWeight:600,fontFamily:F,color:B.wh,background:B.pri,border:"none",borderRadius:6,cursor:"pointer",textDecoration:"none",letterSpacing:.5}}>Shop now</a>
                   <span style={{fontSize:14,fontWeight:600,color:B.pri}}>{aiRec.price}</span>
                 </div>
               </div>
