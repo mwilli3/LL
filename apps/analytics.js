@@ -14,6 +14,7 @@
 //   results_page_viewed     → archetype reveal displays
 //   offer_block_viewed      → paid-app offer scrolls into viewport (once)
 //   checkout_opened         → cart/checkout CTA clicked
+//   bdyalign_shop_clicked   → BdyAlign "Shop now" CTA clicked on the results page
 //   full_profile_expanded   → "full profile" expanded on the results page
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -98,6 +99,13 @@ export function trackOfferBlockViewed(element, archetype) {
 
 export function trackCheckoutOpened(archetype) {
   safeCapture("checkout_opened", { archetype, product: "paid_app", discount: "ARCHETYPE10" });
+}
+
+// Cross-brand BdyAlign supplement CTA on the quiz results page. Separate from
+// checkout_opened because the funnel, destination, and revenue attribution are
+// all different — this leaves the LL checkout entirely and lands on bdyalign.com.
+export function trackBdyAlignClicked(archetype, product, url) {
+  safeCapture("bdyalign_shop_clicked", { archetype, product, url });
 }
 
 export function trackProfileExpanded(archetype) {

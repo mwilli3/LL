@@ -67,10 +67,10 @@ function getWeekTotals(data,wk) { const s=(wk-1)*7+1,e=wk===4?30:wk*7,t={hydrati
 
 
 const RECS = {
-  consistency_gap: { product:"Resveratrol", desc:"Your foundation data shows the consistency pattern that defines the Rooted archetype. Resveratrol is the cellular maintenance layer of the Rooted practice — a long-game supplement for the long-game woman. Research suggests it may support cellular resilience, measured in biomarkers over months.", price:"$29.99", url:"https://bdyalign.com/products/resveratrol" },
-  energy_depletion: { product:"Ashwagandha", desc:"Your tracking data suggests energy patterns that dip when your foundations slip. Ashwagandha is classified as an adaptogen — research suggests it may help modulate cortisol and support sustained energy through periods of stress and inconsistency.", price:"$24.99", url:"https://bdyalign.com/products/ashwagandha" },
-  hydration_cortisol: { product:"Pure Magnesium Power", desc:"Your hydration foundation shows a pattern worth noting. Even mild dehydration can elevate cortisol, and magnesium is involved in over 300 enzymatic processes including hydration regulation at the cellular level. Magnesium may support the connection between your hydration foundation and your nervous system.", price:"$29.99", url:"https://bdyalign.com/products/pure-magnesium-power" },
-  foundation_building: { product:"Resveratrol", desc:"Your data shows you’re building real consistency. Resveratrol matches this approach — it’s not a quick-fix supplement. Its effects are measured in biomarkers over months. The long-game supplement for the woman who’s decided to stop starting over.", price:"$29.99", url:"https://bdyalign.com/products/resveratrol" },
+  consistency_gap: { product:"Resveratrol", desc:"Your foundation data shows the consistency pattern that defines the Rooted archetype. Resveratrol is the cellular maintenance layer of the Rooted practice — a long-game supplement for the long-game woman. Research suggests it may support cellular resilience, measured in biomarkers over months.", price:"$25.99", url:"https://bdyalign.com/products/resveratrol" },
+  energy_depletion: { product:"Ashwagandha", desc:"Your tracking data suggests energy patterns that dip when your foundations slip. Ashwagandha is classified as an adaptogen — research suggests it may help modulate cortisol and support sustained energy through periods of stress and inconsistency.", price:"$23.99", url:"https://bdyalign.com/products/ashwagandha" },
+  hydration_cortisol: { product:"Pure Magnesium Power", desc:"Your hydration foundation shows a pattern worth noting. Even mild dehydration can elevate cortisol, and magnesium is involved in over 300 enzymatic processes including hydration regulation at the cellular level. Magnesium may support the connection between your hydration foundation and your nervous system.", price:"$26.99", url:"https://bdyalign.com/products/magnesium-glycinate" },
+  foundation_building: { product:"Resveratrol", desc:"Your data shows you’re building real consistency. Resveratrol matches this approach — it’s not a quick-fix supplement. Its effects are measured in biomarkers over months. The long-game supplement for the woman who’s decided to stop starting over.", price:"$25.99", url:"https://bdyalign.com/products/resveratrol" },
 };
 
 function Accordion({ title, children }) {
@@ -346,7 +346,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
                 <p style={{fontSize:16,fontWeight:600,marginBottom:6,fontFamily:H}}>{aiRec.product}</p>
                 <p style={{fontSize:13,lineHeight:1.75,color:B.txm,marginBottom:12}}>{aiRec.desc}</p>
                 <div style={{display:"flex",alignItems:"center",gap:12}}>
-                  <a href={aiRec.url} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px",fontSize:13,fontWeight:600,fontFamily:F,color:B.wh,background:B.pri,border:"none",borderRadius:6,cursor:"pointer",textDecoration:"none",letterSpacing:.5}}>Learn more</a>
+                  <a href={aiRec.url} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px",fontSize:13,fontWeight:600,fontFamily:F,color:B.wh,background:B.pri,border:"none",borderRadius:6,cursor:"pointer",textDecoration:"none",letterSpacing:.5}}>Shop now</a>
                   <span style={{fontSize:14,fontWeight:600,color:B.pri}}>{aiRec.price}</span>
                 </div>
               </div>

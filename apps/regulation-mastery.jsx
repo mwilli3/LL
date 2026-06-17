@@ -99,10 +99,10 @@ function BreathTimer({ practice, onDone }) {
 
 
 const RECS = {
-  sympathetic_activation: { product:"Nervous System Bundle", desc:"Your analysis surfaced a pattern of sympathetic activation without adequate recovery support. Magnesium glycinate supports the parasympathetic recovery pathways your nervous system relies on, while Ashwagandha may help modulate the HPA axis response driving your chronic activation.", price:"$44.99", url:"https://bdyalign.com/products/nervous-system-bundle" },
-  sleep_disruption: { product:"Pure Magnesium Power", desc:"Your regulation data shows a pattern connected to sleep disruption. Magnesium is involved in over 300 enzymatic processes, including those that support the transition from sympathetic to parasympathetic dominance at the end of the day.", price:"$29.99", url:"https://bdyalign.com/products/pure-magnesium-power" },
-  hpa_overload: { product:"Ashwagandha", desc:"Your stress cycle data suggests sustained HPA axis activation. Ashwagandha is classified as an adaptogen — research suggests it may help modulate cortisol levels and support the body’s stress response over time.", price:"$24.99", url:"https://bdyalign.com/products/ashwagandha" },
-  stress_incomplete: { product:"Nervous System Bundle", desc:"Your patterns suggest stress cycles that activate but don’t fully complete. The Nervous System Bundle pairs Magnesium (parasympathetic support) with Ashwagandha (HPA axis modulation) to address both the activation and recovery sides of incomplete stress cycles.", price:"$44.99", url:"https://bdyalign.com/products/nervous-system-bundle" },
+  sympathetic_activation: { product:"Nervous System Bundle", desc:"Your analysis surfaced a pattern of sympathetic activation without adequate recovery support. Magnesium glycinate supports the parasympathetic recovery pathways your nervous system relies on, while Ashwagandha may help modulate the HPA axis response driving your chronic activation.", price:"$45.99", url:"https://bdyalign.com/products/ns-bundle" },
+  sleep_disruption: { product:"Pure Magnesium Power", desc:"Your regulation data shows a pattern connected to sleep disruption. Magnesium is involved in over 300 enzymatic processes, including those that support the transition from sympathetic to parasympathetic dominance at the end of the day.", price:"$26.99", url:"https://bdyalign.com/products/magnesium-glycinate" },
+  hpa_overload: { product:"Ashwagandha", desc:"Your stress cycle data suggests sustained HPA axis activation. Ashwagandha is classified as an adaptogen — research suggests it may help modulate cortisol levels and support the body’s stress response over time.", price:"$23.99", url:"https://bdyalign.com/products/ashwagandha" },
+  stress_incomplete: { product:"Nervous System Bundle", desc:"Your patterns suggest stress cycles that activate but don’t fully complete. The Nervous System Bundle pairs Magnesium (parasympathetic support) with Ashwagandha (HPA axis modulation) to address both the activation and recovery sides of incomplete stress cycles.", price:"$45.99", url:"https://bdyalign.com/products/ns-bundle" },
 };
 
 export default function App() {
@@ -438,7 +438,7 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 write in flowi
                 <p style={{fontSize:16,fontWeight:600,marginBottom:6,fontFamily:H}}>{aiRec.product}</p>
                 <p style={{fontSize:13,lineHeight:1.75,color:B.txm,marginBottom:12}}>{aiRec.desc}</p>
                 <div style={{display:"flex",alignItems:"center",gap:12}}>
-                  <a href={aiRec.url} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px",fontSize:13,fontWeight:600,fontFamily:F,color:B.wh,background:B.pri,border:"none",borderRadius:6,cursor:"pointer",textDecoration:"none",letterSpacing:.5}}>Learn more</a>
+                  <a href={aiRec.url} target="_blank" rel="noopener noreferrer" style={{padding:"10px 20px",fontSize:13,fontWeight:600,fontFamily:F,color:B.wh,background:B.pri,border:"none",borderRadius:6,cursor:"pointer",textDecoration:"none",letterSpacing:.5}}>Shop now</a>
                   <span style={{fontSize:14,fontWeight:600,color:B.pri}}>{aiRec.price}</span>
                 </div>
               </div>
