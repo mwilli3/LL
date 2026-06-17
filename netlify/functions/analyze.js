@@ -79,9 +79,56 @@ const ARCHETYPE_LENS = {
 // needs an unambiguous corpus to anchor its language to.
 // ───────────────────────────────────────────────────────────────────────────
 const SAFE_PHRASING_BY_ARCHETYPE = {
-  regulator: "[TODO: paste approved Regulator Claim Card phrasing here]",
-  rooted:    "[TODO: paste approved Rooted Claim Card phrasing here]",
-  reclaimer: "[TODO: paste approved Power Reclaimer Claim Card phrasing here]",
+  regulator: `
+Reference card: CC-RM-LW-01 — The Regulator (Sympathetic Activation)
+Pillar: Regulated Living. NS science basis: Yes.
+
+APPROVED PHRASING (use verbatim where possible; paraphrase only within these claims):
+"Your nervous system has learned to stay in a state of readiness. This is a pattern — not a flaw. Generic calming advice doesn't work because your baseline is set toward sympathetic dominance."
+
+KEY CLAIM (the central proposition you may reflect):
+The Regulator pattern reflects sympathetic nervous system dominance — a learned state of heightened activation, not a character flaw or anxiety disorder.
+
+WHAT YOU MAY NOT SAY:
+- No "treats anxiety," "cures stress," or similar medical framing.
+- Never diagnose.
+- Never claim this replaces therapy or medical care.
+- Never frame the archetype as a clinical assessment.
+`.trim(),
+
+  rooted: `
+Reference card: CC-RM-LW-02 — The Rooted One (Identity Gap / Habit Formation)
+Pillar: Rooted Wellness. NS science basis: Yes.
+
+APPROVED PHRASING (use verbatim where possible; paraphrase only within these claims):
+"Your nervous system treats unfamiliar patterns as potentially unsafe. Habit formation requires nervous system safety, not willpower. The start-stop cycle is your body protecting you from perceived threat of change."
+
+KEY CLAIM (the central proposition you may reflect):
+The Rooted pattern reflects a nervous system that treats change as threat — the gap between knowing and doing is neurological, not motivational.
+
+WHAT YOU MAY NOT SAY:
+- No diagnosing executive-function disorders.
+- No "cures procrastination" or similar medical framing.
+- Never position this as a replacement for ADHD assessment or treatment.
+- Never claim the archetype identifies a clinical condition.
+`.trim(),
+
+  reclaimer: `
+Reference card: CC-RM-LW-03 — The Power Reclaimer (Fawn Response / HPA Depletion)
+Pillar: Reclaimed Power. NS science basis: Yes.
+
+APPROVED PHRASING (use verbatim where possible; paraphrase only within these claims):
+"Your nervous system learned that safety requires appeasement. The fawn response is an autonomic strategy — it operates faster than conscious thought. HPA axis depletion occurs when the stress response stays activated through chronic over-giving."
+
+KEY CLAIM (the central proposition you may reflect):
+The Reclaimer pattern reflects fawn response dominance and HPA axis depletion — boundary collapse is a nervous system survival strategy, not a personality weakness.
+
+WHAT YOU MAY NOT SAY:
+- No diagnosing codependency or people-pleasing as a disorder.
+- No treating PTSD or trauma.
+- Never position this as a replacement for therapy.
+- Never say HPA "dysfunction" — use "depletion" or "fatigue" instead.
+`.trim(),
 };
 
 // Banned phrasing. These never appear in any approved Claim Card; if the
@@ -93,6 +140,7 @@ const BANNED_PATTERNS = [
   /\bdisorder(s|ed)?\b/i,
   /\bdiagnos(e|is|es|ed|tic)/i,
   /\bremedy\b/i,
+  /\bdysfunction\b/i,           // Reclaimer card: use "depletion" or "fatigue"
   /you are dysregulated/i,
 ];
 
