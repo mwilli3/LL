@@ -32,6 +32,10 @@ const T = {
   reg:  "#2C6E6A",
   root: "#5A7F3C",
   rec:  "#8B3A4A",
+
+  // Cross-brand commerce accent — per DESIGN.md, BdyAlign modules use Clay,
+  // not the archetype color, so the commerce surface is unmistakable.
+  clay: "#A84A30",
 };
 
 const F = "'Outfit', system-ui, sans-serif";
@@ -107,6 +111,8 @@ const ARCH = {
       steps: ["Sixty seconds of extended-exhale breathing before you check your phone.", "Two minutes of body-scan awareness.", "Two minutes of affirmation journaling."],
       note: "This signals your nervous system that the day begins from regulation, not reaction." },
     supp: "Pure Magnesium Power supports the magnesium-dependent processes your nervous system runs on. The Nervous System Bundle ($45.99) pairs it with Ashwagandha for HPA-axis support.",
+    bdyalignUrl: "https://bdyalign.com/products/ns-bundle",
+    bdyalignProduct: "Nervous System Bundle",
     content: ["Your exhaustion isn’t laziness. Your nervous system is overloaded.", "The real reason you can’t focus after 2pm.", "You don’t need more motivation. You need a regulated brain."],
     shopifyUrl: "https://lovelarice.com/cart/61863893467506:1"
   },
@@ -124,6 +130,8 @@ const ARCH = {
       steps: ["Track four things daily: hydration, sleep window, movement, one nourishing meal.", "No calorie counting. No perfection metrics.", "Foundation behavior tracking only."],
       note: "The streak becomes your identity anchor. Every day you track is evidence that you follow through." },
     supp: "Resveratrol is the cellular-maintenance layer of the Rooted practice. Effects are measured in biomarkers over months: the long-game supplement for the long-game woman.",
+    bdyalignUrl: "https://bdyalign.com/products/resveratrol",
+    bdyalignProduct: "Resveratrol",
     content: ["Here’s why every plan you’ve tried hasn’t stuck, and it has nothing to do with discipline.", "The wellness industry profits from your inconsistency.", "You don’t need a new program. You need a foundation."],
     shopifyUrl: "https://lovelarice.com/cart/61863893500274:1"
   },
@@ -141,6 +149,8 @@ const ARCH = {
       steps: ["What did I say no to today?", "What did I protect?", "What will I claim for myself tomorrow?"],
       note: "This builds daily evidence that you hold boundaries." },
     supp: "The Nervous System Bundle (Magnesium plus Ashwagandha, $45.99) addresses the depletion pattern most Power Reclaimers share with the Regulator.",
+    bdyalignUrl: "https://bdyalign.com/products/ns-bundle",
+    bdyalignProduct: "Nervous System Bundle",
     content: ["The reason saying no feels physically dangerous, and it has nothing to do with your personality.", "You cannot pour from an empty vessel, and yet here we are.", "We are not in our burnout era anymore."],
     shopifyUrl: "https://lovelarice.com/cart/61863893533042:1"
   },
@@ -1040,6 +1050,26 @@ export default function App() {
               fontSize: 14.5, lineHeight: 1.8, fontWeight: 300,
               color: T.darkBrown, maxWidth: "62ch",
             }}>{a.supp}</p>
+            {a.bdyalignUrl && (
+              <a
+                href={a.bdyalignUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Shop the ${a.bdyalignProduct} on BdyAlign`}
+                style={{
+                  display: "inline-block", marginTop: 18,
+                  padding: "12px 22px", fontSize: 13, fontWeight: 600,
+                  fontFamily: F, letterSpacing: ".06em", textTransform: "uppercase",
+                  color: T.white, background: T.clay, borderRadius: 6,
+                  textDecoration: "none",
+                  transition: "transform 140ms cubic-bezier(0.23,1,0.32,1)",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
+              >
+                Shop {a.bdyalignProduct} on BdyAlign →
+              </a>
+            )}
           </section>
 
           <section style={{
