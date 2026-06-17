@@ -146,7 +146,7 @@ export default function App() {
     try {
       const res = await fetch("/.netlify/functions/analyze", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ app: "rooted-kit", entries, streak, priorThemes, windowDays: WINDOW }),
+        body: JSON.stringify({ app: "rooted-kit", email: (typeof localStorage !== "undefined" && localStorage.getItem("larice_rooted_kit_email")) || "", entries, streak, priorThemes, windowDays: WINDOW }),
       });
       const data2 = await res.json();
       if (!data2 || !data2.headline) {

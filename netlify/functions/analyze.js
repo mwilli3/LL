@@ -13,11 +13,39 @@
 //
 // Keeps ANTHROPIC_API_KEY off the client. Set ANTHROPIC_API_KEY in Netlify env.
 
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Content-Type": "application/json",
+const { checkPurchase } = require("./_lib/purchase");
+const { checkAndInc, clientIp } = require("./_lib/rate-limit");
+
+// ───────────────────────────────────────────────────────────────────────────
+// CORS — explicit allowlist, not "*". Origin is echoed back when matched.
+// Unmatched origins receive a placeholder that triggers a browser CORS block.
+// ───────────────────────────────────────────────────────────────────────────
+
+const ALLOWED_ORIGIN_PATTERNS = [
+  /^https:\/\/apps\.lovelarice\.com$/,
+  /^https:\/\/lovelarice\.com$/,
+  /^https:\/\/[a-z0-9-]+--lovelarice\.netlify\.app$/,
+  /^https:\/\/lovelarice\.netlify\.app$/,
+  /^http:\/\/localhost(:\d+)?$/,
+  /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+];
+
+function corsHeaders(event) {
+  const origin = (event.headers && (event.headers.origin || event.headers.Origin)) || "";
+  const ok = origin && ALLOWED_ORIGIN_PATTERNS.some((re) => re.test(origin));
+  return {
+    "Access-Control-Allow-Origin": ok ? origin : "https://apps.lovelarice.com",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+    "Content-Type": "application/json",
+  };
+}
+
+// Daily request caps. Easy to tune as usage data comes in.
+const RATE_LIMITS = {
+  v2_per_email_per_day:    10,
+  generic_per_ip_per_day:  30,
 };
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -263,9 +291,34 @@ function ruleBasedFallback(payload) {
 // v2 flow — pattern-aware insight engine
 // ───────────────────────────────────────────────────────────────────────────
 
-async function handleV2(body, apiKey) {
+async function handleV2(body, apiKey, cors) {
   const cfg = APP_CONFIG[body.app];
-  if (!cfg) return json(ruleBasedFallback(body));
+  if (!cfg) return json(ruleBasedFallback(body), cors);
+
+  // Server-side purchase re-verification. The client-side gate is for UX;
+  // this gate is the actual security boundary. Stale or forged client state
+  // cannot reach Anthropic without a server-confirmed purchase here.
+  const email = (body.email || "").trim().toLowerCase();
+  if (!email) {
+    return json({ error: "Email required for v2 analyze." }, cors, 401);
+  }
+  const { verified } = await checkPurchase({ email, app: body.app });
+  if (!verified) {
+    return json({ error: "Purchase not on file for this email." }, cors, 403);
+  }
+
+  // Daily per-email cap. Fail open on Blobs outage (rate-limit lib logs).
+  const rl = await checkAndInc({
+    id: `v2:${body.app}:${email}`,
+    limit: RATE_LIMITS.v2_per_email_per_day,
+  });
+  if (!rl.allowed) {
+    return json({
+      error: "Daily analyze limit reached.",
+      limit: rl.limit,
+      resetAt: rl.resetAt,
+    }, cors, 429);
+  }
 
   const entries = Array.isArray(body.entries) ? body.entries : [];
 
@@ -278,20 +331,13 @@ async function handleV2(body, apiKey) {
       insight: `Pattern insights unlock after 5 check-ins. You're at ${entries.length}.`,
       tryThis: "Log today's state — it takes 20 seconds.",
       confidence: "high",
-    });
+    }, cors);
   }
-
-  // TODO(marisa): rate limiting per email or IP — e.g. a Netlify Blobs
-  // counter with a daily cap. Not present today.
-  // TODO(marisa): server-side purchase re-verification. Currently the
-  // purchase gate is client-side only (apps/*-mastery → verifyPurchase()
-  // → /.netlify/functions/verify-purchase). Re-checking here would
-  // prevent a leaked client gate from translating into AI usage.
 
   const safePhrasing = SAFE_PHRASING_BY_ARCHETYPE[cfg.archetype];
   if (!safePhrasing || safePhrasing.startsWith("[TODO")) {
     console.warn(`[analyze v2] SAFE_PHRASING for ${cfg.archetype} not populated — failing closed to rule-based fallback.`);
-    return json(ruleBasedFallback(body));
+    return json(ruleBasedFallback(body), cors);
   }
 
   const system = buildSystemPrompt(cfg.archetype, safePhrasing, cfg.validThemeIds);
@@ -321,25 +367,39 @@ async function handleV2(body, apiKey) {
     });
     upstreamData = await upstream.json();
   } catch {
-    return json(ruleBasedFallback(body));
+    return json(ruleBasedFallback(body), cors);
   }
 
   const insight = parseJsonStrict(upstreamData);
-  if (!insight || typeof insight !== "object") return json(ruleBasedFallback(body));
-  if (insight.type === "insufficient") return json(insight); // model agreed
-  if (!cfg.validThemeIds.includes(insight.themeId)) return json(ruleBasedFallback(body));
-  if (bannedPhraseScan(insight)) return json(ruleBasedFallback(body));
-  if (!citesData(insight, entries)) return json(ruleBasedFallback(body));
+  if (!insight || typeof insight !== "object") return json(ruleBasedFallback(body), cors);
+  if (insight.type === "insufficient") return json(insight, cors); // model agreed
+  if (!cfg.validThemeIds.includes(insight.themeId)) return json(ruleBasedFallback(body), cors);
+  if (bannedPhraseScan(insight)) return json(ruleBasedFallback(body), cors);
+  if (!citesData(insight, entries)) return json(ruleBasedFallback(body), cors);
 
-  return json(insight);
+  return json(insight, cors);
 }
 
 // ───────────────────────────────────────────────────────────────────────────
 // Generic Anthropic proxy (journal, free apps, anything non-v2)
 // Preserves the legacy contract verbatim so existing callers keep working.
+// Rate-limited per client IP to prevent runaway burn from a single caller.
 // ───────────────────────────────────────────────────────────────────────────
 
-async function handleGeneric(body, apiKey) {
+async function handleGeneric(event, body, apiKey, cors) {
+  const ip = clientIp(event);
+  const rl = await checkAndInc({
+    id: `gen:${ip}`,
+    limit: RATE_LIMITS.generic_per_ip_per_day,
+  });
+  if (!rl.allowed) {
+    return json({
+      error: "Daily request limit reached.",
+      limit: rl.limit,
+      resetAt: rl.resetAt,
+    }, cors, 429);
+  }
+
   const payload = {
     model: body.model || "claude-sonnet-4-20250514",
     max_tokens: body.max_tokens || 1000,
@@ -360,14 +420,14 @@ async function handleGeneric(body, apiKey) {
       method: "POST", headers, body: JSON.stringify(payload),
     });
     const data = await res.json();
-    return { statusCode: res.status, headers: CORS, body: JSON.stringify(data) };
+    return { statusCode: res.status, headers: cors, body: JSON.stringify(data) };
   } catch {
-    return { statusCode: 502, headers: CORS, body: JSON.stringify({ error: "Upstream request failed" }) };
+    return { statusCode: 502, headers: cors, body: JSON.stringify({ error: "Upstream request failed" }) };
   }
 }
 
-function json(payload, status = 200) {
-  return { statusCode: status, headers: CORS, body: JSON.stringify(payload) };
+function json(payload, cors, status = 200) {
+  return { statusCode: status, headers: cors, body: JSON.stringify(payload) };
 }
 
 // ───────────────────────────────────────────────────────────────────────────
@@ -375,16 +435,17 @@ function json(payload, status = 200) {
 // ───────────────────────────────────────────────────────────────────────────
 
 exports.handler = async (event) => {
-  if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: CORS, body: "" };
-  if (event.httpMethod !== "POST") return json({ error: "Method not allowed" }, 405);
+  const cors = corsHeaders(event);
+  if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: cors, body: "" };
+  if (event.httpMethod !== "POST") return json({ error: "Method not allowed" }, cors, 405);
 
   const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) return json({ error: "ANTHROPIC_API_KEY not configured" }, 500);
+  if (!key) return json({ error: "ANTHROPIC_API_KEY not configured" }, cors, 500);
 
   let body;
   try { body = JSON.parse(event.body || "{}"); }
-  catch { return json({ error: "Invalid JSON" }, 400); }
+  catch { return json({ error: "Invalid JSON" }, cors, 400); }
 
-  if (body.app && APP_CONFIG[body.app]) return handleV2(body, key);
-  return handleGeneric(body, key);
+  if (body.app && APP_CONFIG[body.app]) return handleV2(body, key, cors);
+  return handleGeneric(event, body, key, cors);
 };

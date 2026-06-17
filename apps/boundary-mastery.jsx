@@ -123,7 +123,7 @@ export default function App() {
     try {
       const res = await fetch("/.netlify/functions/analyze", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ app: "boundary-kit", entries, streak, priorThemes, windowDays: WINDOW }),
+        body: JSON.stringify({ app: "boundary-kit", email: (typeof localStorage !== "undefined" && localStorage.getItem("larice_boundary_mastery_email")) || "", entries, streak, priorThemes, windowDays: WINDOW }),
       });
       const data2 = await res.json();
       if (!data2 || !data2.headline) {
