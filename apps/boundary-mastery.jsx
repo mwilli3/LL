@@ -71,9 +71,9 @@ export default function App() {
   }, []);
   const [view, setView] = useState("home");
   const [tab, setTab] = useState("journal");
-  const [aiResult, setAiResult] = useState("");
-  const [aiRec, setAiRec] = useState(null);
+  const [insight, setInsight] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
   const [scriptCat, setScriptCat] = useState(null);
   const [verified, setVerified] = useState(() => { try { return !!localStorage.getItem("larice_boundary_mastery_email"); } catch { return false; } });
   const [gateEmail, setGateEmail] = useState("");
@@ -99,39 +99,54 @@ export default function App() {
   const setReflection = (wk,text) => {setData({...data,reflections:{...data.reflections,[wk]:text}});};
 
   const analyzePatterns = async () => {
-    setAiLoading(true); setAiResult("");
-    const entriesData = Object.entries(data.entries||{}).filter(([_,v])=>v.no||v.protect||v.claim).map(([d,v])=>({date:d,saidNo:v.no||"",protected:v.protect||"",claiming:v.claim||""})).slice(-30);
-    const energyData = Object.entries(data.energy||{}).filter(([_,v])=>v.gave||v.received).map(([d,v])=>({date:d,gave:v.gave,received:v.received})).slice(-30);
+    setAiLoading(true); setInsight(null); setAiError("");
+    const WINDOW = 14;
+    const journalEntries = data.entries || {};
+    const energy = data.energy || {};
+    const allDates = Array.from(new Set([
+      ...Object.keys(journalEntries), ...Object.keys(energy),
+    ])).filter(Boolean).sort();
+    const entries = allDates.slice(-WINDOW).map((d) => {
+      const v = journalEntries[d] || {};
+      const e = energy[d] || {};
+      return {
+        d,
+        saidNo:    v.no      || "",
+        protected: v.protect || "",
+        claiming:  v.claim   || "",
+        energyGave:     e.gave     ?? null,
+        energyReceived: e.received ?? null,
+      };
+    });
+    const PRIOR_KEY = "larice_boundary_kit_prior_themes";
+    const priorThemes = (() => { try { return JSON.parse(localStorage.getItem(PRIOR_KEY) || "[]"); } catch { return []; } })();
     try {
       const res = await fetch("/.netlify/functions/analyze", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
-          model:"claude-sonnet-4-20250514", max_tokens:1000,
-          messages:[{role:"user",content:`You are a boundary and reclamation coach for the Larice Wellness brand, specifically for The Power Reclaimer archetype. Analyze this woman's boundary journal and energy audit data. Be warm, specific, and reference her actual entries. No generic advice.
-
-BOUNDARY JOURNAL ENTRIES (last 30 days): ${JSON.stringify(entriesData)}
-ENERGY AUDIT DATA (gave vs received, 1-10): ${JSON.stringify(energyData)}
-CURRENT STREAK: ${streak} days
-CURRENT DAY: ${dayNum} of 30, Week ${getWeek(dayNum)}
-
-Provide:
-1. The boundary theme emerging from her journal (what kinds of boundaries she's practicing most)
-2. Her energy pattern (is she giving more than receiving? Is the gap closing?)
-3. Her growth edge — what the journal reveals about where she's ready to push further
-4. An identity-affirming closing that reflects her actual boundary-setting evidence back to her
-
-Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragraphs.\n\nFinally, on a NEW line at the very end, write exactly one of these tags based on the PRIMARY pattern you identified (parsed programmatically, write ONLY the tag):\n[CHRONIC_DEPLETION] [FAWN_ACTIVATION] [ENERGY_IMBALANCE] [NERVOUS_SYSTEM_FATIGUE]`}]
-        })
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ app: "boundary-kit", entries, streak, priorThemes, windowDays: WINDOW }),
       });
-      const d = await res.json();
-      let text = d.content?.map(c=>c.text||"").join("") || "Unable to analyze at this time.";
-      const tagMatch = text.match(/\[(CHRONIC_DEPLETION|FAWN_ACTIVATION|ENERGY_IMBALANCE|NERVOUS_SYSTEM_FATIGUE)\]/);
-      if (tagMatch) { text = text.replace(/\n?\[.*\]\s*$/, '').trim(); setAiRec(RECS[tagMatch[1].toLowerCase()]); }
-      else { setAiRec(RECS.chronic_depletion); }
-      setAiResult(text);
-    } catch(e) { setAiResult("Unable to connect. Please try again."); }
+      const data2 = await res.json();
+      if (!data2 || !data2.headline) {
+        setAiError("Unable to read your patterns right now."); setAiLoading(false); return;
+      }
+      setInsight(data2);
+      if (data2.themeId && data2.type !== "insufficient") {
+        try {
+          const next = [...priorThemes, data2.themeId].slice(-3);
+          localStorage.setItem(PRIOR_KEY, JSON.stringify(next));
+          localStorage.setItem("larice_boundary_kit_last_insight", new Date().toISOString().slice(0, 10));
+        } catch {}
+      }
+    } catch (e) {
+      setAiError("Unable to connect. Please try again.");
+    }
     setAiLoading(false);
   };
+
+  // Map v2 themeId (kebab-case) -> RECS key (snake_case) for the rec card.
+  const aiRec = insight && insight.type !== "insufficient" && insight.themeId
+    ? RECS[insight.themeId.replace(/-/g, "_")] || null
+    : null;
 
   const pastEntries = Object.entries(data.entries||{}).filter(([d,v])=>d!==td()&&(v.no||v.protect||v.claim)).sort((a,b)=>b[0].localeCompare(a[0]));
   const energyEntries = Object.entries(data.energy||{}).filter(([_,v])=>v.gave||v.received).sort((a,b)=>a[0].localeCompare(b[0])).slice(-14);
@@ -339,12 +354,23 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
               onMouseEnter={e=>{if(!aiLoading)e.target.style.background=B.accentD}} onMouseLeave={e=>{if(!aiLoading)e.target.style.background=aiLoading?B.txl:B.accent}}>
               {aiLoading ? "Reading your patterns..." : "Read my patterns"}
             </button>
-            {aiResult && (
+            {aiError && (
+              <div style={{marginTop:16,padding:"16px 18px",borderRadius:12,background:B.fill,border:`1px solid ${B.pri}30`,fontSize:13,color:B.tx}}>{aiError}</div>
+            )}
+            {insight && (
               <div style={{marginTop:16,padding:"22px 20px",borderRadius:12,background:B.accentL,border:`1px solid ${B.accent}20`}}>
-                <p style={{fontSize:14,lineHeight:1.85,color:B.tx,whiteSpace:"pre-wrap"}}>{aiResult}</p>
+                <p style={{fontSize:10,fontWeight:600,letterSpacing:2.5,textTransform:"uppercase",color:B.accent,marginBottom:10}}>{insight.type === "insufficient" ? "Keep building" : "Pattern"}</p>
+                <p style={{fontFamily:H,fontSize:22,fontWeight:600,lineHeight:1.25,color:B.tx,marginBottom:10}}>{insight.headline}</p>
+                <p style={{fontSize:14,lineHeight:1.85,color:B.tx,marginBottom:insight.tryThis?14:0}}>{insight.insight}</p>
+                {insight.tryThis && (
+                  <div style={{marginTop:12,paddingTop:14,borderTop:`1px solid ${B.accent}25`}}>
+                    <p style={{fontSize:10,fontWeight:600,letterSpacing:2.5,textTransform:"uppercase",color:B.accent,marginBottom:6}}>Try this</p>
+                    <p style={{fontSize:14,lineHeight:1.6,color:B.tx}}>{insight.tryThis}</p>
+                  </div>
+                )}
               </div>
             )}
-            {aiRec && aiResult && (
+            {aiRec && insight && (
               <div style={{marginTop:12,padding:"22px 20px",borderRadius:12,background:B.fill,border:`1px solid ${B.pri}20`}}>
                 <p style={{fontSize:10,fontWeight:600,letterSpacing:2.5,textTransform:"uppercase",color:B.pri,marginBottom:8}}>BdyAlign recommendation</p>
                 <p style={{fontSize:16,fontWeight:600,marginBottom:6,fontFamily:H}}>{aiRec.product}</p>
