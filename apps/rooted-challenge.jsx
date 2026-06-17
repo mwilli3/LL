@@ -100,9 +100,9 @@ export default function App() {
   }, []);
   const [view, setView] = useState("home");
   const [tab, setTab] = useState("track");
-  const [aiResult, setAiResult] = useState("");
-  const [aiRec, setAiRec] = useState(null);
+  const [insight, setInsight] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
   const [weekView, setWeekView] = useState(null);
   const [verified, setVerified] = useState(() => { try { return !!localStorage.getItem("larice_rooted_kit_email"); } catch { return false; } });
   const [gateEmail, setGateEmail] = useState("");
@@ -126,39 +126,50 @@ export default function App() {
   const setReflection = (wk,text) => { setData({...data,reflections:{...data.reflections,[wk]:text}}); };
 
   const analyzePatterns = async () => {
-    setAiLoading(true); setAiResult("");
-    const daysData = Object.entries(data.days||{}).map(([d,v])=>({date:d,hydration:!!v.hydration,sleep:!!v.sleep,movement:!!v.movement,nourish:!!v.nourish,notice:v.notice||""})).slice(-30);
-    const t = get30(data);
+    setAiLoading(true); setInsight(null); setAiError("");
+    const WINDOW = 14;
+    const days = data.days || {};
+    const allDates = Object.keys(days).filter(Boolean).sort();
+    const entries = allDates.slice(-WINDOW).map((d) => {
+      const v = days[d] || {};
+      return {
+        d,
+        hydration: !!v.hydration,
+        sleep:     !!v.sleep,
+        movement:  !!v.movement,
+        nourish:   !!v.nourish,
+        notice:    v.notice || "",
+      };
+    });
+    const PRIOR_KEY = "larice_rooted_kit_prior_themes";
+    const priorThemes = (() => { try { return JSON.parse(localStorage.getItem(PRIOR_KEY) || "[]"); } catch { return []; } })();
     try {
       const res = await fetch("/.netlify/functions/analyze", {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
-          model:"claude-sonnet-4-20250514", max_tokens:1000,
-          messages:[{role:"user",content:`You are a wellness foundations coach for the Larice Wellness brand, specifically for The Rooted One archetype. Analyze this woman's 30-day foundation tracking data and provide a warm, specific, actionable audit. Use "you" directly. Reference her actual numbers and patterns. No generic advice.
-
-DAILY TRACKING DATA (last 30 days): ${JSON.stringify(daysData)}
-30-DAY TOTALS: Hydration ${t.hydration}/30, Sleep ${t.sleep}/30, Movement ${t.movement}/30, Nourish ${t.nourish}/30
-CURRENT STREAK: ${streak} days
-CURRENT DAY: ${dayNum} of 30
-
-Provide:
-1. Her strongest foundation with specific evidence from the data
-2. Her most vulnerable foundation and when it tends to drop (day of week, time patterns)
-3. A personalized miss recovery strategy based on her actual miss patterns
-4. An identity-affirming statement using her own data as evidence ("You've shown up X of Y days — that is not inconsistency, that is...")
-
-Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragraphs.\n\nFinally, on a NEW line at the very end, write exactly one of these tags based on the PRIMARY pattern you identified (parsed programmatically, write ONLY the tag):\n[CONSISTENCY_GAP] [ENERGY_DEPLETION] [HYDRATION_CORTISOL] [FOUNDATION_BUILDING]`}]
-        })
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ app: "rooted-kit", entries, streak, priorThemes, windowDays: WINDOW }),
       });
-      const d = await res.json();
-      let text = d.content?.map(c=>c.text||"").join("") || "Unable to analyze at this time.";
-      const tagMatch = text.match(/\[(CONSISTENCY_GAP|ENERGY_DEPLETION|HYDRATION_CORTISOL|FOUNDATION_BUILDING)\]/);
-      if (tagMatch) { text = text.replace(/\n?\[.*\]\s*$/, '').trim(); setAiRec(RECS[tagMatch[1].toLowerCase()]); }
-      else { setAiRec(RECS.consistency_gap); }
-      setAiResult(text);
-    } catch(e) { setAiResult("Unable to connect. Please try again."); }
+      const data2 = await res.json();
+      if (!data2 || !data2.headline) {
+        setAiError("Unable to read your patterns right now."); setAiLoading(false); return;
+      }
+      setInsight(data2);
+      if (data2.themeId && data2.type !== "insufficient") {
+        try {
+          const next = [...priorThemes, data2.themeId].slice(-3);
+          localStorage.setItem(PRIOR_KEY, JSON.stringify(next));
+          localStorage.setItem("larice_rooted_kit_last_insight", new Date().toISOString().slice(0, 10));
+        } catch {}
+      }
+    } catch (e) {
+      setAiError("Unable to connect. Please try again.");
+    }
     setAiLoading(false);
   };
+
+  // Map v2 themeId (kebab-case) -> RECS key (snake_case) for the rec card.
+  const aiRec = insight && insight.type !== "insufficient" && insight.themeId
+    ? RECS[insight.themeId.replace(/-/g, "_")] || null
+    : null;
 
   const verifyPurchase = async () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(gateEmail.trim())) { setGateErr("Please enter a valid email address."); return; }
@@ -335,12 +346,23 @@ Keep it under 200 words. Warm but direct. No bullet points \u2014 flowing paragr
               onMouseEnter={e=>{if(!aiLoading)e.target.style.background=B.accentD}} onMouseLeave={e=>{if(!aiLoading)e.target.style.background=aiLoading?B.txl:B.accent}}>
               {aiLoading ? "Auditing your foundations..." : "Audit my foundations"}
             </button>
-            {aiResult && (
+            {aiError && (
+              <div style={{marginTop:16,padding:"16px 18px",borderRadius:12,background:B.fill,border:`1px solid ${B.pri}30`,fontSize:13,color:B.tx}}>{aiError}</div>
+            )}
+            {insight && (
               <div style={{marginTop:16,padding:"22px 20px",borderRadius:12,background:B.accentL,border:`1px solid ${B.accent}20`}}>
-                <p style={{fontSize:14,lineHeight:1.85,color:B.tx,whiteSpace:"pre-wrap"}}>{aiResult}</p>
+                <p style={{fontSize:10,fontWeight:600,letterSpacing:2.5,textTransform:"uppercase",color:B.accent,marginBottom:10}}>{insight.type === "insufficient" ? "Keep building" : "Pattern"}</p>
+                <p style={{fontFamily:H,fontSize:22,fontWeight:600,lineHeight:1.25,color:B.tx,marginBottom:10}}>{insight.headline}</p>
+                <p style={{fontSize:14,lineHeight:1.85,color:B.tx,marginBottom:insight.tryThis?14:0}}>{insight.insight}</p>
+                {insight.tryThis && (
+                  <div style={{marginTop:12,paddingTop:14,borderTop:`1px solid ${B.accent}25`}}>
+                    <p style={{fontSize:10,fontWeight:600,letterSpacing:2.5,textTransform:"uppercase",color:B.accent,marginBottom:6}}>Try this</p>
+                    <p style={{fontSize:14,lineHeight:1.6,color:B.tx}}>{insight.tryThis}</p>
+                  </div>
+                )}
               </div>
             )}
-            {aiRec && aiResult && (
+            {aiRec && insight && (
               <div style={{marginTop:12,padding:"22px 20px",borderRadius:12,background:B.fill,border:`1px solid ${B.pri}20`}}>
                 <p style={{fontSize:10,fontWeight:600,letterSpacing:2.5,textTransform:"uppercase",color:B.pri,marginBottom:8}}>BdyAlign recommendation</p>
                 <p style={{fontSize:16,fontWeight:600,marginBottom:6,fontFamily:H}}>{aiRec.product}</p>
