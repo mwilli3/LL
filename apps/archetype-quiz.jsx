@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import {
   trackQuizStarted, trackQuestionAnswered, trackQuizCompleted, trackEmailCaptured,
   trackResultsViewed, trackOfferBlockViewed, trackCheckoutOpened, trackProfileExpanded,
+  trackBdyAlignClicked,
 } from "./analytics.js";
 
 /* ─────────────────────────────────────────────────────────────
@@ -1056,6 +1057,7 @@ export default function App() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Shop the ${a.bdyalignProduct} on BdyAlign`}
+                onClick={() => trackBdyAlignClicked(res, a.bdyalignProduct, a.bdyalignUrl)}
                 style={{
                   display: "inline-block", marginTop: 18,
                   padding: "12px 22px", fontSize: 13, fontWeight: 600,
