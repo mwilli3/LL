@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import DataControls from "./data-controls.jsx";
 
 const B = { pri:"#A84A30", sec:"#D4856A", acc:"#5C5470", bg:"#FAF6F2", tx:"#3A2018", txm:"#6B5B52", txl:"#A69890", accL:"#EEEDF5", wh:"#FFFFFF", fill:"#F5E8E1", accent:"#8B3A4A", accentL:"#F5ECF0", accentD:"#6B2A38" };
 const F = "'Outfit', sans-serif";
@@ -433,6 +434,21 @@ export default function App() {
           <p style={{fontSize:11,color:B.txl,letterSpacing:3,textTransform:"uppercase",fontWeight:600}}>I choose myself without apology.</p>
           <p style={{fontSize:11,color:B.txl,marginTop:8,letterSpacing:2}}>@lovelarice</p>
         </div>
+
+        <DataControls
+          appLabel="Boundary Mastery"
+          accent={B.accent}
+          surface={B.bg}
+          ink={B.tx}
+          muted={B.txm}
+          sand={B.accentL}
+          keepKeys={["larice_boundary_mastery_email", "larice_access_boundary-mastery"]}
+          wipeKeys={["larice_boundary_mastery", "larice_boundary_kit_prior_themes", "larice_boundary_kit_last_insight"]}
+          wipeCategories={[
+            { label: "Boundary journal entries and energy audits", key: "larice_boundary_mastery" },
+            { label: "AI insight history (prior themes)", key: "larice_boundary_kit_prior_themes" },
+          ]}
+        />
       </div>
     </div>
   );
