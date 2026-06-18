@@ -114,7 +114,7 @@ export default function App() {
       "Your structured foundation data — dates, daily check-ins, short notes — will be sent to Anthropic for pattern analysis. Your email and identity stay on your device.",
       "Anthropic does not train models on this data. They may retain it for up to 30 days for abuse monitoring. We're currently pursuing a Zero Data Retention agreement that would eliminate this 30-day window.",
     ],
-    privacyUrl: "https://lovelarice.com/policies/privacy-policy",
+    privacyUrl: "https://lovelarice.com/pages/apps-privacy-policy",
   });
   const [weekView, setWeekView] = useState(null);
   const [verified, setVerified] = useState(() => { try { return !!localStorage.getItem("larice_rooted_kit_email"); } catch { return false; } });
