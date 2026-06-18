@@ -4,6 +4,7 @@ import {
   Tooltip, ResponsiveContainer,
 } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
+import DataControls from "./data-controls.jsx";
 
 /* ── Larice palette (locked) ─────────────────────────────── */
 const C = {
@@ -1524,8 +1525,22 @@ After creating the page, reply in one sentence with the page title and its URL.`
         )}
       </AnimatePresence>
 
+      <DataControls
+        appLabel="Review Journal"
+        accent={C.clay}
+        surface={C.offwhite}
+        ink={C.brown}
+        muted={C.taupe}
+        sand={C.sand}
+        keepKeys={["larice_unlocked_journal"]}
+        wipeKeys={["larice-review-journal-v1"]}
+        wipeCategories={[
+          { label: "Reviews (weekly, monthly, quarterly)", key: "larice-review-journal-v1" },
+        ]}
+        requireTypeToConfirm={true}
+      />
+
       <AnimatePresence>
-        {toast && (
           <motion.div
             key={toast.id}
             initial={{ opacity: 0, y: 18 }}

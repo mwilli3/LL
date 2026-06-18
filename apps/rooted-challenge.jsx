@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import DataControls from "./data-controls.jsx";
 
 const B = { pri:"#A84A30", sec:"#D4856A", acc:"#5C5470", bg:"#FAF6F2", tx:"#3A2018", txm:"#6B5B52", txl:"#A69890", accL:"#EEEDF5", wh:"#FFFFFF", fill:"#F5E8E1", accent:"#5A7F3C", accentL:"#ECF2E6", accentD:"#3D5A28" };
 const F = "'Outfit', sans-serif";
@@ -418,6 +419,21 @@ export default function App() {
           <p style={{fontSize:11,color:B.txl,letterSpacing:3,textTransform:"uppercase",fontWeight:600}}>Consistency beats intensity, always.</p>
           <p style={{fontSize:11,color:B.txl,marginTop:8,letterSpacing:2}}>@lovelarice</p>
         </div>
+
+        <DataControls
+          appLabel="Rooted Challenge"
+          accent={B.accent}
+          surface={B.bg}
+          ink={B.tx}
+          muted={B.txm}
+          sand={B.accentL}
+          keepKeys={["larice_rooted_kit_email", "larice_access_rooted-challenge"]}
+          wipeKeys={["larice_rooted_kit", "larice_rooted_kit_prior_themes", "larice_rooted_kit_last_insight"]}
+          wipeCategories={[
+            { label: "Foundation tracking days and reflections", key: "larice_rooted_kit" },
+            { label: "AI insight history (prior themes)", key: "larice_rooted_kit_prior_themes" },
+          ]}
+        />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import DataControls from "./data-controls.jsx";
 
 const B = { pri:"#A84A30", sec:"#D4856A", acc:"#5C5470", bg:"#FAF6F2", tx:"#3A2018", txm:"#6B5B52", txl:"#A69890", accL:"#EEEDF5", wh:"#FFFFFF", fill:"#F5E8E1", accent:"#2C6E6A", accentL:"#E0EFED", accentD:"#1A4A47" };
 const F = "'Outfit', sans-serif";
@@ -541,6 +542,21 @@ export default function App() {
           <p style={{fontSize:11,color:B.txl,letterSpacing:3,textTransform:"uppercase",fontWeight:600}}>Calm is a practice, not a personality.</p>
           <p style={{fontSize:11,color:B.txl,marginTop:8,letterSpacing:2}}>@lovelarice</p>
         </div>
+
+        <DataControls
+          appLabel="Regulation Mastery"
+          accent={B.accent}
+          surface={B.bg}
+          ink={B.tx}
+          muted={B.txm}
+          sand={B.accentL}
+          keepKeys={["larice_reg_mastery_email", "larice_access_regulation-mastery"]}
+          wipeKeys={["larice_reg_mastery", "larice_regulation_kit_prior_themes", "larice_regulation_kit_last_insight"]}
+          wipeCategories={[
+            { label: "Regulation check-ins, WOT ratings, cycles, reflections", key: "larice_reg_mastery" },
+            { label: "AI insight history (prior themes)", key: "larice_regulation_kit_prior_themes" },
+          ]}
+        />
       </div>
     </div>
   );
