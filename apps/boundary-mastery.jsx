@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import DataControls from "./data-controls.jsx";
+import { useAiConsent } from "./ai-consent.jsx";
 
 const B = { pri:"#A84A30", sec:"#D4856A", acc:"#5C5470", bg:"#FAF6F2", tx:"#3A2018", txm:"#6B5B52", txl:"#A69890", accL:"#EEEDF5", wh:"#FFFFFF", fill:"#F5E8E1", accent:"#8B3A4A", accentL:"#F5ECF0", accentD:"#6B2A38" };
 const F = "'Outfit', sans-serif";
@@ -75,6 +76,17 @@ export default function App() {
   const [insight, setInsight] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
+  const { request: requestAiConsent, Modal: AiConsentModal } = useAiConsent({
+    consentKey: "larice_ai_consent_boundary",
+    appLabel: "Boundary Mastery",
+    accent: B.accent, surface: B.bg, ink: B.tx, muted: B.txm, sand: B.accentL,
+    heading: "Before we read your boundary patterns",
+    paragraphs: [
+      "Your structured boundary journal data — dates, energy ratings, short labels — will be sent to Anthropic for pattern analysis. Your email and identity stay on your device.",
+      "Anthropic does not train models on this data. They may retain it for up to 30 days for abuse monitoring. We're currently pursuing a Zero Data Retention agreement that would eliminate this 30-day window.",
+    ],
+    privacyUrl: "https://lovelarice.com/policies/privacy-policy",
+  });
   const [scriptCat, setScriptCat] = useState(null);
   const [verified, setVerified] = useState(() => { try { return !!localStorage.getItem("larice_boundary_mastery_email"); } catch { return false; } });
   const [gateEmail, setGateEmail] = useState("");
@@ -351,7 +363,7 @@ export default function App() {
           <div style={{marginBottom:28}}>
             <Lbl>Read my patterns</Lbl>
             <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginBottom:16}}>Your journal entries and energy data are analyzed to reveal your boundary themes, depletion triggers, and growth edge.</p>
-            <button onClick={analyzePatterns} disabled={aiLoading} style={{width:"100%",padding:"16px",fontSize:14,fontWeight:600,fontFamily:F,color:B.wh,background:aiLoading?B.txl:B.accent,border:"none",borderRadius:8,cursor:aiLoading?"default":"pointer",letterSpacing:.5,transition:"all .2s"}}
+            <button onClick={() => requestAiConsent(analyzePatterns)} disabled={aiLoading} style={{width:"100%",padding:"16px",fontSize:14,fontWeight:600,fontFamily:F,color:B.wh,background:aiLoading?B.txl:B.accent,border:"none",borderRadius:8,cursor:aiLoading?"default":"pointer",letterSpacing:.5,transition:"all .2s"}}
               onMouseEnter={e=>{if(!aiLoading)e.target.style.background=B.accentD}} onMouseLeave={e=>{if(!aiLoading)e.target.style.background=aiLoading?B.txl:B.accent}}>
               {aiLoading ? "Reading your patterns..." : "Read my patterns"}
             </button>
@@ -443,12 +455,13 @@ export default function App() {
           muted={B.txm}
           sand={B.accentL}
           keepKeys={["larice_boundary_mastery_email", "larice_access_boundary-mastery"]}
-          wipeKeys={["larice_boundary_mastery", "larice_boundary_kit_prior_themes", "larice_boundary_kit_last_insight"]}
+          wipeKeys={["larice_boundary_mastery", "larice_boundary_kit_prior_themes", "larice_boundary_kit_last_insight", "larice_ai_consent_boundary"]}
           wipeCategories={[
             { label: "Boundary journal entries and energy audits", key: "larice_boundary_mastery" },
             { label: "AI insight history (prior themes)", key: "larice_boundary_kit_prior_themes" },
           ]}
         />
+        {AiConsentModal}
       </div>
     </div>
   );

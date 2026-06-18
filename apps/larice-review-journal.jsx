@@ -5,6 +5,7 @@ import {
 } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import DataControls from "./data-controls.jsx";
+import { useAiConsent } from "./ai-consent.jsx";
 
 /* ── Larice palette (locked) ─────────────────────────────── */
 const C = {
@@ -483,6 +484,18 @@ export default function LariceReviewJournal() {
   const [comm, setComm] = useState({ talks: [], drills: {}, reps: {} });
   const [drillPlayer, setDrillPlayer] = useState(null);
   const [scorer, setScorer] = useState(false);
+  const { request: requestAiConsent, Modal: AiConsentModal } = useAiConsent({
+    consentKey: "larice_ai_consent_journal",
+    appLabel: "Review Journal",
+    accent: C.clay, surface: C.offwhite, ink: C.brown, muted: C.taupe, sand: C.sand,
+    heading: "Before we synthesize your review",
+    paragraphs: [
+      "The prose you've written in this review will be sent to Anthropic for synthesis, along with structured tracking data. Your email and identity stay on your device.",
+      "If you've named specific people in your review, those names will be in the request — use initials if you'd rather not. You can review and edit your text before continuing.",
+      "Anthropic does not train models on this data. They may retain it for up to 30 days for abuse monitoring. We're currently pursuing a Zero Data Retention agreement that would eliminate this 30-day window.",
+    ],
+    privacyUrl: "https://lovelarice.com/policies/privacy-policy",
+  });
   const [reward, setReward] = useState(null);
   const [liveStatus, setLiveStatus] = useState({ loading: false, error: "" });
   const [player, setPlayer] = useState(null);
@@ -1137,7 +1150,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
               {/* actions */}
               <div style={{ display: "flex", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
                 <button onClick={saveReview} style={primaryBtn}>{editingId ? "Update review" : "Save review"}</button>
-                <button onClick={synthesize} style={goldBtn}>✦ Synthesize with Claude</button>
+                <button onClick={() => requestAiConsent(synthesize)} style={goldBtn}>✦ Synthesize with Claude</button>
               </div>
 
               {/* AI output */}
@@ -1148,7 +1161,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
                   {ai.error && (
                     <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                       <span style={{ color: C.taupe }}>{ai.error}</span>
-                      <button className="pressable" onClick={synthesize} style={{ background: "transparent", border: `1px solid ${C.gold}`, color: C.gold, padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Try again</button>
+                      <button className="pressable" onClick={() => requestAiConsent(synthesize)} style={{ background: "transparent", border: `1px solid ${C.gold}`, color: C.gold, padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Try again</button>
                     </div>
                   )}
                   {ai.data && (
@@ -1367,13 +1380,13 @@ After creating the page, reply in one sentence with the page title and its URL.`
                   <div style={{ ...S.serif, fontSize: 20, fontWeight: 600, color: C.brown }}>Bottleneck pattern scan</div>
                   <div style={{ fontSize: 12.5, color: C.clay, marginTop: 2 }}>Claude reads your recent weekly bottlenecks — flags anything carried two weeks running.</div>
                 </div>
-                <button onClick={patternScan} style={goldBtn}>✦ Scan recent weeks</button>
+                <button onClick={() => requestAiConsent(patternScan)} style={goldBtn}>✦ Scan recent weeks</button>
               </div>
               {scan.loading && <div style={{ marginTop: 14, color: C.clay }}><LoadingDots color={C.clay} label="Scanning recent weeks" /></div>}
               {scan.error && (
                 <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                   <span style={{ color: "#a85a4a" }}>{scan.error}</span>
-                  <button className="pressable" onClick={patternScan} style={{ background: "transparent", border: `1px solid ${C.clay}`, color: C.clay, padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Try again</button>
+                  <button className="pressable" onClick={() => requestAiConsent(patternScan)} style={{ background: "transparent", border: `1px solid ${C.clay}`, color: C.clay, padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Try again</button>
                 </div>
               )}
               {scan.data && (
@@ -1430,7 +1443,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
                   <div style={{ ...S.serif, fontSize: 20, fontWeight: 600, color: C.brown }}>Export summary to Notion</div>
                   <div style={{ fontSize: 12.5, color: C.clay, marginTop: 2 }}>Sends a clean, grouped summary of every saved review to your workspace — placed under the Command Center.</div>
                 </div>
-                <button onClick={exportToNotion} disabled={notion.loading} style={{ ...primaryBtn, background: notion.loading ? C.taupe : C.clay }}>
+                <button onClick={() => requestAiConsent(exportToNotion)} disabled={notion.loading} style={{ ...primaryBtn, background: notion.loading ? C.taupe : C.clay }}>
                   {notion.loading ? "Sending…" : "Send to Notion"}
                 </button>
               </div>
@@ -1533,12 +1546,13 @@ After creating the page, reply in one sentence with the page title and its URL.`
         muted={C.taupe}
         sand={C.sand}
         keepKeys={["larice_unlocked_journal"]}
-        wipeKeys={["larice-review-journal-v1"]}
+        wipeKeys={["larice-review-journal-v1", "larice_ai_consent_journal"]}
         wipeCategories={[
           { label: "Reviews (weekly, monthly, quarterly)", key: "larice-review-journal-v1" },
         ]}
         requireTypeToConfirm={true}
       />
+      {AiConsentModal}
 
       <AnimatePresence>
           <motion.div

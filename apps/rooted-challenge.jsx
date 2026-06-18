@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import DataControls from "./data-controls.jsx";
+import { useAiConsent } from "./ai-consent.jsx";
 
 const B = { pri:"#A84A30", sec:"#D4856A", acc:"#5C5470", bg:"#FAF6F2", tx:"#3A2018", txm:"#6B5B52", txl:"#A69890", accL:"#EEEDF5", wh:"#FFFFFF", fill:"#F5E8E1", accent:"#5A7F3C", accentL:"#ECF2E6", accentD:"#3D5A28" };
 const F = "'Outfit', sans-serif";
@@ -104,6 +105,17 @@ export default function App() {
   const [insight, setInsight] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
+  const { request: requestAiConsent, Modal: AiConsentModal } = useAiConsent({
+    consentKey: "larice_ai_consent_rooted",
+    appLabel: "Rooted Challenge",
+    accent: B.accent, surface: B.bg, ink: B.tx, muted: B.txm, sand: B.accentL,
+    heading: "Before we audit your foundations",
+    paragraphs: [
+      "Your structured foundation data — dates, daily check-ins, short notes — will be sent to Anthropic for pattern analysis. Your email and identity stay on your device.",
+      "Anthropic does not train models on this data. They may retain it for up to 30 days for abuse monitoring. We're currently pursuing a Zero Data Retention agreement that would eliminate this 30-day window.",
+    ],
+    privacyUrl: "https://lovelarice.com/policies/privacy-policy",
+  });
   const [weekView, setWeekView] = useState(null);
   const [verified, setVerified] = useState(() => { try { return !!localStorage.getItem("larice_rooted_kit_email"); } catch { return false; } });
   const [gateEmail, setGateEmail] = useState("");
@@ -343,7 +355,7 @@ export default function App() {
           <div style={{marginBottom:28}}>
             <Lbl>Audit my foundations</Lbl>
             <p style={{fontSize:13,color:B.txm,lineHeight:1.7,marginBottom:16}}>Your tracking data is analyzed to surface your strongest foundation, your vulnerability patterns, and a personalized recovery strategy.</p>
-            <button onClick={analyzePatterns} disabled={aiLoading} style={{width:"100%",padding:"16px",fontSize:14,fontWeight:600,fontFamily:F,color:B.wh,background:aiLoading?B.txl:B.accent,border:"none",borderRadius:8,cursor:aiLoading?"default":"pointer",letterSpacing:.5,transition:"all .2s"}}
+            <button onClick={() => requestAiConsent(analyzePatterns)} disabled={aiLoading} style={{width:"100%",padding:"16px",fontSize:14,fontWeight:600,fontFamily:F,color:B.wh,background:aiLoading?B.txl:B.accent,border:"none",borderRadius:8,cursor:aiLoading?"default":"pointer",letterSpacing:.5,transition:"all .2s"}}
               onMouseEnter={e=>{if(!aiLoading)e.target.style.background=B.accentD}} onMouseLeave={e=>{if(!aiLoading)e.target.style.background=aiLoading?B.txl:B.accent}}>
               {aiLoading ? "Auditing your foundations..." : "Audit my foundations"}
             </button>
@@ -428,12 +440,13 @@ export default function App() {
           muted={B.txm}
           sand={B.accentL}
           keepKeys={["larice_rooted_kit_email", "larice_access_rooted-challenge"]}
-          wipeKeys={["larice_rooted_kit", "larice_rooted_kit_prior_themes", "larice_rooted_kit_last_insight"]}
+          wipeKeys={["larice_rooted_kit", "larice_rooted_kit_prior_themes", "larice_rooted_kit_last_insight", "larice_ai_consent_rooted"]}
           wipeCategories={[
             { label: "Foundation tracking days and reflections", key: "larice_rooted_kit" },
             { label: "AI insight history (prior themes)", key: "larice_rooted_kit_prior_themes" },
           ]}
         />
+        {AiConsentModal}
       </div>
     </div>
   );
