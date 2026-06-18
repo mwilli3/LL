@@ -12,9 +12,116 @@
 //      [mcp_servers] } shape used by the journal and any non-v2 caller.
 //
 // Keeps ANTHROPIC_API_KEY off the client. Set ANTHROPIC_API_KEY in Netlify env.
+//
+// Self-contained on purpose — see the comment at the top of verify-purchase.js
+// for why the shared library was inlined back. Both files keep their own copy.
 
-const { checkPurchase } = require("./_lib/purchase");
-const { checkAndInc, clientIp } = require("./_lib/rate-limit");
+const { getStore } = require("@netlify/blobs");
+
+// ───────────────────────────────────────────────────────────────────────────
+// Purchase-allowlist check (inlined from the shared lib)
+// ───────────────────────────────────────────────────────────────────────────
+
+function purchasesStore() {
+  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN;
+  if (siteID && token) return getStore({ name: "purchases", siteID, token });
+  return getStore("purchases");
+}
+
+const APP_TITLE_ENV = {
+  "regulation-mastery": "REGULATION_MASTERY_PRODUCT_TITLE",
+  "boundary-mastery":   "BOUNDARY_MASTERY_PRODUCT_TITLE",
+  "rooted-challenge":   "ROOTED_CHALLENGE_PRODUCT_TITLE",
+};
+
+const KIT_TO_APP = {
+  "regulation-kit": "regulation-mastery",
+  "rooted-kit":     "rooted-challenge",
+  "boundary-kit":   "boundary-mastery",
+};
+
+let backfill = { emails: {} };
+try {
+  backfill = require("./purchases-backfill.json");
+} catch {
+  // Missing file is fine -> Blobs + env override still work.
+}
+
+function resolveAppForPurchase(input) {
+  if (input.app) {
+    if (APP_TITLE_ENV[input.app]) return input.app;
+    if (KIT_TO_APP[input.app]) return KIT_TO_APP[input.app];
+  }
+  const product = (input.product || "").trim().toLowerCase();
+  if (!product) return null;
+  for (const [app, envKey] of Object.entries(APP_TITLE_ENV)) {
+    const title = (process.env[envKey] || "").trim().toLowerCase();
+    if (title && product.includes(title)) return app;
+  }
+  return null;
+}
+
+async function checkPurchase(input) {
+  const email = (input.email || "").trim().toLowerCase();
+  const app = resolveAppForPurchase(input);
+  if (!email || !app) return { verified: false, app };
+
+  try {
+    const rec = await purchasesStore().get(email, { type: "json" });
+    if (rec?.apps?.includes(app)) return { verified: true, app };
+  } catch {
+    // Blobs not configured yet -> fall through.
+  }
+
+  const seeded = backfill?.emails?.[email];
+  if (Array.isArray(seeded) && seeded.includes(app)) return { verified: true, app };
+
+  const allowed = (process.env.ALLOWED_EMAILS || "")
+    .toLowerCase().split(",").map((s) => s.trim()).filter(Boolean);
+  if (allowed.includes(email)) return { verified: true, app };
+
+  return { verified: false, app };
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Rate limiting (inlined from the shared lib)
+// Daily per-identifier counters backed by Netlify Blobs. Fails OPEN on
+// Blobs outage so a storage hiccup doesn't take the whole API down.
+// ───────────────────────────────────────────────────────────────────────────
+
+function rateLimitStore() {
+  const siteID = process.env.NETLIFY_SITE_ID || process.env.SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN;
+  if (siteID && token) return getStore({ name: "rate-limits", siteID, token });
+  return getStore("rate-limits");
+}
+
+async function checkAndInc({ id, limit }) {
+  if (!id || !limit || limit <= 0) return { allowed: true, count: 0, limit, resetAt: null };
+  const store = rateLimitStore();
+  const date = new Date().toISOString().slice(0, 10);
+  const key = `rl:${date}:${id}`;
+  try {
+    const cur = parseInt((await store.get(key)) || "0", 10);
+    if (cur >= limit) return { allowed: false, count: cur, limit, resetAt: `${date}T23:59:59Z` };
+    await store.set(key, String(cur + 1));
+    return { allowed: true, count: cur + 1, limit, resetAt: `${date}T23:59:59Z` };
+  } catch (e) {
+    console.warn("[rate-limit] Blobs unreachable, failing open:", e?.message || e);
+    return { allowed: true, count: 0, limit, resetAt: null };
+  }
+}
+
+function clientIp(event) {
+  const h = event.headers || {};
+  return (
+    h["x-nf-client-connection-ip"] ||
+    (h["x-forwarded-for"] || "").split(",")[0].trim() ||
+    h["client-ip"] ||
+    "unknown"
+  );
+}
 
 // ───────────────────────────────────────────────────────────────────────────
 // CORS — explicit allowlist, not "*". Origin is echoed back when matched.
