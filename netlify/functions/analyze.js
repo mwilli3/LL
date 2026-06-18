@@ -146,6 +146,8 @@ function corsHeaders(event) {
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Vary": "Origin",
     "Content-Type": "application/json",
+    // AI replies are personal data — no CDN/proxy/browser should cache them.
+    "Cache-Control": "no-store, private",
   };
 }
 
@@ -526,6 +528,19 @@ async function handleGeneric(event, body, apiKey, cors) {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST", headers, body: JSON.stringify(payload),
     });
+    // Sanitize: never echo Anthropic's upstream error body through to the
+    // client. On non-2xx, log the upstream detail server-side (useful for
+    // debugging) and return a generic shape with the original status code.
+    if (!res.ok) {
+      let detail = "";
+      try { detail = (await res.text()).slice(0, 500); } catch {}
+      console.warn(`[analyze generic] Anthropic ${res.status}: ${detail}`);
+      return {
+        statusCode: res.status,
+        headers: cors,
+        body: JSON.stringify({ error: "Upstream error" }),
+      };
+    }
     const data = await res.json();
     return { statusCode: res.status, headers: cors, body: JSON.stringify(data) };
   } catch {
