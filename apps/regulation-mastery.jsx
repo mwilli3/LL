@@ -134,7 +134,7 @@ export default function App() {
       "Your structured tracking data — dates, ratings, short labels — will be sent to Anthropic for pattern analysis. Your email and identity stay on your device.",
       "Anthropic does not train models on this data. They may retain it for up to 30 days for abuse monitoring. We're currently pursuing a Zero Data Retention agreement that would eliminate this 30-day window.",
     ],
-    privacyUrl: "https://lovelarice.com/policies/privacy-policy",
+    privacyUrl: "https://lovelarice.com/pages/apps-privacy-policy",
   });
   const [cycleTrigger, setCycleTrigger] = useState("");
   const [cycleResponse, setCycleResponse] = useState("");

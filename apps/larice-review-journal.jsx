@@ -494,7 +494,7 @@ export default function LariceReviewJournal() {
       "If you've named specific people in your review, those names will be in the request — use initials if you'd rather not. You can review and edit your text before continuing.",
       "Anthropic does not train models on this data. They may retain it for up to 30 days for abuse monitoring. We're currently pursuing a Zero Data Retention agreement that would eliminate this 30-day window.",
     ],
-    privacyUrl: "https://lovelarice.com/policies/privacy-policy",
+    privacyUrl: "https://lovelarice.com/pages/apps-privacy-policy",
   });
   const [reward, setReward] = useState(null);
   const [liveStatus, setLiveStatus] = useState({ loading: false, error: "" });
