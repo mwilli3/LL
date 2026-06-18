@@ -8,8 +8,6 @@
 //   2. purchases-backfill.json — past orders seeded once.
 //   3. ALLOWED_EMAILS env var — manual override (comma-separated).
 
-const fs = require("node:fs");
-const path = require("node:path");
 const { getStore } = require("@netlify/blobs");
 
 function purchasesStore() {
@@ -34,9 +32,12 @@ const KIT_TO_APP = {
   "boundary-kit":   "boundary-mastery",
 };
 
+// require() the backfill JSON so esbuild inlines it at bundle time. This is
+// bundler-proof: no runtime fs access, no __dirname path resolution, no
+// dependency on whether the bundler preserves the _lib/ subdirectory.
 let backfill = { emails: {} };
 try {
-  backfill = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "purchases-backfill.json"), "utf8"));
+  backfill = require("../purchases-backfill.json");
 } catch {
   // Missing file is fine -> Blobs + env override still work.
 }
