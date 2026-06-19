@@ -806,6 +806,15 @@
     .breath-pacer { bottom: 1rem; right: 1rem; width: 48px; height: 48px; }
   }
 
+  /* Landscape: respect iOS safe-area so the nav clears the notch / rounded corners */
+  @media (orientation: landscape) {
+    .nav,
+    .nav[data-scrolled="true"] {
+      padding-left: max(2rem, env(safe-area-inset-left));
+      padding-right: max(2rem, env(safe-area-inset-right));
+    }
+  }
+
   /* ── REDUCED MOTION ── opacity-only fades, no movement ── */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
