@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
@@ -483,6 +483,7 @@ export default function LariceReviewJournal() {
   const [roadmap, setRoadmap] = useState({ exit: {}, streams: {} });
   const [comm, setComm] = useState({ talks: [], drills: {}, reps: {} });
   const [drillPlayer, setDrillPlayer] = useState(null);
+  const [voiceDrill, setVoiceDrill] = useState(null);
   const [scorer, setScorer] = useState(false);
   const { request: requestAiConsent, Modal: AiConsentModal } = useAiConsent({
     consentKey: "larice_ai_consent_journal",
@@ -1043,7 +1044,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
           <CommView
             S={S} comm={comm} today={periodKey("daily")} wkKey={periodKey("weekly")}
             logDrill={logDrill} toggleRep={toggleRep} setCommEnergy={setCommEnergy} deleteTalk={deleteTalk}
-            openDrill={(d) => setDrillPlayer({ ...d, arch: "Comm", run: { mode: "timer", seconds: d.min * 60, cues: d.steps } })}
+            openDrill={(d) => (d.id === "ask" || d.id === "voice") ? setVoiceDrill(d) : setDrillPlayer({ ...d, arch: "Comm", run: { mode: "timer", seconds: d.min * 60, cues: d.steps } })}
             openScorer={() => setScorer(true)} mi={monthIndexNow()}
           />
         )}
@@ -1489,6 +1490,15 @@ After creating the page, reply in one sentence with the page title and its URL.`
         />
       )}
 
+      {voiceDrill && (
+        <VoiceDrillModal
+          drill={voiceDrill}
+          onClose={() => setVoiceDrill(null)}
+          onComplete={(id) => logDrill(periodKey("daily"), id)}
+          requestAiConsent={requestAiConsent}
+        />
+      )}
+
       {scorer && (
         <RubricScorer onClose={() => setScorer(false)} onSave={(t) => { saveTalk(t); setScorer(false); }} />
       )}
@@ -1555,6 +1565,7 @@ After creating the page, reply in one sentence with the page title and its URL.`
       {AiConsentModal}
 
       <AnimatePresence>
+        {toast && (
           <motion.div
             key={toast.id}
             initial={{ opacity: 0, y: 18 }}
@@ -2655,6 +2666,328 @@ function RubricScorer({ onClose, onSave }) {
           </div>
           <button onClick={() => onSave({ scores, total, topic: topic.trim(), link: link.trim() })} style={{ ...primaryBtn, background: COMM }}>Save talk</button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Voice drill recorder + AI feedback (Clear Ask / Voice + Presence) ── */
+function useVoiceDrillRecorder() {
+  const [phase, setPhase] = useState("idle"); // idle | recording | stopped
+  const [elapsed, setElapsed] = useState(0);
+  const [transcript, setTranscript] = useState("");
+  const [interim, setInterim] = useState("");
+  const [audioURL, setAudioURL] = useState("");
+  const [levels, setLevels] = useState(new Array(24).fill(3));
+  const [speechSupported, setSpeechSupported] = useState(true);
+  const [error, setError] = useState("");
+
+  const streamRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const audioCtxRef = useRef(null);
+  const analyserRef = useRef(null);
+  const rafRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const timerRef = useRef(null);
+
+  const drawLevels = useCallback(() => {
+    if (!analyserRef.current) return;
+    const analyser = analyserRef.current;
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(data);
+    const bars = 24;
+    const chunk = Math.max(1, Math.floor(data.length / bars));
+    const next = [];
+    for (let i = 0; i < bars; i++) {
+      let sum = 0;
+      for (let j = 0; j < chunk; j++) sum += data[i * chunk + j] || 0;
+      const avg = sum / chunk;
+      next.push(Math.max(3, Math.min(40, (avg / 255) * 40)));
+    }
+    setLevels(next);
+    rafRef.current = requestAnimationFrame(drawLevels);
+  }, []);
+
+  const start = useCallback(async () => {
+    setError(""); setTranscript(""); setInterim(""); setAudioURL(""); setElapsed(0);
+    chunksRef.current = [];
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        const ctx = new AudioContext();
+        const source = ctx.createMediaStreamSource(stream);
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 128;
+        source.connect(analyser);
+        audioCtxRef.current = ctx;
+        analyserRef.current = analyser;
+        drawLevels();
+      }
+
+      const recorder = new MediaRecorder(stream);
+      recorder.ondataavailable = (e) => { if (e.data.size) chunksRef.current.push(e.data); };
+      recorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: chunksRef.current[0]?.type || "audio/webm" });
+        setAudioURL(URL.createObjectURL(blob));
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SR) {
+        const recognition = new SR();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+        let finalText = "";
+        recognition.onresult = (event) => {
+          let interimText = "";
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const t = event.results[i][0].transcript;
+            if (event.results[i].isFinal) finalText += t + " ";
+            else interimText += t;
+          }
+          setTranscript(finalText);
+          setInterim(interimText);
+        };
+        recognition.onerror = (e) => { if (e.error !== "no-speech") setError("Transcription hiccup — recording continues."); };
+        recognition.onend = () => {
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+            try { recognition.start(); } catch { /* already stopping */ }
+          }
+        };
+        recognitionRef.current = recognition;
+        recognition.start();
+      } else {
+        setSpeechSupported(false);
+      }
+
+      startTimeRef.current = Date.now();
+      timerRef.current = setInterval(() => setElapsed((Date.now() - startTimeRef.current) / 1000), 100);
+      setPhase("recording");
+    } catch {
+      setError("Microphone access was blocked or unavailable. Check your browser's site permissions.");
+    }
+  }, [drawLevels]);
+
+  const stop = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (recognitionRef.current) { recognitionRef.current.onend = null; recognitionRef.current.stop(); }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") mediaRecorderRef.current.stop();
+    if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop());
+    if (audioCtxRef.current) audioCtxRef.current.close();
+    setLevels(new Array(24).fill(3));
+    setPhase("stopped");
+  }, []);
+
+  const reset = useCallback(() => {
+    setPhase("idle"); setElapsed(0); setTranscript(""); setInterim(""); setAudioURL(""); setError("");
+  }, []);
+
+  useEffect(() => () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop());
+  }, []);
+
+  return { phase, elapsed, transcript, interim, audioURL, levels, speechSupported, error, start, stop, reset };
+}
+
+function voiceDrillSystemPrompt(drillId, wpm, durationSec) {
+  if (drillId === "ask") {
+    return `You are a precise communication coach evaluating a "Clear Ask" drill. The required structure is exactly four spoken elements, in this order: (1) CONTEXT — one sentence establishing the situation, (2) ASK — one sentence stating exactly what is wanted, by when, in what form, (3) RATIONALE — one sentence on why it matters, (4) ALTERNATIVE — one sentence naming a fallback if the ask isn't possible.
+
+Evaluate the transcript below. Respond with ONLY raw JSON, no markdown fences, no preamble, matching exactly this shape:
+{"elements_found":{"context":true|false,"ask":true|false,"rationale":true|false,"alternative":true|false},"flagged_phrases":["verbatim phrase from transcript that hedges or apologizes unnecessarily"],"overall_score":1-10,"feedback":"2-3 sentences of direct, specific feedback — name what worked and the single highest-leverage fix"}
+
+Flag phrases like unnecessary apologies, hedging ("maybe", "sort of", "if that's ok"), or vague asks. If a phrase list would be empty, return an empty array. Be honest, not encouraging for its own sake — vague scores help no one improve.`;
+  }
+  return `You are a precise communication coach evaluating a "Voice + Presence" drill. The speaker read a paragraph aloud. Their measured pace was ${wpm} words per minute over ${durationSec.toFixed(1)} seconds (target range: 150–180 wpm — slower than feels natural). You cannot hear tone, pitch, or actual pause length from this transcript, so do not comment on those.
+
+From the transcript text alone, evaluate: filler words (um, uh, like, you know, so — as a spoken filler not a connector), hedging language, and whether sentence length/rhythm suggests rushed or run-on delivery.
+
+Respond with ONLY raw JSON, no markdown fences, no preamble, matching exactly this shape:
+{"filler_examples":["verbatim examples found"],"hedging_phrases":["verbatim examples found"],"pace_note":"one sentence assessing the ${wpm} wpm figure against the 150-180 target","overall_score":1-10,"feedback":"2-3 sentences of direct, specific feedback"}
+
+Be honest, not encouraging for its own sake.`;
+}
+
+async function analyzeVoiceDrill(drillId, transcript, wpm, durationSec) {
+  const system = voiceDrillSystemPrompt(drillId, wpm, durationSec);
+  const res = await fetch("/.netlify/functions/analyze", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: MODEL, max_tokens: 500,
+      messages: [{ role: "user", content: `TRANSCRIPT:\n"""${transcript.trim()}"""` }],
+      system,
+    }),
+  });
+  if (!res.ok) throw new Error(`Analyze error: ${res.status}`);
+  const data = await res.json();
+  const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("").trim();
+  const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/```$/i, "").trim();
+  return JSON.parse(cleaned);
+}
+
+function MiniWaveform({ levels, active, accent }) {
+  return (
+    <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 3, height: 44 }}>
+      {levels.map((h, i) => (
+        <div key={i} style={{ width: 3, borderRadius: 2, height: h, background: active ? accent : C.sand, transition: "height 75ms linear" }} />
+      ))}
+    </div>
+  );
+}
+
+function MiniScoreRing({ score, accent, size = 76 }) {
+  const pct = Math.max(0, Math.min(1, score / 10));
+  const r = (size - 8) / 2;
+  const c = 2 * Math.PI * r;
+  const color = pct >= 0.7 ? ARCH.Rooted : pct >= 0.45 ? accent : "#a85a4a";
+  return (
+    <svg width={size} height={size} style={{ flexShrink: 0 }}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={C.sand} strokeWidth="5" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="5" strokeLinecap="round"
+        strokeDasharray={c} strokeDashoffset={c - pct * c} transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        style={{ transition: "stroke-dashoffset .8s ease" }} />
+      <text x="50%" y="53%" textAnchor="middle" dominantBaseline="middle" style={{ ...serifStyle, fontSize: 22, fontWeight: 700, fill: C.brown }}>{score}</text>
+    </svg>
+  );
+}
+
+function VoiceDrillModal({ drill, onClose, onComplete, requestAiConsent }) {
+  const rec = useVoiceDrillRecorder();
+  const [analysis, setAnalysis] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState("");
+
+  const wpm = (() => {
+    const words = rec.transcript.trim().split(/\s+/).filter(Boolean).length;
+    if (!words || rec.elapsed < 2) return 0;
+    return Math.round(words / (rec.elapsed / 60));
+  })();
+
+  async function runAnalysis() {
+    setAnalyzing(true); setAnalyzeError("");
+    try {
+      const result = await analyzeVoiceDrill(drill.id, rec.transcript, wpm, rec.elapsed);
+      setAnalysis(result);
+    } catch {
+      setAnalyzeError("Couldn't reach the analyzer. Retry, or just review the recording by ear and log it.");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
+
+  const flagged = [...(analysis?.flagged_phrases || []), ...(analysis?.hedging_phrases || []), ...(analysis?.filler_examples || [])];
+  const mmss = `${Math.floor(rec.elapsed / 60)}:${String(Math.floor(rec.elapsed % 60)).padStart(2, "0")}`;
+
+  return (
+    <div onClick={onClose} role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, zIndex: 110, background: "rgba(43,43,43,.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, animation: "ljovl .25s ease both" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 460, background: C.offwhite, borderRadius: 20, padding: "24px 24px 22px", boxShadow: "0 4px 20px -8px rgba(74,58,50,.25)", maxHeight: "90vh", overflowY: "auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <div style={{ fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", color: COMM, fontWeight: 600 }}>Record · transcribe · get feedback</div>
+            <div style={{ ...serifStyle, fontSize: 21, fontWeight: 600, color: C.brown }}>{drill.name}</div>
+          </div>
+          <button onClick={onClose} aria-label="Close" style={{ border: "none", background: "transparent", fontSize: 22, color: C.clay, cursor: "pointer" }}>×</button>
+        </div>
+
+        {!analysis && (
+          <>
+            <div style={{ fontSize: 12.5, color: C.charcoal, opacity: .85, marginTop: 10 }}>{drill.why}</div>
+            <div style={{ display: "grid", gap: 4, marginTop: 10 }}>
+              {drill.steps.map((s, i) => (
+                <div key={i} style={{ fontSize: 12, color: C.clay }}><span style={{ fontWeight: 700, color: COMM }}>{i + 1}.</span> {s}</div>
+              ))}
+            </div>
+
+            {!rec.speechSupported && (
+              <div style={{ marginTop: 12, fontSize: 12, color: "#a85a4a", background: "rgba(168,90,74,.1)", borderRadius: 8, padding: "8px 10px" }}>
+                Live transcription needs Chrome or Edge. Recording and playback still work — no automated feedback this session.
+              </div>
+            )}
+            {rec.error && (
+              <div style={{ marginTop: 12, fontSize: 12, color: "#a85a4a", background: "rgba(168,90,74,.1)", borderRadius: 8, padding: "8px 10px" }}>{rec.error}</div>
+            )}
+
+            <div style={{ marginTop: 16, background: C.sand, borderRadius: 14, padding: "16px 14px", textAlign: "center" }}>
+              <MiniWaveform levels={rec.levels} active={rec.phase === "recording"} accent={COMM} />
+              <div style={{ ...serifStyle, fontSize: 32, fontWeight: 700, color: C.brown, marginTop: 6 }}>{mmss}</div>
+              <div style={{ fontSize: 11, color: C.clay, marginBottom: 10 }}>target {drill.min * 60}s{rec.phase !== "idle" && wpm > 0 ? ` · ${wpm} wpm` : ""}</div>
+
+              {rec.phase === "idle" && (
+                <button onClick={rec.start} style={{ border: "none", background: COMM, color: "#fff", padding: "9px 20px", borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>● Start recording</button>
+              )}
+              {rec.phase === "recording" && (
+                <button onClick={rec.stop} style={{ border: "none", background: "#a85a4a", color: "#fff", padding: "9px 20px", borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>■ Stop</button>
+              )}
+              {rec.phase === "stopped" && (
+                <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                  <button onClick={rec.reset} style={{ border: `1px solid ${C.taupe}`, background: "#fff", color: C.brown, padding: "9px 16px", borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>↺ Redo</button>
+                  <button onClick={() => requestAiConsent(runAnalysis)} disabled={analyzing || !rec.transcript.trim()} style={{ border: "none", background: COMM, color: "#fff", padding: "9px 18px", borderRadius: 999, fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: (analyzing || !rec.transcript.trim()) ? .5 : 1 }}>
+                    {analyzing ? "Analyzing…" : "Get feedback"}
+                  </button>
+                </div>
+              )}
+
+              {rec.audioURL && <audio controls src={rec.audioURL} style={{ width: "100%", marginTop: 12, height: 32 }} />}
+            </div>
+
+            {(rec.transcript || rec.interim) && (
+              <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${C.sand}` }}>
+                <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: C.taupe }}>Transcript</div>
+                <p style={{ fontSize: 13, lineHeight: 1.5, color: C.charcoal, marginTop: 4 }}>{rec.transcript}<span style={{ color: C.taupe }}>{rec.interim}</span></p>
+              </div>
+            )}
+
+            {analyzeError && (
+              <div style={{ marginTop: 10, fontSize: 12, color: "#a85a4a", background: "rgba(168,90,74,.1)", borderRadius: 8, padding: "8px 10px" }}>{analyzeError}</div>
+            )}
+          </>
+        )}
+
+        {analysis && (
+          <div style={{ marginTop: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <MiniScoreRing score={analysis.overall_score} accent={COMM} />
+              <div style={{ fontSize: 12.5, color: C.clay }}>
+                {drill.id === "voice" ? `${wpm} wpm · target 150–180` : `${Math.round(rec.elapsed)}s take`}
+              </div>
+            </div>
+
+            {analysis.elements_found && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
+                {Object.entries(analysis.elements_found).map(([k, v]) => (
+                  <span key={k} style={{ fontSize: 11.5, padding: "4px 9px", borderRadius: 7, background: v ? "rgba(90,127,60,.14)" : "rgba(168,90,74,.12)", color: v ? "#5A7F3C" : "#a85a4a", fontWeight: 600 }}>{v ? "✓" : "✕"} {k}</span>
+                ))}
+              </div>
+            )}
+
+            {analysis.pace_note && <div style={{ fontSize: 12.5, color: C.clay, marginTop: 10 }}>{analysis.pace_note}</div>}
+
+            {flagged.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: C.taupe, marginBottom: 6 }}>Flagged</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {flagged.map((p, i) => (
+                    <span key={i} style={{ fontSize: 11.5, padding: "4px 8px", borderRadius: 6, background: "rgba(168,90,74,.1)", color: "#a85a4a" }}>"{p}"</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <p style={{ fontSize: 13.5, lineHeight: 1.55, color: C.charcoal, marginTop: 14 }}>{analysis.feedback}</p>
+
+            <button onClick={() => { onComplete(drill.id); onClose(); }} style={{ ...primaryBtn, background: COMM, marginTop: 6 }}>Log drill · done</button>
+          </div>
+        )}
       </div>
     </div>
   );

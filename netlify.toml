@@ -55,4 +55,12 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=(), payment=()"
     # CSP runs in REPORT-ONLY first. Tune over a few days against real
     # violations, then promote to enforcing Content-Security-Policy.
-    Content-Security-Policy-Report-Only = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us.i.posthog.com https://us-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.anthropic.com https://us.i.posthog.com https://us-assets.i.posthog.com https://a.klaviyo.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    Content-Security-Policy-Report-Only = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://us.i.posthog.com https://us-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob:; connect-src 'self' https://api.anthropic.com https://us.i.posthog.com https://us-assets.i.posthog.com https://a.klaviyo.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+
+# Journal-only override: the Communication Mastery drills record audio via
+# getUserMedia, so the generic mic block above must be lifted for this path.
+# This stanza is declared after "/*" so it wins for matching requests.
+[[headers]]
+  for = "/journal*"
+  [headers.values]
+    Permissions-Policy = "camera=(), microphone=(self), geolocation=(), interest-cohort=(), payment=()"
